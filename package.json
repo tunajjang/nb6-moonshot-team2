@@ -1,0 +1,42 @@
+{
+  "name": "nb6-moonshot-team2",
+  "version": "1.0.0",
+  "description": "Node백엔드6기 2팀 MOONSHOT",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc",
+    "dev": "nodemon --watch src --exec ts-node src/main.ts"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.1.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "nodemon": "^3.1.11",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2"
+  }
+}
