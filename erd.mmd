@@ -1,0 +1,157 @@
+
+erDiagram
+
+User {
+    Int id PK
+    String email UK
+    String name
+    String current_password
+    String profile_image
+    Datetime created_at
+    Datetime updated_at
+    Datetime deleted_at "soft delete"
+}
+
+UserCredential{
+    Int id PK
+    String email UK
+    Int user_id FK
+    String password
+    Datetime created_at
+    Datetime updated_at
+}
+
+SocialAccount{
+    Int id PK
+    Int provider FK        "google, kakao, naver, facebook"
+    String provider_uid
+    Int user_id FK
+    Datetime created_at
+    Datetime updated_at
+}
+
+Token{
+    Int id PK
+    String refresh_token UK
+    String user_agent       "디바이스 정보"
+    Int user_id FK
+    Datetime created_at
+    Datetime updated_at
+    Datetime expires_at
+}
+
+Project{
+    Int id PK
+    String name
+    String description
+    Int owner_id FK         
+    Datetime created_at
+    Datetime updated_at
+    Datetime deleted_at     "soft delete"
+}
+
+Task{
+    Int id PK
+    Int project_id FK
+    String title
+    Datetime start_at
+    Datetime end_at
+    Int status_id FK       "todo | in_progress | done"
+    Int assignee_id FK
+    String[] tags
+    String[] attachments    "첨부파일"
+    Datetime created_at
+    Datetime updated_at
+    Datetime deleted_at     "soft delete"
+}
+
+SubTask{
+    Int id PK
+    String title
+    Int task_id FK
+    Int status_id FK       "todo | in_progress | done"
+    Int author_id FK
+    Datetime created_at
+    Datetime updated_at
+    Datetime deleted_at     "soft delete"   
+}
+
+Comment{
+    Int id PK
+    String content
+    Int task_id FK
+    Int author_id FK
+    Datetime created_at
+    Datetime updated_at
+    Datetime deleted_at     "soft delete"
+}
+
+ProjectMember{
+    Int id PK
+    Int project_id FK
+    Int user_id FK
+    Int member_status_id FK   "pending | accepted | rejected"
+    String invitation_id    "uuid"
+    
+    %%UNIQUE (project_id, user_id)
+}
+
+Status{
+    Int id PK
+    String name UK          "todo | in_progress | done"
+}
+
+
+Provider{
+    Int id PK
+    String name UK          "google, kakao, naver, facebook"
+}
+
+
+MemberStatus{
+    Int id PK
+    String name UK          "pending | accepted | rejected"
+}
+
+ProjectStats{
+    Int project_id PK
+    Int member_count
+    Int todo_count
+    Int in_progress_count
+    Int done_count
+}
+
+%% 유저 - 인증
+User ||--o| UserCredential : "1:0..1 (이메일 사용자만)"
+User ||--o{ SocialAccount : "1:N (소셜 계정)"
+User ||--o{ Token : "1:N (다중 기기)"
+
+SocialAccount ||--|| Provider : "1:1 (소셜 계정)"
+
+%% 유저 - 프로젝트
+User ||--o{ Project : "1:N 프로젝트 소유자"
+User ||--o{ ProjectMember : "1:N 소유자와 멤버"
+User ||--o{ Task : "1:N(assignee)"
+User ||--o{ SubTask : "1:N(author)"
+User ||--o{ Comment : "1:N(author)"
+
+ProjectMember ||--|| MemberStatus : "1:1 (프로젝트 맴버 상태값)"
+
+%% 프로젝트 - 할 일
+Project ||--o{ ProjectMember : "1:N (여러명의 user)"
+Project ||--o{ Task : "1:N (여러개의 할 일)"
+
+Project ||--|| ProjectStats : "1:1 (프로젝트 속성값)"
+
+%% 할 일 - 하위 할 일
+Task ||--o{ SubTask : "1:N (여러개의 하위 할 일)"
+Task ||--o{ Comment : "1:N (여러개의 댓글)"
+
+%% 할 일 - 상태
+Task }o--|| Status : "N:1 (상태)"
+SubTask }o--|| Status : "N:1 (상태)"
+
+
+
+
+
