@@ -17,32 +17,194 @@ datasource db {
 //나머지 user, article 등등의 id는 autoincrement로
 
 model User {
-  id              Int              @id @default(autoincrement())
-  email           String           @unique
-  name            String
-  currentPassword String
-  profileImage    String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  deletedAt       DateTime?
-  userCredential  UserCredential[]
-}
-
-model UserCredential {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id                Int             @id @default(autoincrement())
+  email             String          @unique
+  name              String
+  password          String
+  profileImage      String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  deletedAt         DateTime?
+  socialAccounts    SocialAccount[]
+  tokens            Token[]
+  projects          Project[]
+  projectMembers    ProjectMember[]
+  tasks             Task[]
+  comments          Comment[]
+  invitationByHost  Invitation[]    @relation("host")
+  invitationByGuest Invitation[]    @relation("guest")
 }
 
 model SocialAccount {
-  id Int @id @default(autoincrement())
+  id                   Int      @id @default(autoincrement())
+  provider             Provider
+  providerUid          String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               Int
+  externalAccessToken  String
+  externalRefreshToken String
+  externalExpiresAt    DateTime
+  externalScope        String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
+  @@unique([provider, providerUid])
+}
+
+model Token {
+  id           Int         @id @default(autoincrement())
+  refreshToken String      @unique
+  userAgent    String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
+  tokenStatus  TokenStatus
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  expiresAt    DateTime
+}
+
+model Project {
+  id              Int             @id @default(autoincrement())
+  owner           User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId         Int
+  name            String
+  description     String
+  memberCount     Int
+  todoCount       Int
+  inProgressCount Int
+  doneCount       Int
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+  projectMembers  ProjectMember[]
+  tasks           Task[]
+  invitations     Invitation[]
+}
+
+model ProjectMember {
+  id           Int          @id @default(autoincrement())
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    Int
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
+  role         ProjectRole
+  memberStatus MemberStatus
+  invitation   Invitation   @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  invitationId String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  @@unique([projectId, userId])
+}
+
+model Task {
+  id          Int          @id @default(autoincrement())
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   Int
+  title       String
+  startAt     DateTime
+  endAt       DateTime
+  status      TaskStatus
+  assignee    User         @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
+  assigneeId  Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+  attachments Attachment[]
+  subTasks    SubTask[]
+  comments    Comment[]
+  taskTags    TaskTag[]
+}
+
+model Attachment {
+  id       Int    @id @default(autoincrement())
+  title    String
+  task     Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId   Int
+  url      String
+  fileName String
+}
+
+model SubTask {
+  id        Int        @id @default(autoincrement())
+  title     String
+  task      Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    Int
+  status    TaskStatus
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+}
+
+model Invitation {
+  id               String           @id @default(uuid())
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        Int
+  host             User             @relation(name: "host", fields: [hostId], references: [id], onDelete: Cascade)
+  hostId           Int
+  guest            User             @relation(name: "guest", fields: [guestId], references: [id], onDelete: Cascade)
+  guestId          Int
+  invitationStatus InvitationStatus
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  projectMembers   ProjectMember[]
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    Int
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+}
+
+model Tag {
+  id       Int       @id @default(autoincrement())
+  name     String
+  taskTags TaskTag[]
+}
+
+model TaskTag {
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId Int
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  Int
+
+  @@unique([taskId, tagId])
+}
+
+enum Provider {
+  GOOGLE
+}
+
+enum TokenStatus {
+  OKAY
+  EXPIRED
+}
+
+enum ProjectRole {
+  OWNER
+  MEMBER
+}
+
+enum MemberStatus {
+  PENDING
+  ACCEPTED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  CANCELED
 }

@@ -1,82 +1,112 @@
-
 erDiagram
 
 User {
     Int id PK
     String email UK
     String name
-    String current_password
+    String password
     String profile_image
     Datetime created_at
     Datetime updated_at
     Datetime deleted_at "soft delete"
 }
 
-UserCredential{
+SocialAccount { 
     Int id PK
-    String email UK
-    Int user_id FK
-    String password
-    Datetime created_at
-    Datetime updated_at
-}
-
-SocialAccount{
-    Int id PK
-    Int provider FK        "google, kakao, naver, facebook"
+    Enum provider         "google"
     String provider_uid
     Int user_id FK
+    %% 구글 API 전용 필드들 (이름을 명확히 함)
+    String external_access_token    "구글 API 호출용"
+    String external_refresh_token   "구글 토큰 갱신용"
+    Datetime external_expires_at    "구글 토큰 만료 시간"
+    String external_scope           "허용된 구글 권한 목록"
     Datetime created_at
     Datetime updated_at
+    
+    %%UNIQUE(provider, provider_uid)
 }
 
-Token{
+Token {
     Int id PK
-    String refresh_token UK
-    String user_agent       "디바이스 정보"
+    String refresh_token UK   "우리 서비스 로그인 유지용"
+    String user_agent         "디바이스 정보"
     Int user_id FK
+    Enum token_status         "okay, expired"
     Datetime created_at
     Datetime updated_at
     Datetime expires_at
 }
 
-Project{
+Project {
     Int id PK
+    Int owner_id FK
     String name
     String description
-    Int owner_id FK         
+    Int member_count
+    Int todo_count
+    Int in_progress_count
+    Int done_count
     Datetime created_at
     Datetime updated_at
     Datetime deleted_at     "soft delete"
 }
 
-Task{
+ProjectMember {
+    Int id PK
+    Int project_id FK
+    Int user_id FK
+    Enum role                  "owner | member"
+    Enum member_status         "pending | accepted"
+    String invitation_id FK    "uuid, nullable"
+    Datetime created_at
+    Datetime updated_at
+    Datetime deleted_at     "soft delete"
+    
+    %%UNIQUE (project_id, user_id)
+}
+
+Task {
     Int id PK
     Int project_id FK
     String title
-    Datetime start_at
-    Datetime end_at
-    Int status_id FK       "todo | in_progress | done"
+    Date start_at
+    Date end_at
+    Enum status       "todo | in_progress | done"
     Int assignee_id FK
-    String[] tags
-    String[] attachments    "첨부파일"
     Datetime created_at
     Datetime updated_at
     Datetime deleted_at     "soft delete"
 }
 
-SubTask{
+Attachment {
+    Int id PK
+    Int task_id FK
+    String url
+    String file_name
+}   
+
+SubTask {
     Int id PK
     String title
     Int task_id FK
-    Int status_id FK       "todo | in_progress | done"
-    Int author_id FK
+    Enum status      "todo | in_progress | done"
     Datetime created_at
     Datetime updated_at
     Datetime deleted_at     "soft delete"   
 }
 
-Comment{
+Invitation {
+    String id PK                "uuid"
+    Int project_id FK
+    Int host_id FK
+    Int guest_id FK
+    Enum invitation_status     "pending | accepted | canceled"
+    Datetime created_at
+    Datetime updated_at
+}
+
+Comment {
     Int id PK
     String content
     Int task_id FK
@@ -86,72 +116,40 @@ Comment{
     Datetime deleted_at     "soft delete"
 }
 
-ProjectMember{
+Tag {
     Int id PK
-    Int project_id FK
-    Int user_id FK
-    Int member_status_id FK   "pending | accepted | rejected"
-    String invitation_id    "uuid"
-    
-    %%UNIQUE (project_id, user_id)
+    String name
 }
 
-Status{
-    Int id PK
-    String name UK          "todo | in_progress | done"
-}
-
-
-Provider{
-    Int id PK
-    String name UK          "google, kakao, naver, facebook"
-}
-
-
-MemberStatus{
-    Int id PK
-    String name UK          "pending | accepted | rejected"
-}
-
-ProjectStats{
-    Int project_id PK
-    Int member_count
-    Int todo_count
-    Int in_progress_count
-    Int done_count
+TaskTag {
+    Int task_id FK
+    Int tag_id FK
+    %% UNIQUE(task_id, tag_id)
 }
 
 %% 유저 - 인증
-User ||--o| UserCredential : "1:0..1 (이메일 사용자만)"
 User ||--o{ SocialAccount : "1:N (소셜 계정)"
 User ||--o{ Token : "1:N (다중 기기)"
-
-SocialAccount ||--|| Provider : "1:1 (소셜 계정)"
 
 %% 유저 - 프로젝트
 User ||--o{ Project : "1:N 프로젝트 소유자"
 User ||--o{ ProjectMember : "1:N 소유자와 멤버"
 User ||--o{ Task : "1:N(assignee)"
-User ||--o{ SubTask : "1:N(author)"
 User ||--o{ Comment : "1:N(author)"
 
-ProjectMember ||--|| MemberStatus : "1:1 (프로젝트 맴버 상태값)"
-
 %% 프로젝트 - 할 일
-Project ||--o{ ProjectMember : "1:N (여러명의 user)"
-Project ||--o{ Task : "1:N (여러개의 할 일)"
-
-Project ||--|| ProjectStats : "1:1 (프로젝트 속성값)"
+Project ||--o{ ProjectMember : "1:N (여러 명의 user)"
+Project ||--o{ Task : "1:N (여러 개의 할 일)"
 
 %% 할 일 - 하위 할 일
-Task ||--o{ SubTask : "1:N (여러개의 하위 할 일)"
-Task ||--o{ Comment : "1:N (여러개의 댓글)"
+Task ||--o{ SubTask : "1:N (여러 개의 하위 할 일)"
+Task ||--o{ Comment : "1:N (여러 개의 댓글)"
+Task ||--o{ TaskTag : "1:N (여러 개의 태그)"
+Tag ||--o{ TaskTag : "1:N (여러 개의 태그)"
 
-%% 할 일 - 상태
-Task }o--|| Status : "N:1 (상태)"
-SubTask }o--|| Status : "N:1 (상태)"
+Task ||--o{ Attachment : "1:N (Cascade Delete)"
 
-
-
-
-
+%% 맴버 - 초대 
+User }|--o{ Invitation : "host, guest 연결"
+Project ||--o{ Invitation : "project에서 게스트 초대"
+Invitation ||--|| ProjectMember : "accepted시 생성"
