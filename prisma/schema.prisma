@@ -64,21 +64,17 @@ model Token {
 }
 
 model Project {
-  id              Int             @id @default(autoincrement())
-  owner           User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId         Int
-  name            String
-  description     String
-  memberCount     Int
-  todoCount       Int
-  inProgressCount Int
-  doneCount       Int
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  deletedAt       DateTime?
-  projectMembers  ProjectMember[]
-  tasks           Task[]
-  invitations     Invitation[]
+  id             Int             @id @default(autoincrement())
+  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId        Int
+  name           String
+  description    String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
+  projectMembers ProjectMember[]
+  tasks          Task[]
+  invitations    Invitation[]
 }
 
 model ProjectMember {
@@ -89,8 +85,8 @@ model ProjectMember {
   userId       Int
   role         ProjectRole
   memberStatus MemberStatus
-  invitation   Invitation   @relation(fields: [invitationId], references: [id], onDelete: Cascade)
-  invitationId String
+  invitation   Invitation?  @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  invitationId String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   deletedAt    DateTime?
