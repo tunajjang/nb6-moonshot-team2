@@ -1,4 +1,5 @@
 # Local files
+.Ds_Store
 .vscode/
 node_modules/
 .env
