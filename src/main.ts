@@ -1,10 +1,11 @@
-console.log('hello world');
+import express from 'express';
+import taskRouter from './routers/task-router';
 
-console.log('이것은 테스트용 코드입니다.');
+const app = express();
+const PORT = 3000;
 
-const mosebuger: number = 10000;
-const cola: number = 20000;
+app.use('/tasks', taskRouter);
 
-const setmenu: number = mosebuger + cola;
-
-console.log(`세트메뉴는 ${setmenu}원 입니다`);
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+});
