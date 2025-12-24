@@ -1,5 +1,11 @@
 import { CommentRepository } from '../repositories/comment.repository';
 import { Comment } from '@prisma/client';
+import {
+  TaskNotFoundError,
+  CommentNotFoundError,
+  CommentUnauthorizedError,
+  ProjectMemberRequiredError,
+} from '../lib/errors/comment.error';
 
 export class CommentService {
   private commentRepository: CommentRepository;
@@ -13,19 +19,19 @@ export class CommentService {
     // 태스크 존재 여부 확인
     const taskExists = await this.commentRepository.taskExists(taskId);
     if (!taskExists) {
-      throw new Error('Task not found');
+      throw new TaskNotFoundError(taskId);
     }
 
     // 태스크의 프로젝트 ID 조회
     const projectId = await this.commentRepository.getTaskProjectId(taskId);
     if (!projectId) {
-      throw new Error('Task not found');
+      throw new TaskNotFoundError(taskId);
     }
 
     // 프로젝트 멤버 여부 확인
     const isMember = await this.commentRepository.isProjectMember(projectId, authorId);
     if (!isMember) {
-      throw new Error('Unauthorized: You must be a project member to create comments');
+      throw new ProjectMemberRequiredError('You must be a project member to create comments');
     }
 
     // 댓글 생성
@@ -41,7 +47,7 @@ export class CommentService {
     // 태스크 존재 여부 확인
     const taskExists = await this.commentRepository.taskExists(taskId);
     if (!taskExists) {
-      throw new Error('Task not found');
+      throw new TaskNotFoundError(taskId);
     }
 
     return await this.commentRepository.findByTaskId(taskId);
@@ -52,12 +58,12 @@ export class CommentService {
     // 댓글 존재 여부 및 작성자 확인
     const comment = await this.commentRepository.findById(commentId);
     if (!comment) {
-      throw new Error('Comment not found');
+      throw new CommentNotFoundError(commentId);
     }
 
     // 작성자 확인
     if (comment.authorId !== authorId) {
-      throw new Error('Unauthorized: You can only update your own comments');
+      throw new CommentUnauthorizedError('You can only update your own comments');
     }
 
     return await this.commentRepository.update(commentId, content);
@@ -68,12 +74,12 @@ export class CommentService {
     // 댓글 존재 여부 및 작성자 확인
     const comment = await this.commentRepository.findById(commentId);
     if (!comment) {
-      throw new Error('Comment not found');
+      throw new CommentNotFoundError(commentId);
     }
 
     // 작성자 확인
     if (comment.authorId !== authorId) {
-      throw new Error('Unauthorized: You can only delete your own comments');
+      throw new CommentUnauthorizedError('You can only delete your own comments');
     }
 
     return await this.commentRepository.softDelete(commentId);

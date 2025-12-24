@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { faker } from '@faker-js/faker/locale/ko';
 
 const prisma = new PrismaClient();
@@ -38,6 +38,10 @@ async function main() {
         name: faker.book.title() + ' 프로젝트',
         description: faker.lorem.sentence(10),
         ownerId: randomUser.id,
+        memberCount: 0,
+        todoCount: 0,
+        inProgressCount: 0,
+        doneCount: 0,
       },
     });
   }
@@ -47,12 +51,23 @@ async function main() {
   const projects = await prisma.project.findMany();
 
   for (const project of projects) {
+    // 소유자용 invitation 생성
+    const ownerInvitation = await prisma.invitation.create({
+      data: {
+        projectId: project.id,
+        hostId: project.ownerId,
+        guestId: project.ownerId,
+        invitationStatus: 'ACCEPTED',
+      },
+    });
+
     await prisma.projectMember.create({
       data: {
         projectId: project.id,
         userId: project.ownerId,
         role: 'OWNER',
         memberStatus: 'ACCEPTED',
+        invitationId: ownerInvitation.id,
       },
     });
 
@@ -62,12 +77,23 @@ async function main() {
       .slice(0, 2);
 
     for (const member of otherMembers) {
+      // 멤버용 invitation 생성
+      const memberInvitation = await prisma.invitation.create({
+        data: {
+          projectId: project.id,
+          hostId: project.ownerId,
+          guestId: member.id,
+          invitationStatus: 'ACCEPTED',
+        },
+      });
+
       await prisma.projectMember.create({
         data: {
           projectId: project.id,
           userId: member.id,
           role: 'MEMBER',
           memberStatus: 'ACCEPTED',
+          invitationId: memberInvitation.id,
         },
       });
     }
