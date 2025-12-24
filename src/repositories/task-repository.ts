@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import { CreateTaskInput, UpdateTaskInput, TaskParams } from '../superstructs/task-superstruct';
+import { CreateTaskInput, UpdateTaskInput, TaskParams } from '../superstructs/task-struct';
 
 export const taskRepository = {
   create(data: CreateTaskInput) {
@@ -16,5 +16,8 @@ export const taskRepository = {
   },
   delete(id: number) {
     return prisma.task.delete({ where: { id } });
+  },
+  findTaskDebug(id: number) {
+    return prisma.task.findUnique({ where: { id } });
   },
 };

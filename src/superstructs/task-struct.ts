@@ -4,7 +4,7 @@ const TaskStatusStruct = s.enums(['PENDING', 'IN_PROGRESS', 'DONE']);
 const ParamOrderStruct = s.enums(['asc', 'desc']);
 const ParamOrderByStruct = s.enums([`created_at`, `name`, `end_date`]);
 
-const CreateTaskBodyStruct = s.object({
+export const CreateTaskBodyStruct = s.object({
   projectId: s.number(),
   title: s.nonempty(s.string()),
   startAt: s.date(),
@@ -15,7 +15,7 @@ const CreateTaskBodyStruct = s.object({
   attachmentId: s.optional(s.array(s.number())),
 });
 
-const TaskParamsStruct = s.object({
+export const TaskParamsStruct = s.object({
   page: s.defaulted(s.number(), 1),
   limit: s.defaulted(s.number(), 10),
   status: s.optional(TaskStatusStruct),
@@ -25,7 +25,7 @@ const TaskParamsStruct = s.object({
   keyword: s.optional(s.nonempty(s.string())),
 });
 
-const UpdateTaskBodyStruct = s.partial(CreateTaskBodyStruct);
+export const UpdateTaskBodyStruct = s.partial(CreateTaskBodyStruct);
 
 export type CreateTaskInput = s.Infer<typeof CreateTaskBodyStruct>;
 export type UpdateTaskInput = s.Infer<typeof UpdateTaskBodyStruct>;
