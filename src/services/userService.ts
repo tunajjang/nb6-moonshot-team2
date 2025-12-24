@@ -1,5 +1,6 @@
 import { Prisma, User } from '@prisma/client';
 import { UserRepository } from '../repositories/userRepository';
+import { NotFoundError } from '../lib/errors/notFoundError';
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -10,7 +11,7 @@ export class UserService {
   async getUserById(userId: User['id']) {
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
-      throw new Error('User not found!');
+      throw new NotFoundError('User not found!');
     }
     return user;
   }
@@ -44,7 +45,7 @@ export class UserService {
   async findUserByEmail(email: User['email']) {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundError('User not found');
     }
     return user;
   }
