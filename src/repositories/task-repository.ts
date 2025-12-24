@@ -5,13 +5,8 @@ export const taskRepository = {
   create(data: CreateTaskInput) {
     return prisma.task.create({ data });
   },
-  findList(params: TaskParams) {
-    return prisma.task.findMany({
-      skip,
-      take,
-      orderBy,
-      where,
-    });
+  findList({ page, limit, status, assigneeId, order, orderBy, keyword }: TaskParams) {
+    return prisma.task.findMany({});
   },
   findById(id: number) {
     return prisma.task.findUnique({ where: { id } });
