@@ -1,6 +1,6 @@
 import { Prisma, User } from '@prisma/client';
-import { UserRepository } from '../repositories/userRepository';
-import { NotFoundError } from '../lib/errors/notFoundError';
+import { UserRepository } from '@repositories';
+import { NotFoundError } from '@lib';
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}

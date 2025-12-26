@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { BaseError } from './baseError';
+import { BaseError } from '@lib';
 
 export class NotFoundError extends BaseError {
   constructor(message: string) {

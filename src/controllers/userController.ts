@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { UserService } from '../services/userService';
+import { UserService } from '@services';
 
 export class UserController {
   constructor(private userService: UserService) {}

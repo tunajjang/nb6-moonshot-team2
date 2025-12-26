@@ -1,10 +1,20 @@
-console.log('hello world');
+import cors from 'cors';
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import { PORT } from '@lib';
+import { errorHandler } from '@middlewares';
+import router from '@routers';
 
-console.log('이것은 테스트용 코드입니다.');
+const app = express();
 
-const mosebuger: number = 10000;
-const cola: number = 20000;
+app.use(cors());
+app.use(cookieParser());
+app.use(express.json());
 
-const setmenu: number = mosebuger + cola;
+app.use(router);
 
-console.log(`세트메뉴는 ${setmenu}원 입니다`);
+app.use(errorHandler);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
