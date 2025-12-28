@@ -3,7 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { UserRepository } from '@/repositories';
 import { UserService } from '@/services';
 import { UserController } from '@/controllers';
-import { asyncHandler } from '@/middlewares';
+import { asyncHandler, validate } from '@/middlewares';
+import { UpdateUserStruct } from '@superstructs';
 
 const prisma = new PrismaClient();
 const userRepository = new UserRepository(prisma);
@@ -12,6 +13,14 @@ const userController = new UserController(userService);
 
 const router = Router();
 
-router.route('/:id').get(asyncHandler(userController.getUserById));
+router.route('/').get(asyncHandler(userController.findUsers));
+
+router.route('/search').get(asyncHandler(userController.findUserByEmail));
+
+router
+  .route('/:id')
+  .patch(validate(UpdateUserStruct), asyncHandler(userController.updateUser))
+  .get(asyncHandler(userController.getUserById))
+  .delete(asyncHandler(userController.deleteUser));
 
 export default router;
