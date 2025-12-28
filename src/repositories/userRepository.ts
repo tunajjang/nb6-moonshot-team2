@@ -5,7 +5,7 @@ export class UserRepository {
 
   //사용자 정보 조회
   async getUserById(userId: User['id']) {
-    return this.prisma.user.findUnique({ where: { id: userId } });
+    return this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
   }
 
   // 사용자 정보 수정
@@ -28,13 +28,13 @@ export class UserRepository {
 
   // 사용자 목록 조회
   async findUsers() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({ where: { deletedAt: null } });
   }
 
   //이메일로 사용자 조회
   async findUserByEmail(email: User['email']) {
-    return this.prisma.user.findUnique({
-      where: { email },
+    return this.prisma.user.findFirst({
+      where: { email, deletedAt: null },
     });
   }
 }

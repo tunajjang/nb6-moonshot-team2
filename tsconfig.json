@@ -15,7 +15,7 @@
       "@repositories": ["src/repositories/index"],
       "@routers": ["src/routers/index"],
       "@services": ["src/services/index"],
-      "@superstructs": ["src/superstructs/*"],
+      "@superstructs": ["src/superstructs/index"],
       "@types": ["src/types/*"]
     },
     "typeRoots": [

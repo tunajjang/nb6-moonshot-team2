@@ -3,7 +3,7 @@ import userRouter from './userRouter';
 
 const router = Router();
 
-router.route('/api').get((req, res) => {
+router.route('/').get((req, res) => {
   res.send('ok');
 });
 
