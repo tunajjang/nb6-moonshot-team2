@@ -36,7 +36,7 @@ export class ProjectRepository {
     });
   }
 
-  // 프로젝트 목록 조회
+  // 프로젝트 목록 조회 (Soft Delete)
   async getMyProjects(userId: User['id'], sort: 'latest' | 'alphabetical') {
     const orderBy: Prisma.ProjectOrderByWithRelationInput =
       sort === 'latest' ? { createdAt: 'desc' } : { name: 'asc' };
@@ -44,18 +44,15 @@ export class ProjectRepository {
     return this.prisma.project.findMany({
       where: {
         projectMembers: {
-          // 내가 '삭제되지 않은(활성)' 멤버인 경우만 조회
           some: { userId, deletedAt: null },
         },
         deletedAt: null,
       },
       include: {
         _count: {
-          // 삭제되지 않은 멤버 수만 카운트
           select: { projectMembers: { where: { deletedAt: null } } },
         },
         tasks: {
-          // 삭제되지 않은 할 일만 가져오기
           where: { deletedAt: null },
           select: { status: true },
         },
@@ -70,7 +67,7 @@ export class ProjectRepository {
     });
   }
 
-  // 프로젝트 상세 조회 (Detail)
+  // 프로젝트 상세 조회
   async getProjectDetail(projectId: Project['id']) {
     return this.prisma.project.findFirst({
       where: {
