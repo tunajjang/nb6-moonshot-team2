@@ -9,10 +9,10 @@ const commentController = new CommentController();
 router.get('/tasks/:taskId/comments', commentController.getCommentsByTaskId);
 
 // 댓글 생성
-router.post('/tasks/:taskId/comments', CreateCommentSchema, commentController.createComment);
+router.post('/tasks/:taskId/comments', ...CreateCommentSchema, commentController.createComment);
 
 // 댓글 수정
-router.put('/comments/:commentId', UpdateCommentSchema, commentController.updateComment);
+router.put('/comments/:commentId', ...UpdateCommentSchema, commentController.updateComment);
 
 // 댓글 삭제
 router.delete('/comments/:commentId', commentController.deleteComment);
