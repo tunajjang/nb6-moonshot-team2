@@ -66,8 +66,5 @@ router.use('/users', userRouter(userController));
 router.use('/projects', projectRouter(projectController, memberController, invitationController));
 router.use('/members', memberRouter);
 router.use('/invitations', invitationRouter);
-// router.use('/tasks', taskRouter);
-// router.use('/subtasks', subtaskRouter);
-// router.use('/invitations', invitationRouter);
 
 export default router;
