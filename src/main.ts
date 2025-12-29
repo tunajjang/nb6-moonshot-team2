@@ -4,6 +4,8 @@ import taskRouter from './routers/task-router';
 const app = express();
 const PORT = 3000;
 
+app.use(express.json());
+
 app.use('/tasks', taskRouter);
 
 app.listen(PORT, () => {
