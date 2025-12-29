@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { PORT } from '@lib';
 import { errorHandler } from '@middlewares';
-import router from '@routers';
+import router from './routers/comment.router';
 
 dotenv.config();
 
