@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import commentRouter from './comment.router';
 import { PrismaClient } from '@prisma/client';
 
@@ -8,6 +9,7 @@ import { UserController, AuthController } from '@controllers';
 
 import { authRouter } from './authRouter';
 import { userRouter } from './userRouter';
+import projectRouter from './projectRouter';
 
 const router = Router();
 
@@ -28,8 +30,7 @@ router.use('/api', commentRouter);
 
 router.use('/auth', authRouter(authController));
 router.use('/users', userRouter(userController));
-
-// router.use('/projects', projectRouter);
+router.use('/projects', projectRouter);
 // router.use('/tasks', taskRouter);
 // router.use('/subtasks', subtaskRouter);
 // router.use('/invitations', invitationRouter);
