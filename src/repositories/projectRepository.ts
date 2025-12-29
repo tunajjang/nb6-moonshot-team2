@@ -12,6 +12,7 @@ export class ProjectRepository {
     return await this.prisma.project.count({
       where: {
         ownerId: userId,
+        deletedAt: null,
       },
     });
   }
@@ -43,14 +44,19 @@ export class ProjectRepository {
     return this.prisma.project.findMany({
       where: {
         projectMembers: {
-          some: { userId },
+          // 내가 '삭제되지 않은(활성)' 멤버인 경우만 조회
+          some: { userId, deletedAt: null },
         },
+        deletedAt: null,
       },
       include: {
         _count: {
-          select: { projectMembers: true },
+          // 삭제되지 않은 멤버 수만 카운트
+          select: { projectMembers: { where: { deletedAt: null } } },
         },
         tasks: {
+          // 삭제되지 않은 할 일만 가져오기
+          where: { deletedAt: null },
           select: { status: true },
         },
       },
@@ -59,8 +65,52 @@ export class ProjectRepository {
   }
   // 유저 존재 여부 확인
   async findUserById(userId: User['id']) {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
+    return this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+  }
+
+  // 프로젝트 상세 조회 (Detail)
+  async getProjectDetail(projectId: Project['id']) {
+    return this.prisma.project.findFirst({
+      where: {
+        id: projectId,
+        deletedAt: null,
+      },
+      include: {
+        _count: {
+          select: { projectMembers: { where: { deletedAt: null } } },
+        },
+        tasks: {
+          where: { deletedAt: null },
+          select: { status: true },
+        },
+      },
+    });
+  }
+
+  // 프로젝트 ID로 조회 (수정 시 존재 확인용)
+  async findProjectById(projectId: Project['id']) {
+    return this.prisma.project.findFirst({
+      where: { id: projectId, deletedAt: null },
+    });
+  }
+
+  // 프로젝트 수정
+  async updateProject(projectId: Project['id'], projectData: Prisma.ProjectUpdateInput) {
+    return this.prisma.project.update({
+      where: { id: projectId },
+      data: projectData,
+    });
+  }
+
+  // 프로젝트 삭제
+  async deleteProject(projectId: Project['id']) {
+    return this.prisma.project.update({
+      where: { id: projectId },
+      data: {
+        deletedAt: new Date(),
+      },
     });
   }
 }

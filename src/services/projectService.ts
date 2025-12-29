@@ -1,4 +1,4 @@
-import { Project, User } from '@prisma/client';
+import { Prisma, Project, User } from '@prisma/client';
 import { ProjectRepository } from '../repositories/projectRepository';
 import { BadRequestError } from '../lib/errors/badRequestError';
 import { NotFoundError } from '../lib/errors/notFoundError';
@@ -35,38 +35,55 @@ export class ProjectService {
     return newProject;
   }
 
-  // 프로젝트 조회
-  async getMyProjects(userId: User['id'], sort: 'latest' | 'alphabetical') {
-    const user = await this.projectRepository.findUserById(userId);
-    if (!user) {
-      throw new NotFoundError();
+  // 프로젝트 상세 조회
+  async getProjectDetail(projectId: Project['id']) {
+    const project = await this.projectRepository.getProjectDetail(projectId);
+
+    if (!project) {
+      throw new NotFoundError('Project not found');
     }
 
-    const projects = await this.projectRepository.getMyProjects(userId, sort);
+    const taskCount = {
+      PENDING: 0,
+      IN_PROGRESS: 0,
+      DONE: 0,
+    };
 
-    return projects.map((project) => {
-      const taskCount = {
-        PENDING: 0,
-        IN_PROGRESS: 0,
-        DONE: 0,
-      };
-
-      project.tasks.forEach((task) => {
-        const status = task.status as keyof typeof taskCount;
-        if (taskCount[status] !== undefined) {
-          taskCount[status]++;
-        }
-      });
-
-      return {
-        id: project.id,
-        name: project.name,
-        description: project.description,
-        memberCount: project._count.projectMembers,
-        todoCount: taskCount.PENDING,
-        inProgressCount: taskCount.IN_PROGRESS,
-        doneCount: taskCount.DONE,
-      };
+    project.tasks.forEach((task) => {
+      const status = task.status as keyof typeof taskCount;
+      if (taskCount[status] !== undefined) {
+        taskCount[status]++;
+      }
     });
+
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      memberCount: project._count.projectMembers,
+      todoCount: taskCount.PENDING,
+      inProgressCount: taskCount.IN_PROGRESS,
+      doneCount: taskCount.DONE,
+    };
+  }
+
+  // 프로젝트 수정
+  async updateProject(projectId: Project['id'], projectData: Prisma.ProjectUpdateInput) {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) {
+      throw new NotFoundError('Project not found');
+    }
+
+    return this.projectRepository.updateProject(projectId, projectData);
+  }
+
+  // 프로젝트 삭제
+  async deleteProject(projectId: Project['id']) {
+    const project = await this.projectRepository.findProjectById(projectId);
+    if (!project) {
+      throw new NotFoundError('Project not found');
+    }
+
+    return this.projectRepository.deleteProject(projectId);
   }
 }
