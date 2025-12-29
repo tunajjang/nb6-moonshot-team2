@@ -1,5 +1,6 @@
 import { Project } from '@prisma/client';
 import { ProjectRepository } from '../repositories/projectRepository';
+import { BadRequestError } from '../lib/errors/badRequestError';
 
 export interface CreateProjectDto {
   name: string;
@@ -21,7 +22,7 @@ export class ProjectService {
     const existingProjectCount = await this.projectRepository.countProjectsByUserId(userId);
 
     if (existingProjectCount >= MAX_PROJECT_COUNT) {
-      throw new Error(`프로젝트는 최대 ${MAX_PROJECT_COUNT}개까지만 생성할 수 있습니다.`);
+      throw new BadRequestError(`프로젝트는 최대 ${MAX_PROJECT_COUNT}개까지만 생성할 수 있습니다.`);
     }
 
     const newProject = await this.projectRepository.createProject(
