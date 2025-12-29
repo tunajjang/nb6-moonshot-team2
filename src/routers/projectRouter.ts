@@ -13,5 +13,6 @@ const projectService = new ProjectService(projectRepository);
 const projectController = new ProjectController(projectService);
 
 router.post('/', validate(CreateProjectStruct), asyncHandler(projectController.createProject));
+router.get('/:projectId', asyncHandler(projectController.getMyProjects));
 
 export default router;

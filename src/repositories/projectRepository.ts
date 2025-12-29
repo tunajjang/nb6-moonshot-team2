@@ -1,4 +1,4 @@
-import { PrismaClient, Project, ProjectRole, MemberStatus } from '@prisma/client';
+import { PrismaClient, Project, ProjectRole, MemberStatus, User, Prisma } from '@prisma/client';
 
 export class ProjectRepository {
   private prisma: PrismaClient;
@@ -8,7 +8,7 @@ export class ProjectRepository {
   }
 
   // 유저가 가진 프로젝트 개수 조회
-  async countProjectsByUserId(userId: number): Promise<number> {
+  async countProjectsByUserId(userId: User['id']): Promise<number> {
     return await this.prisma.project.count({
       where: {
         ownerId: userId,
@@ -17,7 +17,7 @@ export class ProjectRepository {
   }
 
   // 프로젝트 생성 (트랜잭션 포함: 프로젝트 생성 + 멤버 추가)
-  async createProject(userId: number, name: string, description: string): Promise<Project> {
+  async createProject(userId: User['id'], name: string, description: string): Promise<Project> {
     return await this.prisma.project.create({
       data: {
         ownerId: userId,
@@ -32,6 +32,35 @@ export class ProjectRepository {
           },
         },
       },
+    });
+  }
+
+  // 프로젝트 목록 조회
+  async getMyProjects(userId: User['id'], sort: 'latest' | 'alphabetical') {
+    const orderBy: Prisma.ProjectOrderByWithRelationInput =
+      sort === 'latest' ? { createdAt: 'desc' } : { name: 'asc' };
+
+    return this.prisma.project.findMany({
+      where: {
+        projectMembers: {
+          some: { userId },
+        },
+      },
+      include: {
+        _count: {
+          select: { projectMembers: true },
+        },
+        tasks: {
+          select: { status: true },
+        },
+      },
+      orderBy,
+    });
+  }
+  // 유저 존재 여부 확인
+  async findUserById(userId: User['id']) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
     });
   }
 }

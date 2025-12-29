@@ -1,6 +1,7 @@
-import { Project } from '@prisma/client';
+import { Project, User } from '@prisma/client';
 import { ProjectRepository } from '../repositories/projectRepository';
 import { BadRequestError } from '../lib/errors/badRequestError';
+import { NotFoundError } from '../lib/errors/notFoundError';
 
 export interface CreateProjectDto {
   name: string;
@@ -18,7 +19,7 @@ export class ProjectService {
   }
 
   // 프로젝트 생성
-  async createProject(userId: number, dto: CreateProjectDto): Promise<Project> {
+  async createProject(userId: User['id'], dto: CreateProjectDto): Promise<Project> {
     const existingProjectCount = await this.projectRepository.countProjectsByUserId(userId);
 
     if (existingProjectCount >= MAX_PROJECT_COUNT) {
@@ -32,5 +33,40 @@ export class ProjectService {
     );
 
     return newProject;
+  }
+
+  // 프로젝트 조회
+  async getMyProjects(userId: User['id'], sort: 'latest' | 'alphabetical') {
+    const user = await this.projectRepository.findUserById(userId);
+    if (!user) {
+      throw new NotFoundError();
+    }
+
+    const projects = await this.projectRepository.getMyProjects(userId, sort);
+
+    return projects.map((project) => {
+      const taskCount = {
+        PENDING: 0,
+        IN_PROGRESS: 0,
+        DONE: 0,
+      };
+
+      project.tasks.forEach((task) => {
+        const status = task.status as keyof typeof taskCount;
+        if (taskCount[status] !== undefined) {
+          taskCount[status]++;
+        }
+      });
+
+      return {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        memberCount: project._count.projectMembers,
+        todoCount: taskCount.PENDING,
+        inProgressCount: taskCount.IN_PROGRESS,
+        doneCount: taskCount.DONE,
+      };
+    });
   }
 }
