@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { prisma } from '../lib/prisma';
+import prisma from '../lib/prisma';
 import { ProjectRepository } from '../repositories/projectRepository';
 import { ProjectService } from '../services/projectService';
 import { ProjectController } from '../controllers/projectController';

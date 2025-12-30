@@ -1,7 +1,6 @@
 import { Router } from 'express';
-
 import commentRouter from './comment.router';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 
 import { UserRepository, AuthRepository } from '@repositories';
 import { UserService, AuthService } from '@services';
@@ -12,8 +11,6 @@ import { userRouter } from './userRouter';
 import projectRouter from './projectRouter';
 
 const router = Router();
-
-const prisma = new PrismaClient();
 
 const userRepository = new UserRepository(prisma);
 const authRepository = new AuthRepository(prisma);
