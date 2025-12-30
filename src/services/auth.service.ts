@@ -2,9 +2,8 @@ import { Prisma, TokenStatus } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-import { BaseError } from '@lib';
-import { AuthRepository } from '../repositories/auth.repository';
-import { UserRepository } from '../repositories/user.repository';
+import { AppError } from '@lib';
+import { AuthRepository, UserRepository } from '@repositories';
 
 export class AuthService {
   private authRepository: AuthRepository;
@@ -18,7 +17,7 @@ export class AuthService {
   async signUp(userData: Prisma.UserCreateInput) {
     const existingUser = await this.userRepository.findUserByEmail(userData.email);
     if (existingUser) {
-      throw new BaseError(StatusCodes.CONFLICT, '이미 존재하는 이메일입니다.');
+      throw new AppError('이미 존재하는 이메일입니다.', StatusCodes.CONFLICT);
     }
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const createUser = await this.authRepository.signUp({
@@ -32,11 +31,11 @@ export class AuthService {
   async login(email: string, pw: string, userAgent: string) {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) {
-      throw new BaseError(StatusCodes.UNAUTHORIZED, '이메일 또는 비밀번호가 일치하지 않습니다.');
+      throw new AppError('이메일 또는 비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
     }
     const isPasswordValid = await bcrypt.compare(pw, user.password);
     if (!isPasswordValid) {
-      throw new BaseError(StatusCodes.UNAUTHORIZED, '이메일 또는 비밀번호가 일치하지 않습니다.');
+      throw new AppError('이메일 또는 비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
     }
     // 토큰 발급
     const { accessToken, refreshToken } = this._issueToken(user);
@@ -64,4 +63,3 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 }
-

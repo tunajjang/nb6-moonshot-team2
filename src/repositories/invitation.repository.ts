@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import { prisma } from '@lib';
 import { Invitation, InvitationStatus, Prisma } from '@prisma/client';
 
 export class InvitationRepository {
@@ -202,4 +202,3 @@ export class InvitationRepository {
     });
   }
 }
-

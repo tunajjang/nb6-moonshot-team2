@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 
 const prismaClientSingleton = () => {
@@ -16,4 +17,6 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
-export default prisma;
+const PORT = process.env.PORT || 3000;
+
+export { prisma, PORT };

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { is } from 'superstruct';
-
 import { AuthService } from '@services';
 import { signUpStruct, loginStruct } from '@superstructs';
 

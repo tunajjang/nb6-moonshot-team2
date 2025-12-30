@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { CommentController } from '../controllers/comment.controller';
-import { CreateCommentSchema, UpdateCommentSchema } from '../superstructs/comment.superstruct';
+import { CommentController } from '@controllers';
+import { CreateCommentSchema, UpdateCommentSchema } from '@superstructs';
 
 const router = Router();
 const commentController = new CommentController();

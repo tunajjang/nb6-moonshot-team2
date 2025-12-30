@@ -1,11 +1,11 @@
-import { CommentRepository } from '../repositories/comment.repository';
 import { Comment } from '@prisma/client';
+import { CommentRepository } from '@repositories';
 import {
   TaskNotFoundError,
   CommentNotFoundError,
   CommentUnauthorizedError,
   ProjectMemberRequiredError,
-} from '../lib/errors/comment.error';
+} from '@lib';
 
 export class CommentService {
   private commentRepository: CommentRepository;

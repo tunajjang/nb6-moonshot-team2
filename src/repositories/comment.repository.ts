@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import { prisma } from '@lib';
 import { Comment } from '@prisma/client';
 
 export class CommentRepository {

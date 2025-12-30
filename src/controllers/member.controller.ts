@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { MemberService } from '../services/member.service';
 import { validationResult } from 'express-validator';
-import { UnauthorizedError, BadRequestError } from '../lib/errors/app.error';
+import { MemberService } from '@services';
+import { UnauthorizedError, BadRequestError } from '@lib';
 
 export class MemberController {
   private memberService: MemberService;

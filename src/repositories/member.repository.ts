@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import { prisma } from '@lib';
 import { ProjectMember, ProjectRole, MemberStatus, Prisma } from '@prisma/client';
 
 export class MemberRepository {
@@ -174,4 +174,3 @@ export class MemberRepository {
     });
   }
 }
-

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../lib/errors/app.error';
+import { AppError } from '@lib';
 
 export interface ErrorResponse {
   success: false;
