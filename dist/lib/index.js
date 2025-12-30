@@ -15,6 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./constants"), exports);
+__exportStar(require("./errors/app.error"), exports);
 __exportStar(require("./errors/base.error"), exports);
 __exportStar(require("./errors/member.error"), exports);
-__exportStar(require("./errors/notFound.error"), exports);
+// export * from './errors/notFound.error';

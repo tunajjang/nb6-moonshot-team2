@@ -78,4 +78,3 @@ export class UserNotFoundError extends NotFoundError {
     this.name = 'UserNotFoundError';
   }
 }
-

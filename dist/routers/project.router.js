@@ -14,8 +14,12 @@ const router = (0, express_1.Router)();
 const projectRepository = new project_repository_1.ProjectRepository(prisma_1.default);
 const projectService = new project_service_1.ProjectService(projectRepository);
 const projectController = new project_controller_1.ProjectController(projectService);
-router.post('/', (0, _middlewares_1.validate)(project_superstruct_1.CreateProjectStruct), (0, _middlewares_1.asyncHandler)(projectController.createProject));
-router.get('/:projectId', (0, _middlewares_1.asyncHandler)(projectController.getProjectDetail));
-router.patch('/:projectId', (0, _middlewares_1.validate)(project_superstruct_1.UpdateProjectStruct), (0, _middlewares_1.asyncHandler)(projectController.updateProject));
-router.delete('/:projectId', (0, _middlewares_1.asyncHandler)(projectController.deleteProject));
+// 프로젝트 생성 (인증 필요)
+router.post('/', _middlewares_1.authenticate, (0, _middlewares_1.validate)(project_superstruct_1.CreateProjectStruct), (0, _middlewares_1.asyncHandler)(projectController.createProject));
+// 프로젝트 상세 조회 (인증 필요)
+router.get('/:projectId', _middlewares_1.authenticate, (0, _middlewares_1.asyncHandler)(projectController.getProjectDetail));
+// 프로젝트 수정 (인증 필요)
+router.patch('/:projectId', _middlewares_1.authenticate, (0, _middlewares_1.validate)(project_superstruct_1.UpdateProjectStruct), (0, _middlewares_1.asyncHandler)(projectController.updateProject));
+// 프로젝트 삭제 (인증 필요)
+router.delete('/:projectId', _middlewares_1.authenticate, (0, _middlewares_1.asyncHandler)(projectController.deleteProject));
 exports.default = router;

@@ -10,9 +10,9 @@ const userRouter = (userController) => {
     router.route('/search').get((0, middlewares_1.asyncHandler)(userController.findUserByEmail));
     router
         .route('/:id')
-        .patch((0, middlewares_1.validate)(_superstructs_1.UpdateUserStruct), (0, middlewares_1.asyncHandler)(userController.updateUser))
-        .get((0, middlewares_1.asyncHandler)(userController.getUserById))
-        .delete((0, middlewares_1.asyncHandler)(userController.deleteUser));
+        .patch(middlewares_1.authenticate, (0, middlewares_1.validate)(_superstructs_1.UpdateUserStruct), (0, middlewares_1.asyncHandler)(userController.updateUser))
+        .get((0, middlewares_1.asyncHandler)(userController.getUserById)) // 조회는 공개 가능
+        .delete(middlewares_1.authenticate, (0, middlewares_1.asyncHandler)(userController.deleteUser)); // 삭제는 인증 필요
     return router;
 };
 exports.userRouter = userRouter;
