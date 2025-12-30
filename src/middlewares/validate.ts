@@ -8,7 +8,7 @@ export const validate = (struct: Struct<any>) => {
       assert(req.body, struct);
       next();
     } catch (e) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: (e as Error).message });
+      res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 데이터 형식' });
     }
   };
 };
