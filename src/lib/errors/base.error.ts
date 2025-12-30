@@ -8,4 +8,3 @@ export class BaseError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
-

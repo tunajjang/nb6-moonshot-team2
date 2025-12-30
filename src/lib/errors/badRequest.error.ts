@@ -6,4 +6,3 @@ export class BadRequestError extends BaseError {
     super(StatusCodes.BAD_REQUEST, message);
   }
 }
-
