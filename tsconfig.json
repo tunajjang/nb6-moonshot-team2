@@ -16,7 +16,7 @@
       "@routers": ["src/routers/index"],
       "@services": ["src/services/index"],
       "@superstructs": ["src/superstructs/index"],
-      "@types": ["src/types/*"]
+      "@types": ["src/types/index"]
     },
     "typeRoots": [
       "./src/types",
