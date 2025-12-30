@@ -162,9 +162,9 @@ class MemberService {
             }
             // 초대 생성
             return yield this.invitationRepository.create({
-                projectId,
-                hostId,
-                guestId: guest.id,
+                project: { connect: { id: projectId } },
+                host: { connect: { id: hostId } },
+                guest: { connect: { id: guest.id } },
                 invitationStatus: 'PENDING',
             });
         });
