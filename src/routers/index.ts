@@ -19,20 +19,17 @@ import commentRouter from './comment.router';
 
 const router = Router();
 
-// Repositories
 const userRepository = new UserRepository(prisma);
 const authRepository = new AuthRepository(prisma);
 const commentRepository = new CommentRepository();
 const memberRepository = new MemberRepository();
 const invitationRepository = new InvitationRepository();
 
-// Services
 const userService = new UserService(userRepository);
 const authService = new AuthService(authRepository, userRepository);
 const commentService = new CommentService();
 const memberService = new MemberService();
 
-// Controllers
 const userController = new UserController(userService);
 const authController = new AuthController(authService);
 const commentController = new CommentController();
