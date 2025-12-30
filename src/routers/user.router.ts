@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '@controllers';
-import { asyncHandler, validate } from '@middlewares';
+import { authenticate, asyncHandler, validate } from '@middlewares';
 import { UpdateUserStruct } from '@superstructs';
 
 export const userRouter = (userController: UserController) => {
@@ -12,9 +12,9 @@ export const userRouter = (userController: UserController) => {
 
   router
     .route('/:id')
-    .patch(validate(UpdateUserStruct), asyncHandler(userController.updateUser))
-    .get(asyncHandler(userController.getUserById))
-    .delete(asyncHandler(userController.deleteUser));
+    .patch(authenticate, validate(UpdateUserStruct), asyncHandler(userController.updateUser))
+    .get(asyncHandler(userController.getUserById)) // 조회는 공개 가능
+    .delete(authenticate, asyncHandler(userController.deleteUser)); // 삭제는 인증 필요
 
   return router;
 };

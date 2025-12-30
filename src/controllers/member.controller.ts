@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import { MemberService } from '@services';
 import { UnauthorizedError, BadRequestError } from '@lib';
+import { AuthRequest } from '@middlewares';
 
 export class MemberController {
   private memberService: MemberService;
@@ -12,13 +13,13 @@ export class MemberController {
 
   // 프로젝트 멤버 목록 조회
   getMembersByProjectId = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
       const { projectId } = req.params;
-      const userId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!userId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -34,10 +35,10 @@ export class MemberController {
   };
 
   // 멤버 역할 변경
-  updateMemberRole = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  updateMemberRole = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
-      const userId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!userId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -62,10 +63,10 @@ export class MemberController {
   };
 
   // 멤버 상태 변경
-  updateMemberStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  updateMemberStatus = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
-      const userId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!userId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -90,10 +91,10 @@ export class MemberController {
   };
 
   // 멤버 삭제 (탈퇴)
-  deleteMember = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  deleteMember = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
-      const userId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!userId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -108,10 +109,10 @@ export class MemberController {
   };
 
   // 멤버 강제 제외 (프로젝트 생성자만 가능)
-  removeMember = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  removeMember = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
-      const userId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!userId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -126,10 +127,10 @@ export class MemberController {
   };
 
   // 초대 생성
-  createInvitation = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  createInvitation = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { projectId } = req.params;
-      const hostId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const hostId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!hostId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -154,10 +155,10 @@ export class MemberController {
   };
 
   // 초대 수락 (초대 링크 접속 시)
-  acceptInvitation = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  acceptInvitation = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { invitationId } = req.params;
-      const guestId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const guestId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!guestId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -173,10 +174,10 @@ export class MemberController {
   };
 
   // 초대 취소
-  cancelInvitation = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  cancelInvitation = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { invitationId } = req.params;
-      const hostId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const hostId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!hostId) {
         throw new UnauthorizedError('User authentication required');
       }
@@ -193,13 +194,13 @@ export class MemberController {
 
   // 프로젝트의 초대 목록 조회
   getInvitationsByProjectId = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
       const { projectId } = req.params;
-      const userId = (req as any).user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
       if (!userId) {
         throw new UnauthorizedError('User authentication required');
       }
