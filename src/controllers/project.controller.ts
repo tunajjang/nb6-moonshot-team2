@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from 'express';
-import { ProjectService } from '../services/projectService';
-import { NotFoundError } from '../lib/errors/notFoundError';
-import { BadRequestError } from '../lib/errors/badRequestError';
+import { ProjectService } from '../services/project.service';
+import { NotFoundError } from '../lib/errors/notFound.error';
+import { BadRequestError } from '../lib/errors/badRequest.error';
 
 export class ProjectController {
   private projectService: ProjectService;

@@ -5,3 +5,4 @@ export const asyncHandler = (requestHandler: RequestHandler): RequestHandler => 
     Promise.resolve(requestHandler(req, res, next)).catch(next);
   };
 };
+

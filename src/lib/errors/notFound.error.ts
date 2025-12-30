@@ -6,3 +6,4 @@ export class NotFoundError extends BaseError {
     super(StatusCodes.NOT_FOUND, message);
   }
 }
+

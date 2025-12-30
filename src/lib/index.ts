@@ -1,3 +1,3 @@
 export * from './constants';
-export * from './errors/baseError';
-export * from './errors/notFoundError';
+export * from './errors/base.error';
+export * from './errors/notFound.error';

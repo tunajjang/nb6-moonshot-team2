@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { BaseError } from '@/lib';
+import { BaseError } from '@lib';
 
 export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(error.stack);

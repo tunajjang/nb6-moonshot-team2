@@ -12,3 +12,4 @@ export const validate = (struct: Struct<any>) => {
     }
   };
 };
+

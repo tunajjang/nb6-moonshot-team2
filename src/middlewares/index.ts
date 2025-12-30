@@ -1,3 +1,3 @@
-export * from './asyncHandler';
-export * from './errorHandler';
-export * from './validate';
+export * from './asyncHandler.middleware';
+export * from './errorHandler.middleware';
+export * from './validate.middleware';

@@ -1,0 +1,32 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const comment_router_1 = __importDefault(require("./comment.router"));
+const prisma_1 = __importDefault(require("../lib/prisma"));
+const _repositories_1 = require("@repositories");
+const _services_1 = require("@services");
+const _controllers_1 = require("@controllers");
+const authRouter_1 = require("./authRouter");
+const userRouter_1 = require("./userRouter");
+const projectRouter_1 = __importDefault(require("./projectRouter"));
+const router = (0, express_1.Router)();
+const userRepository = new _repositories_1.UserRepository(prisma_1.default);
+const authRepository = new _repositories_1.AuthRepository(prisma_1.default);
+const userService = new _services_1.UserService(userRepository);
+const authService = new _services_1.AuthService(authRepository, userRepository);
+const userController = new _controllers_1.UserController(userService);
+const authController = new _controllers_1.AuthController(authService);
+router.route('/').get((req, res) => {
+    res.send('ok');
+});
+router.use('/api', comment_router_1.default);
+router.use('/auth', (0, authRouter_1.authRouter)(authController));
+router.use('/users', (0, userRouter_1.userRouter)(userController));
+router.use('/projects', projectRouter_1.default);
+// router.use('/tasks', taskRouter);
+// router.use('/subtasks', subtaskRouter);
+// router.use('/invitations', invitationRouter);
+exports.default = router;
