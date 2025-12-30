@@ -1,7 +1,7 @@
-import { MemberRepository } from '../repositories/member.repository';
-import { InvitationRepository } from '../repositories/invitation.repository';
-import prisma from '../lib/prisma';
+import { MemberRepository, InvitationRepository } from '@repositories';
+import { ProjectRole, MemberStatus } from '@prisma/client';
 import {
+  prisma,
   ProjectNotFoundError,
   MemberNotFoundError,
   MemberUnauthorizedError,
@@ -12,8 +12,7 @@ import {
   InvitationAlreadyCanceledError,
   UserNotFoundError,
   OwnerCannotLeaveError,
-} from '../lib/errors/member.error';
-import { ProjectRole, MemberStatus } from '@prisma/client';
+} from '@lib';
 
 export class MemberService {
   private memberRepository: MemberRepository;

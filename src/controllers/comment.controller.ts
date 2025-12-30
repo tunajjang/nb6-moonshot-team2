@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { CommentService } from '../services/comment.service';
 import { validationResult } from 'express-validator';
-import { UnauthorizedError, BadRequestError } from '../lib/errors/app.error';
+import { CommentService } from '@services';
+import { UnauthorizedError, BadRequestError } from '@lib';
 
 export class CommentController {
   private commentService: CommentService;

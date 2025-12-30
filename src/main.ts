@@ -1,12 +1,10 @@
+import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import { PORT } from '@lib';
 import { errorHandler } from '@middlewares';
-import router from './routers/comment.router';
-
-dotenv.config();
+import router from '@routers';
 
 const app = express();
 

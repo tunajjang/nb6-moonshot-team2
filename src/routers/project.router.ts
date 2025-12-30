@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import prisma from '../lib/prisma';
-import { ProjectRepository } from '../repositories/project.repository';
-import { ProjectService } from '../services/project.service';
-import { ProjectController } from '../controllers/project.controller';
+import { prisma } from '@lib';
+import { ProjectRepository } from '@repositories';
+import { ProjectService } from '@services';
+import { ProjectController } from '@controllers';
 import { asyncHandler, validate } from '@middlewares';
-import { CreateProjectStruct, UpdateProjectStruct } from '../superstructs/project.superstruct';
+import { CreateProjectStruct, UpdateProjectStruct } from '@superstructs';
 
 const router = Router();
 

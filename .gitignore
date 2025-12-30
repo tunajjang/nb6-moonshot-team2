@@ -1,5 +1,5 @@
 # Local files
-.DS_Store
+.Ds_Store
 .vscode/
 node_modules/
 .env

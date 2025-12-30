@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { MemberController } from '../controllers/member.controller';
+import { MemberController } from '@controllers';
 import {
   CreateInvitationSchema,
   UpdateMemberRoleSchema,
   UpdateMemberStatusSchema,
-} from '../superstructs/member.superstruct';
+} from '@superstructs';
 
 const router = Router();
 const memberController = new MemberController();
@@ -13,7 +13,11 @@ const memberController = new MemberController();
 router.get('/projects/:projectId/members', memberController.getMembersByProjectId);
 
 // 멤버 역할 변경
-router.put('/projects/:projectId/members/:memberId/role', ...UpdateMemberRoleSchema, memberController.updateMemberRole);
+router.put(
+  '/projects/:projectId/members/:memberId/role',
+  ...UpdateMemberRoleSchema,
+  memberController.updateMemberRole,
+);
 
 // 멤버 상태 변경
 router.patch(
@@ -29,7 +33,11 @@ router.delete('/projects/:projectId/members/:memberId', memberController.deleteM
 router.delete('/projects/:projectId/members/:memberId/remove', memberController.removeMember);
 
 // 초대 생성
-router.post('/projects/:projectId/invitations', ...CreateInvitationSchema, memberController.createInvitation);
+router.post(
+  '/projects/:projectId/invitations',
+  ...CreateInvitationSchema,
+  memberController.createInvitation,
+);
 
 // 초대 수락 (초대 링크 접속 시)
 router.post('/invitations/:invitationId/accept', memberController.acceptInvitation);
@@ -41,4 +49,3 @@ router.post('/invitations/:invitationId/cancel', memberController.cancelInvitati
 router.get('/projects/:projectId/invitations', memberController.getInvitationsByProjectId);
 
 export default router;
-

@@ -1,7 +1,7 @@
 import { is } from 'superstruct';
-import { EmailStruct } from '@superstructs';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { EmailStruct } from '@superstructs';
 import { UserService } from '@services';
 
 export class UserController {
@@ -49,4 +49,3 @@ export class UserController {
     return res.status(StatusCodes.OK).json(user);
   };
 }
-

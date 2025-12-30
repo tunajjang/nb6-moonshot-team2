@@ -1,5 +1,5 @@
 // 기본 애플리케이션 에러 클래스
-export abstract class AppError extends Error {
+export class AppError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;
 

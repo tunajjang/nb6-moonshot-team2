@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { UserController } from '@/controllers';
-import { asyncHandler, validate } from '@/middlewares';
+import { UserController } from '@controllers';
+import { asyncHandler, validate } from '@middlewares';
 import { UpdateUserStruct } from '@superstructs';
 
 export const userRouter = (userController: UserController) => {
@@ -18,4 +18,3 @@ export const userRouter = (userController: UserController) => {
 
   return router;
 };
-

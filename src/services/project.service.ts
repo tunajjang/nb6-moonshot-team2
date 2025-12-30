@@ -1,7 +1,6 @@
 import { Prisma, Project, User } from '@prisma/client';
-import { ProjectRepository } from '../repositories/project.repository';
-import { BadRequestError } from '../lib/errors/badRequest.error';
-import { NotFoundError } from '../lib/errors/notFound.error';
+import { ProjectRepository } from '@repositories';
+import { NotFoundError, BadRequestError } from '@lib';
 
 export interface CreateProjectDto {
   name: string;
