@@ -44,7 +44,11 @@ export class CommentController {
   };
 
   // 특정 태스크의 댓글 목록 조회
-  getCommentsByTaskId = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  getCommentsByTaskId = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const { taskId } = req.params;
 

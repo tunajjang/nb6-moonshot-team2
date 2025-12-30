@@ -63,7 +63,11 @@ export class MemberController {
   };
 
   // 멤버 상태 변경
-  updateMemberStatus = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  updateMemberStatus = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const { memberId } = req.params;
       const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
