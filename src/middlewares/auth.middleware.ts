@@ -20,13 +20,13 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('Authentication token is required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
 
     const token = authHeader.substring(7); // 'Bearer ' 제거
 
     if (!token) {
-      throw new UnauthorizedError('Authentication token is required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
 
     // 환경 변수에서 JWT Secret 가져오기 (토큰 검증에 필요한 비밀키)
@@ -47,10 +47,10 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      return next(new UnauthorizedError('Invalid token'));
+      return next(new UnauthorizedError('로그인이 필요합니다'));
     }
     if (error instanceof jwt.TokenExpiredError) {
-      return next(new UnauthorizedError('Token expired'));
+      return next(new UnauthorizedError('토큰이 만료되었습니다'));
     }
     next(error);
   }

@@ -1,81 +1,38 @@
-import { RequestHandler } from 'express';
+import { Response } from 'express'; // NextFunction은 이제 필요 없어
 import { ProjectService } from '@services';
-import { NotFoundError, BadRequestError } from '@lib';
+import { AuthRequest } from '@middlewares';
 
 export class ProjectController {
-  private projectService: ProjectService;
+  constructor(private projectService: ProjectService) {}
 
-  constructor(projectService: ProjectService) {
-    this.projectService = projectService;
-  }
+  createProject = async (req: AuthRequest, res: Response) => {
+    const userId = req.user!.id;
+    const result = await this.projectService.createProject(userId, req.body);
 
-  public createProject: RequestHandler = async (req, res) => {
-    const { userId, name, description } = req.body;
-
-    const newProject = await this.projectService.createProject(parseInt(userId, 10), {
-      name,
-      description,
-    });
-
-    res.status(200).json(newProject);
+    return res.status(201).json(result);
   };
 
-  public getProjectDetail: RequestHandler = async (req, res) => {
-    const projectId = parseInt(req.params.projectId, 10);
+  getProjectDetail = async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params;
+    const userId = req.user!.id;
+    const result = await this.projectService.getProjectDetail(Number(projectId), userId);
 
-    try {
-      const project = await this.projectService.getProjectDetail(projectId);
-      return res.status(200).json(project);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).send();
-        return;
-      }
-      throw error;
-    }
+    return res.status(200).json(result);
   };
 
-  public updateProject: RequestHandler = async (req, res) => {
-    const projectId = parseInt(req.params.projectId, 10);
-    const { name, description } = req.body;
+  updateProject = async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params;
+    const userId = req.user!.id;
+    const result = await this.projectService.updateProject(Number(projectId), userId, req.body);
 
-    if (isNaN(projectId)) {
-      throw new BadRequestError('잘못된 데이터 형식');
-    }
-
-    try {
-      const updatedProject = await this.projectService.updateProject(projectId, {
-        name,
-        description,
-      });
-
-      res.status(200).json(updatedProject);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).send();
-        return;
-      }
-      throw error;
-    }
+    return res.status(200).json(result);
   };
 
-  public deleteProject: RequestHandler = async (req, res) => {
-    const projectId = parseInt(req.params.projectId, 10);
+  deleteProject = async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params;
+    const userId = req.user!.id;
+    await this.projectService.deleteProject(Number(projectId), userId);
 
-    if (isNaN(projectId)) {
-      throw new BadRequestError('잘못된 데이터 형식');
-    }
-
-    try {
-      await this.projectService.deleteProject(projectId);
-
-      res.status(204).send();
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).send();
-        return;
-      }
-      throw error;
-    }
+    return res.status(204).send();
   };
 }
