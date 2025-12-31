@@ -1,6 +1,6 @@
 import { ProjectMember, User } from '@prisma/client';
-import { CreateTaskInput, UpdateTaskInput } from '../superstructs/task-struct';
-import { projectMemberRepository, taskRepository } from '../repositories/task-repository';
+import { CreateTaskInput, UpdateTaskInput } from '../superstructs/task.struct';
+import { projectMemberRepository, taskRepository } from '../repositories/task.repository';
 import { PaginationParams } from '../types/pagination';
 
 export const taskService = {

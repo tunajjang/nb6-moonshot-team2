@@ -1,5 +1,5 @@
 import express from 'express';
-import taskRouter from './routers/task-router';
+import taskRouter from './routers/task.router';
 
 const app = express();
 const PORT = 3000;

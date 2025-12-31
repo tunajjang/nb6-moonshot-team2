@@ -10,6 +10,10 @@ export const ProjectIdParamStruct = s.object({
   projectId: integerString,
 });
 
+export const TaskIdParamsStruct = s.object({
+  taskId: integerString,
+});
+
 export const PageParamsStrict = s.object({
   page: s.defaulted(integerString, 1),
   limit: s.defaulted(integerString, 10),

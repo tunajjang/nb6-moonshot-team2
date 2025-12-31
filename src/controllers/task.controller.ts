@@ -1,12 +1,12 @@
 import { create } from 'superstruct';
 import { Request, Response } from 'express';
-import { projectMemberService, taskService } from '../services/task-service';
-import { IdParamStruct, ProjectIdParamStruct } from '../superstructs/common-structs';
+import { projectMemberService, taskService } from '../services/task.service';
+import { IdParamStruct, ProjectIdParamStruct } from '../superstructs/common.structs';
 import {
   CreateTaskBodyStruct,
   GetTaskListParamsStruct,
   UpdateTaskBodyStruct,
-} from '../superstructs/task-struct';
+} from '../superstructs/task.struct';
 
 export async function createTask(req: Request, res: Response) {
   const { projectId } = create(req.params, ProjectIdParamStruct);
