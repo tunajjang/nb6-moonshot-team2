@@ -1,5 +1,5 @@
 import * as s from 'superstruct';
-import { PageParamsStrict } from './common-structs';
+import { PageParamsStrict } from './common.structs';
 
 const TaskStatusStruct = s.enums(['PENDING', 'IN_PROGRESS', 'DONE']);
 

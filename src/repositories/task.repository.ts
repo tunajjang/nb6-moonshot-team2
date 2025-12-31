@@ -1,5 +1,5 @@
 import { prisma, taskStatus } from '../lib/prisma';
-import { CreateTaskInput, UpdateTaskInput } from '../superstructs/task-struct';
+import { CreateTaskInput, UpdateTaskInput } from '../superstructs/task.struct';
 import { PaginationParams } from '../types/pagination';
 
 export const taskRepository = {
