@@ -16,5 +16,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./asyncHandler.middleware"), exports);
 __exportStar(require("./auth.middleware"), exports);
-__exportStar(require("./errorHandler.middleware"), exports);
+__exportStar(require("./error.middleware"), exports);
 __exportStar(require("./validate.middleware"), exports);

@@ -38,7 +38,7 @@ class AuthService {
         return __awaiter(this, void 0, void 0, function* () {
             const existingUser = yield this.userRepository.findUserByEmail(userData.email);
             if (existingUser) {
-                throw new _lib_1.BaseError(http_status_codes_1.StatusCodes.CONFLICT, '이미 존재하는 이메일입니다.');
+                throw new _lib_1.AppError('이미 존재하는 이메일입니다.', http_status_codes_1.StatusCodes.CONFLICT);
             }
             const hashedPassword = yield bcrypt_1.default.hash(userData.password, 10);
             const createUser = yield this.authRepository.signUp(Object.assign(Object.assign({}, userData), { password: hashedPassword }));
@@ -50,11 +50,11 @@ class AuthService {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield this.userRepository.findUserByEmail(email);
             if (!user) {
-                throw new _lib_1.BaseError(http_status_codes_1.StatusCodes.UNAUTHORIZED, '이메일 또는 비밀번호가 일치하지 않습니다.');
+                throw new _lib_1.AppError('이메일 또는 비밀번호가 일치하지 않습니다.', http_status_codes_1.StatusCodes.UNAUTHORIZED);
             }
             const isPasswordValid = yield bcrypt_1.default.compare(pw, user.password);
             if (!isPasswordValid) {
-                throw new _lib_1.BaseError(http_status_codes_1.StatusCodes.UNAUTHORIZED, '이메일 또는 비밀번호가 일치하지 않습니다.');
+                throw new _lib_1.AppError('이메일 또는 비밀번호가 일치하지 않습니다.', http_status_codes_1.StatusCodes.UNAUTHORIZED);
             }
             // 토큰 발급
             const { accessToken, refreshToken } = this._issueToken(user);

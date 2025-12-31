@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentService = void 0;
-const comment_repository_1 = require("../repositories/comment.repository");
-const comment_error_1 = require("../lib/errors/comment.error");
+const _repositories_1 = require("@repositories");
+const _lib_1 = require("@lib");
 class CommentService {
     constructor() {
-        this.commentRepository = new comment_repository_1.CommentRepository();
+        this.commentRepository = new _repositories_1.CommentRepository();
     }
     // 댓글 생성
     createComment(content, taskId, authorId) {
@@ -22,17 +22,17 @@ class CommentService {
             // 태스크 존재 여부 확인
             const taskExists = yield this.commentRepository.taskExists(taskId);
             if (!taskExists) {
-                throw new comment_error_1.TaskNotFoundError(taskId);
+                throw new _lib_1.TaskNotFoundError(taskId);
             }
             // 태스크의 프로젝트 ID 조회
             const projectId = yield this.commentRepository.getTaskProjectId(taskId);
             if (!projectId) {
-                throw new comment_error_1.TaskNotFoundError(taskId);
+                throw new _lib_1.TaskNotFoundError(taskId);
             }
             // 프로젝트 멤버 여부 확인
             const isMember = yield this.commentRepository.isProjectMember(projectId, authorId);
             if (!isMember) {
-                throw new comment_error_1.ProjectMemberRequiredError('You must be a project member to create comments');
+                throw new _lib_1.ProjectMemberRequiredError('You must be a project member to create comments');
             }
             // 댓글 생성
             return yield this.commentRepository.create({
@@ -48,7 +48,7 @@ class CommentService {
             // 태스크 존재 여부 확인
             const taskExists = yield this.commentRepository.taskExists(taskId);
             if (!taskExists) {
-                throw new comment_error_1.TaskNotFoundError(taskId);
+                throw new _lib_1.TaskNotFoundError(taskId);
             }
             return yield this.commentRepository.findByTaskId(taskId);
         });
@@ -59,11 +59,11 @@ class CommentService {
             // 댓글 존재 여부 및 작성자 확인
             const comment = yield this.commentRepository.findById(commentId);
             if (!comment) {
-                throw new comment_error_1.CommentNotFoundError(commentId);
+                throw new _lib_1.CommentNotFoundError(commentId);
             }
             // 작성자 확인
             if (comment.authorId !== authorId) {
-                throw new comment_error_1.CommentUnauthorizedError('You can only update your own comments');
+                throw new _lib_1.CommentUnauthorizedError('You can only update your own comments');
             }
             return yield this.commentRepository.update(commentId, content);
         });
@@ -74,11 +74,11 @@ class CommentService {
             // 댓글 존재 여부 및 작성자 확인
             const comment = yield this.commentRepository.findById(commentId);
             if (!comment) {
-                throw new comment_error_1.CommentNotFoundError(commentId);
+                throw new _lib_1.CommentNotFoundError(commentId);
             }
             // 작성자 확인
             if (comment.authorId !== authorId) {
-                throw new comment_error_1.CommentUnauthorizedError('You can only delete your own comments');
+                throw new _lib_1.CommentUnauthorizedError('You can only delete your own comments');
             }
             return yield this.commentRepository.softDelete(commentId);
         });

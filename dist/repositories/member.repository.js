@@ -8,17 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemberRepository = void 0;
-const prisma_1 = __importDefault(require("../lib/prisma"));
+const _lib_1 = require("@lib");
 class MemberRepository {
     // 프로젝트 멤버 목록 조회 (삭제되지 않은 멤버만, 초대 정보 포함)
     findByProjectId(projectId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.projectMember.findMany({
+            return yield _lib_1.prisma.projectMember.findMany({
                 where: {
                     projectId,
                     deletedAt: null,
@@ -49,7 +46,7 @@ class MemberRepository {
     // 멤버 ID로 조회
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.projectMember.findFirst({
+            return yield _lib_1.prisma.projectMember.findFirst({
                 where: {
                     id,
                     deletedAt: null,
@@ -70,7 +67,7 @@ class MemberRepository {
     // 프로젝트와 사용자로 멤버 조회
     findByProjectAndUser(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.projectMember.findFirst({
+            return yield _lib_1.prisma.projectMember.findFirst({
                 where: {
                     projectId,
                     userId,
@@ -92,7 +89,7 @@ class MemberRepository {
     // 멤버 역할 변경
     updateRole(id, role) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.projectMember.update({
+            return yield _lib_1.prisma.projectMember.update({
                 where: { id },
                 data: { role },
                 include: {
@@ -111,7 +108,7 @@ class MemberRepository {
     // 멤버 상태 변경
     updateStatus(id, memberStatus) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.projectMember.update({
+            return yield _lib_1.prisma.projectMember.update({
                 where: { id },
                 data: { memberStatus },
                 include: {
@@ -130,7 +127,7 @@ class MemberRepository {
     // 멤버 삭제 (soft delete)
     softDelete(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.projectMember.update({
+            return yield _lib_1.prisma.projectMember.update({
                 where: { id },
                 data: { deletedAt: new Date() },
                 include: {
@@ -149,7 +146,7 @@ class MemberRepository {
     // 프로젝트 존재 여부 확인
     projectExists(projectId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const project = yield prisma_1.default.project.findFirst({
+            const project = yield _lib_1.prisma.project.findFirst({
                 where: {
                     id: projectId,
                     deletedAt: null,
@@ -161,7 +158,7 @@ class MemberRepository {
     // 프로젝트 소유자 확인
     isProjectOwner(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const project = yield prisma_1.default.project.findFirst({
+            const project = yield _lib_1.prisma.project.findFirst({
                 where: {
                     id: projectId,
                     ownerId: userId,
@@ -174,7 +171,7 @@ class MemberRepository {
     // 프로젝트 멤버 여부 확인 (ACCEPTED 상태이고 삭제되지 않은 멤버만)
     isProjectMember(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const projectMember = yield prisma_1.default.projectMember.findFirst({
+            const projectMember = yield _lib_1.prisma.projectMember.findFirst({
                 where: {
                     projectId,
                     userId,
@@ -188,7 +185,7 @@ class MemberRepository {
     // 프로젝트의 OWNER 역할 멤버 수 확인
     countOwners(projectId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.projectMember.count({
+            return yield _lib_1.prisma.projectMember.count({
                 where: {
                     projectId,
                     role: 'OWNER',

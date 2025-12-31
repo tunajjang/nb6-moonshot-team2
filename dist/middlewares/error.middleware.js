@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorHandler = void 0;
-const app_error_1 = require("../lib/errors/app.error");
+const _lib_1 = require("@lib");
 // 에러 핸들링 미들웨어
 const errorHandler = (err, req, res, next) => {
     // AppError 인스턴스인 경우
-    if (err instanceof app_error_1.AppError) {
+    if (err instanceof _lib_1.AppError) {
         const response = {
             success: false,
             error: {

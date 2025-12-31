@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemberController = void 0;
-const member_service_1 = require("../services/member.service");
 const express_validator_1 = require("express-validator");
-const app_error_1 = require("../lib/errors/app.error");
+const _services_1 = require("@services");
+const _lib_1 = require("@lib");
 class MemberController {
     constructor() {
         // 프로젝트 멤버 목록 조회
@@ -22,7 +22,7 @@ class MemberController {
                 const { projectId } = req.params;
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!userId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 const members = yield this.memberService.getMembersByProjectId(parseInt(projectId), userId);
                 res.status(200).json({
@@ -42,12 +42,12 @@ class MemberController {
                 const { memberId } = req.params;
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!userId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 // 요청 데이터 검증
                 const errors = (0, express_validator_1.validationResult)(req);
                 if (!errors.isEmpty()) {
-                    throw new app_error_1.BadRequestError('Invalid input');
+                    throw new _lib_1.BadRequestError('Invalid input');
                 }
                 const member = yield this.memberService.updateMemberRole(parseInt(memberId), req.body.role, userId);
                 res.status(200).json({
@@ -67,12 +67,12 @@ class MemberController {
                 const { memberId } = req.params;
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!userId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 // 요청 데이터 검증
                 const errors = (0, express_validator_1.validationResult)(req);
                 if (!errors.isEmpty()) {
-                    throw new app_error_1.BadRequestError('Invalid input');
+                    throw new _lib_1.BadRequestError('Invalid input');
                 }
                 const member = yield this.memberService.updateMemberStatus(parseInt(memberId), req.body.memberStatus, userId);
                 res.status(200).json({
@@ -92,7 +92,7 @@ class MemberController {
                 const { memberId } = req.params;
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!userId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 yield this.memberService.deleteMember(parseInt(memberId), userId);
                 res.status(200).json({
@@ -111,7 +111,7 @@ class MemberController {
                 const { memberId } = req.params;
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!userId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 yield this.memberService.removeMember(parseInt(memberId), userId);
                 res.status(200).json({
@@ -130,12 +130,12 @@ class MemberController {
                 const { projectId } = req.params;
                 const hostId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!hostId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 // 요청 데이터 검증
                 const errors = (0, express_validator_1.validationResult)(req);
                 if (!errors.isEmpty()) {
-                    throw new app_error_1.BadRequestError('Invalid input');
+                    throw new _lib_1.BadRequestError('Invalid input');
                 }
                 const invitation = yield this.memberService.createInvitation(parseInt(projectId), hostId, req.body.email);
                 res.status(201).json({
@@ -155,7 +155,7 @@ class MemberController {
                 const { invitationId } = req.params;
                 const guestId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!guestId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 const invitation = yield this.memberService.acceptInvitation(invitationId, guestId);
                 res.status(200).json({
@@ -175,7 +175,7 @@ class MemberController {
                 const { invitationId } = req.params;
                 const hostId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!hostId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 const invitation = yield this.memberService.cancelInvitation(invitationId, hostId);
                 res.status(200).json({
@@ -195,7 +195,7 @@ class MemberController {
                 const { projectId } = req.params;
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
                 if (!userId) {
-                    throw new app_error_1.UnauthorizedError('User authentication required');
+                    throw new _lib_1.UnauthorizedError('User authentication required');
                 }
                 const invitations = yield this.memberService.getInvitationsByProjectId(parseInt(projectId), userId);
                 res.status(200).json({
@@ -208,7 +208,7 @@ class MemberController {
                 next(err);
             }
         });
-        this.memberService = new member_service_1.MemberService();
+        this.memberService = new _services_1.MemberService();
     }
 }
 exports.MemberController = MemberController;

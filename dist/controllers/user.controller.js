@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const superstruct_1 = require("superstruct");
-const _superstructs_1 = require("@superstructs");
 const http_status_codes_1 = require("http-status-codes");
+const _superstructs_1 = require("@superstructs");
 class UserController {
     constructor(userService) {
         this.userService = userService;

@@ -10,8 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectService = void 0;
-const badRequest_error_1 = require("../lib/errors/badRequest.error");
-const notFound_error_1 = require("../lib/errors/notFound.error");
+const _lib_1 = require("@lib");
 // 유저당 최대 5개의 프로젝트만 생성 가능
 const MAX_PROJECT_COUNT = 5;
 class ProjectService {
@@ -23,7 +22,7 @@ class ProjectService {
         return __awaiter(this, void 0, void 0, function* () {
             const existingProjectCount = yield this.projectRepository.countProjectsByUserId(userId);
             if (existingProjectCount >= MAX_PROJECT_COUNT) {
-                throw new badRequest_error_1.BadRequestError(`프로젝트는 최대 ${MAX_PROJECT_COUNT}개까지만 생성할 수 있습니다.`);
+                throw new _lib_1.BadRequestError(`프로젝트는 최대 ${MAX_PROJECT_COUNT}개까지만 생성할 수 있습니다.`);
             }
             const newProject = yield this.projectRepository.createProject(userId, dto.name, dto.description);
             return newProject;
@@ -34,7 +33,7 @@ class ProjectService {
         return __awaiter(this, void 0, void 0, function* () {
             const project = yield this.projectRepository.getProjectDetail(projectId);
             if (!project) {
-                throw new notFound_error_1.NotFoundError('Project not found');
+                throw new _lib_1.NotFoundError('Project not found');
             }
             const taskCount = {
                 PENDING: 0,
@@ -63,7 +62,7 @@ class ProjectService {
         return __awaiter(this, void 0, void 0, function* () {
             const project = yield this.projectRepository.findProjectById(projectId);
             if (!project) {
-                throw new notFound_error_1.NotFoundError('Project not found');
+                throw new _lib_1.NotFoundError('Project not found');
             }
             return this.projectRepository.updateProject(projectId, projectData);
         });
@@ -73,7 +72,7 @@ class ProjectService {
         return __awaiter(this, void 0, void 0, function* () {
             const project = yield this.projectRepository.findProjectById(projectId);
             if (!project) {
-                throw new notFound_error_1.NotFoundError('Project not found');
+                throw new _lib_1.NotFoundError('Project not found');
             }
             return this.projectRepository.deleteProject(projectId);
         });

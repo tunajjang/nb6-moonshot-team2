@@ -8,17 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentRepository = void 0;
-const prisma_1 = __importDefault(require("../lib/prisma"));
+const _lib_1 = require("@lib");
 class CommentRepository {
     // 댓글 생성
     create(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.comment.create({
+            return yield _lib_1.prisma.comment.create({
                 data,
                 include: {
                     author: {
@@ -36,7 +33,7 @@ class CommentRepository {
     // 특정 태스크의 댓글 목록 조회 (삭제되지 않은 댓글만)
     findByTaskId(taskId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.comment.findMany({
+            return yield _lib_1.prisma.comment.findMany({
                 where: {
                     taskId,
                     deletedAt: null,
@@ -60,7 +57,7 @@ class CommentRepository {
     // 댓글 ID로 조회
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.comment.findFirst({
+            return yield _lib_1.prisma.comment.findFirst({
                 where: {
                     id,
                     deletedAt: null,
@@ -81,7 +78,7 @@ class CommentRepository {
     // 댓글 수정
     update(id, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.comment.update({
+            return yield _lib_1.prisma.comment.update({
                 where: { id },
                 data: { content },
                 include: {
@@ -100,7 +97,7 @@ class CommentRepository {
     // 댓글 삭제 (soft delete)
     softDelete(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.comment.update({
+            return yield _lib_1.prisma.comment.update({
                 where: { id },
                 data: { deletedAt: new Date() },
                 include: {
@@ -119,7 +116,7 @@ class CommentRepository {
     // 태스크 존재 여부 확인
     taskExists(taskId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const task = yield prisma_1.default.task.findFirst({
+            const task = yield _lib_1.prisma.task.findFirst({
                 where: {
                     id: taskId,
                     deletedAt: null,
@@ -132,7 +129,7 @@ class CommentRepository {
     getTaskProjectId(taskId) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            const task = yield prisma_1.default.task.findFirst({
+            const task = yield _lib_1.prisma.task.findFirst({
                 where: {
                     id: taskId,
                     deletedAt: null,
@@ -147,7 +144,7 @@ class CommentRepository {
     // 프로젝트 멤버 여부 확인 (ACCEPTED 상태이고 삭제되지 않은 멤버만)
     isProjectMember(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const projectMember = yield prisma_1.default.projectMember.findFirst({
+            const projectMember = yield _lib_1.prisma.projectMember.findFirst({
                 where: {
                     projectId,
                     userId,

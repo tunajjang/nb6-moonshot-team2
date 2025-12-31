@@ -10,8 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectController = void 0;
-const notFound_error_1 = require("../lib/errors/notFound.error");
-const badRequest_error_1 = require("../lib/errors/badRequest.error");
+const _lib_1 = require("@lib");
 class ProjectController {
     constructor(projectService) {
         this.createProject = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -29,7 +28,7 @@ class ProjectController {
                 return res.status(200).json(project);
             }
             catch (error) {
-                if (error instanceof notFound_error_1.NotFoundError) {
+                if (error instanceof _lib_1.NotFoundError) {
                     res.status(404).send();
                     return;
                 }
@@ -40,7 +39,7 @@ class ProjectController {
             const projectId = parseInt(req.params.projectId, 10);
             const { name, description } = req.body;
             if (isNaN(projectId)) {
-                throw new badRequest_error_1.BadRequestError('잘못된 데이터 형식');
+                throw new _lib_1.BadRequestError('잘못된 데이터 형식');
             }
             try {
                 const updatedProject = yield this.projectService.updateProject(projectId, {
@@ -50,7 +49,7 @@ class ProjectController {
                 res.status(200).json(updatedProject);
             }
             catch (error) {
-                if (error instanceof notFound_error_1.NotFoundError) {
+                if (error instanceof _lib_1.NotFoundError) {
                     res.status(404).send();
                     return;
                 }
@@ -60,14 +59,14 @@ class ProjectController {
         this.deleteProject = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const projectId = parseInt(req.params.projectId, 10);
             if (isNaN(projectId)) {
-                throw new badRequest_error_1.BadRequestError('잘못된 데이터 형식');
+                throw new _lib_1.BadRequestError('잘못된 데이터 형식');
             }
             try {
                 yield this.projectService.deleteProject(projectId);
                 res.status(204).send();
             }
             catch (error) {
-                if (error instanceof notFound_error_1.NotFoundError) {
+                if (error instanceof _lib_1.NotFoundError) {
                     res.status(404).send();
                     return;
                 }

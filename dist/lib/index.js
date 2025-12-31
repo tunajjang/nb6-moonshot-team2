@@ -14,8 +14,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./constants"), exports);
+__exportStar(require("./prisma"), exports);
+// errors
 __exportStar(require("./errors/app.error"), exports);
-__exportStar(require("./errors/base.error"), exports);
+__exportStar(require("./errors/comment.error"), exports);
 __exportStar(require("./errors/member.error"), exports);
-// export * from './errors/notFound.error';
