@@ -38,10 +38,6 @@ async function main() {
         name: faker.book.title() + ' 프로젝트',
         description: faker.lorem.sentence(10),
         ownerId: randomUser.id,
-        memberCount: 0,
-        todoCount: 0,
-        inProgressCount: 0,
-        doneCount: 0,
       },
     });
   }

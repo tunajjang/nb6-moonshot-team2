@@ -1,14 +1,10 @@
 import { PrismaClient, Project, ProjectRole, MemberStatus, User, Prisma } from '@prisma/client';
 
 export class ProjectRepository {
-  private prisma: PrismaClient;
-
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
-  }
+  constructor(private prisma: PrismaClient) {}
 
   // 유저가 가진 프로젝트 개수 조회
-  async countProjectsByUserId(userId: User['id']): Promise<number> {
+  async countOwnedProjectsByUserId(userId: User['id']): Promise<number> {
     return await this.prisma.project.count({
       where: {
         ownerId: userId,
@@ -24,7 +20,6 @@ export class ProjectRepository {
         ownerId: userId,
         name,
         description,
-        // Nested Write: 프로젝트를 만들면서 동시에 멤버 테이블에도 데이터 넣기
         projectMembers: {
           create: {
             userId,
@@ -36,40 +31,9 @@ export class ProjectRepository {
     });
   }
 
-  // 프로젝트 목록 조회 (Soft Delete)
-  async getMyProjects(userId: User['id'], sort: 'latest' | 'alphabetical') {
-    const orderBy: Prisma.ProjectOrderByWithRelationInput =
-      sort === 'latest' ? { createdAt: 'desc' } : { name: 'asc' };
-
-    return this.prisma.project.findMany({
-      where: {
-        projectMembers: {
-          some: { userId, deletedAt: null },
-        },
-        deletedAt: null,
-      },
-      include: {
-        _count: {
-          select: { projectMembers: { where: { deletedAt: null } } },
-        },
-        tasks: {
-          where: { deletedAt: null },
-          select: { status: true },
-        },
-      },
-      orderBy,
-    });
-  }
-  // 유저 존재 여부 확인
-  async findUserById(userId: User['id']) {
-    return this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
-    });
-  }
-
   // 프로젝트 상세 조회
-  async getProjectDetail(projectId: Project['id']) {
-    return this.prisma.project.findFirst({
+  async getProjectDetailData(projectId: number) {
+    const project = await this.prisma.project.findUnique({
       where: {
         id: projectId,
         deletedAt: null,
@@ -78,33 +42,71 @@ export class ProjectRepository {
         _count: {
           select: { projectMembers: { where: { deletedAt: null } } },
         },
-        tasks: {
-          where: { deletedAt: null },
-          select: { status: true },
-        },
+      },
+    });
+
+    if (!project) return null;
+
+    // 상태별 할 일 개수 (Promise.all로 병렬 처리 - 성능 최적화): 꺼내오지 않고 count()만 호출하여 DB 레벨에서 계산
+    const [todoCount, inProgressCount, doneCount] = await Promise.all([
+      this.prisma.task.count({ where: { projectId, status: 'PENDING', deletedAt: null } }),
+      this.prisma.task.count({ where: { projectId, status: 'IN_PROGRESS', deletedAt: null } }),
+      this.prisma.task.count({ where: { projectId, status: 'DONE', deletedAt: null } }),
+    ]);
+
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      memberCount: project._count.projectMembers,
+      todoCount,
+      inProgressCount,
+      doneCount,
+    };
+  }
+
+  // 프로젝트 수정
+  async updateProject(
+    projectId: number,
+    data: { name?: string; description?: string },
+  ): Promise<Project> {
+    return this.prisma.project.update({
+      where: {
+        id: projectId,
+        deletedAt: null,
+      },
+      data: {
+        name: data.name,
+        description: data.description,
       },
     });
   }
 
-  // 프로젝트 ID로 조회 (수정 시 존재 확인용)
-  async findProjectById(projectId: Project['id']) {
-    return this.prisma.project.findFirst({
-      where: { id: projectId, deletedAt: null },
+  // 권한 체크용 (이 유저가 멤버인지 확인)
+  async isMember(projectId: number, userId: number): Promise<boolean> {
+    const member = await this.prisma.projectMember.findFirst({
+      where: { projectId, userId, deletedAt: null },
     });
+    return !!member;
   }
 
-  // 프로젝트 수정
-  async updateProject(projectId: Project['id'], projectData: Prisma.ProjectUpdateInput) {
-    return this.prisma.project.update({
-      where: { id: projectId },
-      data: projectData,
+  // 프로젝트 ID로 조회 (Soft Delete )
+  async findProjectById(projectId: number): Promise<Project | null> {
+    return this.prisma.project.findUnique({
+      where: {
+        id: projectId,
+        deletedAt: null,
+      },
     });
   }
 
   // 프로젝트 삭제
-  async deleteProject(projectId: Project['id']) {
-    return this.prisma.project.update({
-      where: { id: projectId },
+  async deleteProject(projectId: number): Promise<void> {
+    await this.prisma.project.update({
+      where: {
+        id: projectId,
+        deletedAt: null,
+      },
       data: {
         deletedAt: new Date(),
       },
