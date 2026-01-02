@@ -7,12 +7,16 @@ export class UserRepository {
     this.prisma = prisma;
   }
 
-  //사용자 정보 조회
+  /**
+   * 사용자 정보 조회
+   */
   async getUserById(userId: number): Promise<User | null> {
     return await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
   }
 
-  // 사용자 정보 수정
+  /**
+   * 사용자 정보 수정
+   */
   async updateUser(userId: number, userData: Prisma.UserUpdateInput): Promise<User> {
     return await this.prisma.user.update({
       where: { id: userId },
@@ -20,7 +24,9 @@ export class UserRepository {
     });
   }
 
-  // 사용자 정보 삭제 soft delete
+  /**
+   * 사용자 정보 삭제 soft delete
+   */
   async deleteUser(userId: number): Promise<User> {
     return await this.prisma.user.update({
       where: { id: userId },
@@ -30,15 +36,43 @@ export class UserRepository {
     });
   }
 
-  // 사용자 목록 조회
+  /**
+   * 사용자 목록 조회
+   */
   async findUsers(): Promise<User[]> {
     return await this.prisma.user.findMany({ where: { deletedAt: null } });
   }
 
-  //이메일로 사용자 조회
+  /**
+   * 이메일로 사용자 조회
+   */
   async findUserByEmail(email: string): Promise<User | null> {
     return await this.prisma.user.findFirst({
       where: { email, deletedAt: null },
     });
+  }
+
+  /**
+   * 내가 멤버로 속한 프로젝트 목록 조회
+   */
+  async findProjectsByUserId(userId: User['id']) {
+    const projects = await this.prisma.projectMember.findMany({
+      where: { userId, deletedAt: null },
+      include: { project: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return projects;
+  }
+
+  /**
+   * 나에게 할당된 태스크 목록 조회
+   */
+  async findTasksByUserId(userId: User['id']) {
+    const tasks = await this.prisma.task.findMany({
+      where: { assigneeId: userId, deletedAt: null },
+      include: { project: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return tasks;
   }
 }

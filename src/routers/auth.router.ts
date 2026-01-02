@@ -9,7 +9,7 @@ export const authRouter = (authController: AuthController) => {
 
   router.route('/login').post(asyncHandler(authController.login));
 
-  // router.route('/logout').post(asyncHandler(authController.logout));
+  router.route('/logout').post(asyncHandler(authController.logout));
 
   router.route('/refresh').post(asyncHandler(authController.refreshTokens));
 
