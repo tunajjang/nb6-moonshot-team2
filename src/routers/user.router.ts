@@ -11,7 +11,7 @@ export const userRouter = (userController: UserController) => {
   router.route('/search').get(asyncHandler(userController.findUserByEmail));
 
   router
-    .route('/:id')
+    .route('/me')
     .patch(authenticate, validate(UpdateUserStruct), asyncHandler(userController.updateUser))
     .get(asyncHandler(userController.getUserById)) // 조회는 공개 가능
     .delete(authenticate, asyncHandler(userController.deleteUser)); // 삭제는 인증 필요
