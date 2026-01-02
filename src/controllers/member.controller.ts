@@ -221,4 +221,48 @@ export class MemberController {
       next(err);
     }
   };
+
+  // 프로젝트에서 유저 제외하기
+  removeUserFromProject = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const { projectId, userId } = req.params;
+      const requesterId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      if (!requesterId) {
+        throw new UnauthorizedError('User authentication required');
+      }
+      await this.memberService.removeUserFromProject(
+        parseInt(projectId),
+        parseInt(userId),
+        requesterId,
+      );
+      res.status(200).json({
+        success: true,
+        message: 'User removed from project successfully',
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // 초대 삭제
+  deleteInvitation = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { invitationId } = req.params;
+      const hostId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
+      if (!hostId) {
+        throw new UnauthorizedError('User authentication required');
+      }
+      await this.memberService.deleteInvitation(invitationId, hostId);
+      res.status(200).json({
+        success: true,
+        message: 'Invitation deleted successfully',
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 }

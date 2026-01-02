@@ -265,6 +265,30 @@ export class MemberService {
     return await this.invitationRepository.updateStatus(invitationId, 'CANCELED');
   }
 
+  // 초대 삭제 (프로젝트 소유자만 가능) - DELETE 메서드용
+  async deleteInvitation(invitationId: string, hostId: number) {
+    // 초대 존재 여부 확인
+    const invitation = await this.invitationRepository.findById(invitationId);
+    if (!invitation) {
+      throw new InvitationNotFoundError(invitationId);
+    }
+    // 프로젝트 소유자인지 확인
+    const isOwner = await this.memberRepository.isProjectOwner(invitation.projectId, hostId);
+    if (!isOwner) {
+      throw new MemberUnauthorizedError('Only project owner can delete invitations');
+    }
+    // 이미 수락된 초대는 삭제 불가
+    if (invitation.invitationStatus === 'ACCEPTED') {
+      throw new InvitationAlreadyAcceptedError('Cannot delete an accepted invitation');
+    }
+    // 이미 취소된 초대인지 확인
+    if (invitation.invitationStatus === 'CANCELED') {
+      throw new InvitationAlreadyCanceledError('Invitation has already been canceled');
+    }
+    // 초대 취소
+    return await this.invitationRepository.updateStatus(invitationId, 'CANCELED');
+  }
+
   // 프로젝트의 초대 목록 조회
   async getInvitationsByProjectId(projectId: number, userId: number) {
     // 프로젝트 존재 여부 확인
@@ -278,5 +302,36 @@ export class MemberService {
       throw new MemberUnauthorizedError('Only project owner can view invitations');
     }
     return await this.invitationRepository.findByProjectId(projectId);
+  }
+
+  // 프로젝트에서 유저 제외하기 (userId로)
+  async removeUserFromProject(projectId: number, userId: number, requesterId: number) {
+    // 프로젝트 존재 여부 확인
+    const projectExists = await this.memberRepository.projectExists(projectId);
+    if (!projectExists) {
+      throw new ProjectNotFoundError(projectId);
+    }
+    // 프로젝트 소유자만 멤버 제외 가능
+    const isOwner = await this.memberRepository.isProjectOwner(projectId, requesterId);
+    if (!isOwner) {
+      throw new MemberUnauthorizedError('Only project owner can remove members');
+    }
+    // 제외할 멤버 조회
+    const member = await this.memberRepository.findByProjectAndUser(projectId, userId);
+    if (!member) {
+      throw new MemberNotFoundError(0); // userId로 찾은 멤버가 없음
+    }
+    // 자신을 제외할 수 없음
+    if (member.userId === requesterId) {
+      throw new MemberUnauthorizedError('You cannot remove yourself. Use leave project instead.');
+    }
+    // 프로젝트 소유자를 제외할 수 없음
+    if (member.role === 'OWNER') {
+      const ownerCount = await this.memberRepository.countOwners(projectId);
+      if (ownerCount <= 1) {
+        throw new MemberUnauthorizedError('Cannot remove the only owner of the project');
+      }
+    }
+    return await this.memberRepository.softDelete(member.id);
   }
 }
