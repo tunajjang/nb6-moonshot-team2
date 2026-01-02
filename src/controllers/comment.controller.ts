@@ -64,6 +64,23 @@ export class CommentController {
     }
   };
 
+  // 댓글 조회
+  getCommentById = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { commentId } = req.params;
+
+      const comment = await this.commentService.getCommentById(parseInt(commentId));
+
+      res.status(200).json({
+        success: true,
+        message: 'Comment retrieved successfully',
+        data: comment,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
   // 댓글 수정
   updateComment = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {

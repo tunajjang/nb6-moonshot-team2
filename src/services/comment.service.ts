@@ -53,6 +53,16 @@ export class CommentService {
     return await this.commentRepository.findByTaskId(taskId);
   }
 
+  // 댓글 조회
+  async getCommentById(commentId: number): Promise<Comment> {
+    const comment = await this.commentRepository.findById(commentId);
+    if (!comment) {
+      throw new CommentNotFoundError(commentId);
+    }
+
+    return comment;
+  }
+
   // 댓글 수정
   async updateComment(commentId: number, content: string, authorId: number): Promise<Comment> {
     // 댓글 존재 여부 및 작성자 확인
