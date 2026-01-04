@@ -3,3 +3,4 @@ export * from './comment.service';
 export * from './member.service';
 export * from './project.service';
 export * from './user.service';
+export * from './mail.service';

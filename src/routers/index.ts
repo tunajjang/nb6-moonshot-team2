@@ -8,7 +8,14 @@ import {
   InvitationRepository,
   ProjectRepository,
 } from '@repositories';
-import { UserService, AuthService, CommentService, MemberService, ProjectService } from '@services';
+import {
+  UserService,
+  AuthService,
+  CommentService,
+  MemberService,
+  ProjectService,
+  MailService,
+} from '@services';
 import {
   UserController,
   AuthController,
@@ -37,7 +44,8 @@ const userService = new UserService(userRepository);
 const authService = new AuthService(authRepository, userRepository);
 const commentService = new CommentService();
 const memberService = new MemberService();
-const projectService = new ProjectService(projectRepository);
+const mailService = new MailService();
+const projectService = new ProjectService(projectRepository, mailService);
 
 const userController = new UserController(userService);
 const authController = new AuthController(authService);
