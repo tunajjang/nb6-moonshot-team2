@@ -25,6 +25,16 @@ export class UserRepository {
   }
 
   /**
+   * 비밀번호 정보 수정
+   */
+  async updatePassword(userId: number, userData: Prisma.UserUpdateInput): Promise<User> {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: userData.password },
+    });
+  }
+
+  /**
    * 사용자 정보 삭제 soft delete
    */
   async deleteUser(userId: number): Promise<User> {

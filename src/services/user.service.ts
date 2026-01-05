@@ -47,6 +47,16 @@ export class UserService {
   }
 
   /**
+   * 비밀번호 수정
+   */
+  async updatePassword(userId: User['id'], userData: Prisma.UserUpdateInput) {
+    await this.getUserById(userId);
+    const newPassword = userData.password as string;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    return await this.userRepository.updatePassword(userId, { password: hashedPassword });
+  }
+
+  /**
    * 사용자 정보 삭제(soft delete)
    */
   async deleteUser(userId: User['id']) {
@@ -69,6 +79,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundError('User not found');
     }
+
     return user;
   }
 
