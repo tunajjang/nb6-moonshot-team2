@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { ProjectController, MemberController } from '@controllers';
+import { ProjectController, MemberController, InvitationController } from '@controllers';
 import { CreateInvitationSchema } from '@superstructs';
 import { authenticate, asyncHandler } from '@middlewares'; // asyncHandler 잊지 말고 임포트!
 
 export const projectRouter = (
   projectController: ProjectController,
   memberController: MemberController,
+  invitationController: InvitationController,
 ) => {
   const router = Router();
 
@@ -23,7 +24,13 @@ export const projectRouter = (
   router.post(
     '/:projectId/invitations',
     ...CreateInvitationSchema,
-    asyncHandler(memberController.createInvitation),
+    asyncHandler(invitationController.createInvitation),
+  );
+
+  // 프로젝트의 초대 목록 조회
+  router.get(
+    '/:projectId/invitations',
+    asyncHandler(invitationController.getInvitationsByProjectId),
   );
 
   // 프로젝트 상세 조회, 수정, 삭제
