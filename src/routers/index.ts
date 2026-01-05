@@ -31,7 +31,6 @@ import { userRouter } from './user.router';
 import { projectRouter } from './project.router';
 import memberRouter from './member.router';
 import commentRouter from './comment.router';
-import invitationRouter from './invitation.router';
 
 const router = Router();
 
@@ -46,8 +45,7 @@ const userService = new UserService(userRepository);
 const authService = new AuthService(authRepository, userRepository);
 const commentService = new CommentService();
 const memberService = new MemberService();
-const mailService = new MailService();
-const projectService = new ProjectService(projectRepository, mailService);
+const projectService = new ProjectService(projectRepository);
 
 const userController = new UserController(userService);
 const authController = new AuthController(authService);

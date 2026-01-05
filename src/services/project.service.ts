@@ -3,13 +3,12 @@ import { NotFoundError, BadRequestError, ForbiddenError } from '@lib';
 import { CreateProjectDto, ProjectDetailDto, UpdateProjectDto } from '@/types';
 import * as s from 'superstruct';
 import { CreateProjectStruct, UpdateProjectStruct } from '@/superstructs';
-import { MailService } from '@services';
 
 // 유저당 최대 5개의 프로젝트만 생성 가능
 const MAX_PROJECT_COUNT = 5;
 
 export class ProjectService {
-  constructor(private projectRepository: ProjectRepository, private mailService: MailService) {}
+  constructor(private projectRepository: ProjectRepository) {}
 
   // 프로젝트 생성
   async createProject(userId: number, dto: CreateProjectDto): Promise<ProjectDetailDto> {
@@ -75,22 +74,13 @@ export class ProjectService {
       throw new BadRequestError('잘못된 데이터 형식');
     }
 
-    const project = (await this.projectRepository.findProjectById(projectId)) as any;
+    const project = await this.projectRepository.findProjectById(projectId);
     if (!project) throw new NotFoundError();
 
     if (project.ownerId !== userId) {
       throw new ForbiddenError('프로젝트 관리자가 아닙니다');
     }
 
-    const memberEmails =
-      project.projectMembers
-        ?.map((m: any) => m.user?.email)
-        .filter((email: string | undefined) => !!email) || [];
-
     await this.projectRepository.deleteProject(projectId);
-
-    if (memberEmails.length > 0) {
-      this.mailService.sendProjectDeletionEmail(memberEmails, project.name);
-    }
   }
 }
