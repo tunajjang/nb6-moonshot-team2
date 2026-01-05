@@ -14,7 +14,7 @@ export class AppError extends Error {
 
 // 404 Not Found 에러
 export class NotFoundError extends AppError {
-  constructor(message: string = 'Resource not found') {
+  constructor(message: string = '리소스를 찾을 수 없습니다') {
     super(message, 404);
     this.name = 'NotFoundError';
   }
@@ -22,7 +22,7 @@ export class NotFoundError extends AppError {
 
 // 401 Unauthorized 에러
 export class UnauthorizedError extends AppError {
-  constructor(message: string = 'Unauthorized') {
+  constructor(message: string = '인증이 필요합니다') {
     super(message, 401);
     this.name = 'UnauthorizedError';
   }
@@ -30,7 +30,7 @@ export class UnauthorizedError extends AppError {
 
 // 403 Forbidden 에러
 export class ForbiddenError extends AppError {
-  constructor(message: string = 'Forbidden') {
+  constructor(message: string = '접근이 거부되었습니다') {
     super(message, 403);
     this.name = 'ForbiddenError';
   }
@@ -38,7 +38,7 @@ export class ForbiddenError extends AppError {
 
 // 400 Bad Request 에러
 export class BadRequestError extends AppError {
-  constructor(message: string = 'Bad request') {
+  constructor(message: string = '잘못된 요청입니다') {
     super(message, 400);
     this.name = 'BadRequestError';
   }
@@ -46,7 +46,7 @@ export class BadRequestError extends AppError {
 
 // 409 Conflict 에러
 export class ConflictError extends AppError {
-  constructor(message: string = 'Conflict') {
+  constructor(message: string = '충돌이 발생했습니다') {
     super(message, 409);
     this.name = 'ConflictError';
   }

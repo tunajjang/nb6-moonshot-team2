@@ -42,7 +42,9 @@ exports.OwnerCannotLeaveError = OwnerCannotLeaveError;
 // 초대 관련 에러 클래스들 (멤버 기능에 포함)
 class InvitationNotFoundError extends app_error_1.NotFoundError {
     constructor(invitationId) {
-        super(invitationId ? `ID ${invitationId}에 해당하는 초대를 찾을 수 없습니다` : '초대를 찾을 수 없습니다');
+        super(invitationId
+            ? `ID ${invitationId}에 해당하는 초대를 찾을 수 없습니다`
+            : '초대를 찾을 수 없습니다');
         this.name = 'InvitationNotFoundError';
     }
 }
@@ -68,4 +70,3 @@ class InvitationAlreadyExistsError extends app_error_1.ConflictError {
     }
 }
 exports.InvitationAlreadyExistsError = InvitationAlreadyExistsError;
-// UserNotFoundError는 user.error.ts로 이동됨
