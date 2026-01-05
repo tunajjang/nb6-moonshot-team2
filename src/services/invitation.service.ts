@@ -209,6 +209,15 @@ export class InvitationService {
     return await this.invitationRepository.updateStatus(invitationId, 'CANCELED');
   }
 
+  // 초대 정보 조회 (링크 접속 시 사용)
+  async getInvitationById(invitationId: string) {
+    const invitation = await this.invitationRepository.findById(invitationId);
+    if (!invitation) {
+      throw new InvitationNotFoundError(invitationId);
+    }
+    return invitation;
+  }
+
   // 프로젝트의 초대 목록 조회
   async getInvitationsByProjectId(projectId: number, userId: number) {
     // 프로젝트 존재 여부 확인

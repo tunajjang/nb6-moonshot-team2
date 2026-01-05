@@ -55,3 +55,36 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     next(error);
   }
 };
+
+/**
+ * 선택적 인증 미들웨어 - 토큰이 있으면 검증하고, 없으면 그냥 통과
+ * 초대 링크 접속 시 사용 (로그인되어 있으면 자동 수락, 없으면 로그인 페이지로 리다이렉트)
+ */
+export const optionalAuthenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const jwtSecret = process.env.JWT_SECRET;
+
+      if (token && jwtSecret) {
+        try {
+          const decoded = jwt.verify(token, jwtSecret) as { id: number; email: string };
+          req.user = {
+            id: decoded.id,
+            email: decoded.email,
+          };
+        } catch (error) {
+          // 토큰이 유효하지 않아도 에러를 던지지 않고 그냥 통과
+          // req.user는 undefined로 유지됨
+        }
+      }
+    }
+
+    next();
+  } catch (error) {
+    // 에러가 발생해도 그냥 통과 (인증 실패 시 req.user는 undefined)
+    next();
+  }
+};

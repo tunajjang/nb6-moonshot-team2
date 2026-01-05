@@ -40,7 +40,43 @@ class InvitationController {
                 next(err);
             }
         });
-        // 초대 수락 (초대 링크 접속 시)
+        // 초대 링크 접속 시 (GET) - 로그인되어 있으면 자동 수락, 없으면 로그인 페이지로 리다이렉트
+        this.getInvitationLink = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const { invitationId } = req.params;
+                const guestId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 선택적 인증 미들웨어에서 설정된 사용자 ID
+                // 초대 정보 조회
+                const invitation = yield this.invitationService.getInvitationById(invitationId);
+                // 로그인되어 있지 않은 경우
+                if (!guestId) {
+                    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+                    // 로그인 페이지로 리다이렉트 (초대 ID를 쿼리 파라미터로 전달)
+                    return res.redirect(`${frontendUrl}/login?invitation=${invitationId}`);
+                }
+                // 로그인되어 있고, 초대받은 사용자인 경우 자동 수락
+                if (invitation.guest.id === guestId) {
+                    try {
+                        const acceptedInvitation = yield this.invitationService.acceptInvitation(invitationId, guestId);
+                        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+                        // 프로젝트 페이지로 리다이렉트
+                        return res.redirect(`${frontendUrl}/projects/${acceptedInvitation.project.id}`);
+                    }
+                    catch (acceptError) {
+                        // 이미 수락되었거나 다른 에러인 경우
+                        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+                        return res.redirect(`${frontendUrl}/invitations/${invitationId}?error=already_accepted`);
+                    }
+                }
+                // 로그인되어 있지만 초대받은 사용자가 아닌 경우
+                const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+                return res.redirect(`${frontendUrl}/invitations/${invitationId}?error=unauthorized`);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+        // 초대 수락 (POST) - API 호출용
         this.acceptInvitation = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {

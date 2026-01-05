@@ -199,6 +199,16 @@ class InvitationService {
             return yield this.invitationRepository.updateStatus(invitationId, 'CANCELED');
         });
     }
+    // 초대 정보 조회 (링크 접속 시 사용)
+    getInvitationById(invitationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const invitation = yield this.invitationRepository.findById(invitationId);
+            if (!invitation) {
+                throw new _lib_1.InvitationNotFoundError(invitationId);
+            }
+            return invitation;
+        });
+    }
     // 프로젝트의 초대 목록 조회
     getInvitationsByProjectId(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
