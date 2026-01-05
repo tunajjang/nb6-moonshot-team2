@@ -9,49 +9,47 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   // 비밀번호 검증
-  public verifyPassword = async (req: AuthRequest, res: Response) => {
+  verifyPassword = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
-    const { password } = req.body;
 
-    await this.userService.verifyPassword(userId, password);
+    await this.userService.verifyPassword(userId, req.body);
     return res.status(StatusCodes.OK).json({ message: 'Password verified successfully!' });
   };
 
   // ID로 찾기
-  public getUserById = async (req: Request, res: Response) => {
+  getUserById = async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid user Id' });
       return;
     }
-
     const { password, ...userData } = await this.userService.getUserById(userId);
     return res.status(StatusCodes.OK).json(userData);
   };
 
   // 내정보 찾기
-  public getMe = async (req: AuthRequest, res: Response) => {
+  getMe = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
     const { password, ...userData } = await this.userService.getUserById(userId);
     return res.status(StatusCodes.OK).json(userData);
   };
 
   // 내정보 수정
-  public updateUser = async (req: AuthRequest, res: Response) => {
+  updateUser = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
     const { password, ...userData } = await this.userService.updateUser(userId, req.body);
     return res.status(StatusCodes.OK).json(userData);
   };
 
   // 비밀번호 수정
-  public updatePassword = async (req: AuthRequest, res: Response) => {
+  updatePassword = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
     await this.userService.updatePassword(userId, req.body.password);
     return res.status(StatusCodes.OK).json({ message: '비밀번호가 변경되었습니다.' });
   };
 
   // 사용자 찾기
-  public findUsers = async (req: Request, res: Response) => {
+  findUsers = async (req: Request, res: Response) => {
     const users = await this.userService.findUsers();
     const usersWithoutPassword = users.map((user) => {
       const { password, ...userData } = user;
@@ -61,13 +59,13 @@ export class UserController {
   };
 
   // 사용자 삭제
-  public deleteUser = async (req: AuthRequest, res: Response) => {
+  deleteUser = async (req: AuthRequest, res: Response) => {
     await this.userService.deleteUser(req.user?.id as number);
     return res.status(StatusCodes.OK).json({ message: '사용자를 삭제했습니다.' });
   };
 
   // EMAIL로 찾기
-  public findUserByEmail = async (req: Request, res: Response) => {
+  findUserByEmail = async (req: Request, res: Response) => {
     const email = req.query.email as string;
     if (!is(email, EmailStruct)) {
       res.status(StatusCodes.BAD_REQUEST).json({ message: 'Email is required' });
@@ -78,14 +76,14 @@ export class UserController {
   };
 
   // 내 프로젝트 목록 보기
-  public getMyProjects = async (req: AuthRequest, res: Response) => {
+  getMyProjects = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
     const projects = await this.userService.getMyProjects(userId);
     return res.status(StatusCodes.OK).json(projects);
   };
 
   // 내 할일 목록 보기
-  public getMyTasks = async (req: AuthRequest, res: Response) => {
+  getMyTasks = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
     const tasks = await this.userService.getMyTasks(userId);
     return res.status(StatusCodes.OK).json(tasks);

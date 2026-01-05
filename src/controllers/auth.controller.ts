@@ -12,7 +12,7 @@ export class AuthController {
   /**
    * 회원가입
    */
-  public signUp = async (req: Request, res: Response) => {
+  signUp = async (req: Request, res: Response) => {
     if (!is(req.body, signUpStruct)) {
       return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid input data.' });
     }
@@ -24,7 +24,7 @@ export class AuthController {
   /**
    * 로그인
    */
-  public login = async (req: Request, res: Response) => {
+  login = async (req: Request, res: Response) => {
     if (!is(req.body, loginStruct)) {
       return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid input data.' });
     }
@@ -38,7 +38,7 @@ export class AuthController {
   /**
    * 로그아웃
    */
-  public logout = async (req: Request, res: Response) => {
+  logout = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
       throw new AppError('리프레시 토큰이 존재하지 않습니다.', StatusCodes.BAD_REQUEST);
@@ -50,7 +50,7 @@ export class AuthController {
   /**
    * 리프레시 토큰 재발급
    */
-  public refreshTokens = async (req: Request, res: Response) => {
+  refreshTokens = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
       throw new AppError('리프레시 토큰이 존재하지 않습니다.', StatusCodes.BAD_REQUEST);
@@ -63,7 +63,7 @@ export class AuthController {
   /**
    * 구글 로그인 페이지 리다이렉트
    */
-  public googleAuth = (req: Request, res: Response) => {
+  googleAuth = (req: Request, res: Response) => {
     const url = this.authService.getGoogleAuthURL();
     return res.redirect(url);
   };
@@ -71,7 +71,7 @@ export class AuthController {
   /**
    * 구글 로그인 콜백 처리
    */
-  public googleAuthCallback = async (req: Request, res: Response) => {
+  googleAuthCallback = async (req: Request, res: Response) => {
     const { code } = req.query;
     if (!code) {
       throw new AppError('인증 코드가 없습니다.', StatusCodes.BAD_REQUEST);
