@@ -11,17 +11,17 @@ import {
   InvitationAlreadyCanceledError,
   UserNotFoundError,
 } from '@lib';
-import { EmailService } from './email.service';
+import { MailService } from './mail.service';
 
 export class InvitationService {
   private memberRepository: MemberRepository;
   private invitationRepository: InvitationRepository;
-  private emailService: EmailService;
+  private mailService: MailService;
 
   constructor() {
     this.memberRepository = new MemberRepository();
     this.invitationRepository = new InvitationRepository();
-    this.emailService = new EmailService();
+    this.mailService = new MailService();
   }
 
   // 초대 생성
@@ -71,15 +71,14 @@ export class InvitationService {
     const invitationLink = `${frontendUrl}/invitations/${invitation.id}/accept`;
 
     // 이메일 발송 (비동기, 에러가 발생해도 초대는 생성되었으므로 로깅만 하고 계속 진행)
-    this.emailService
+    this.mailService
       .sendInvitationEmail({
         to: guestEmail,
-        invitationId: invitation.id,
         projectName: invitation.project.name,
         hostName: invitation.host.name,
         invitationLink,
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error('초대 이메일 발송 실패 (초대는 생성됨):', error);
         // 이메일 발송 실패해도 초대는 이미 생성되었으므로 에러를 던지지 않음
       });

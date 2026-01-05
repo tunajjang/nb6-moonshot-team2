@@ -12,12 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvitationService = void 0;
 const _repositories_1 = require("@repositories");
 const _lib_1 = require("@lib");
-const email_service_1 = require("./email.service");
+const mail_service_1 = require("./mail.service");
 class InvitationService {
     constructor() {
         this.memberRepository = new _repositories_1.MemberRepository();
         this.invitationRepository = new _repositories_1.InvitationRepository();
-        this.emailService = new email_service_1.EmailService();
+        this.mailService = new mail_service_1.MailService();
     }
     // 초대 생성
     createInvitation(projectId, hostId, guestEmail) {
@@ -62,10 +62,9 @@ class InvitationService {
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
             const invitationLink = `${frontendUrl}/invitations/${invitation.id}/accept`;
             // 이메일 발송 (비동기, 에러가 발생해도 초대는 생성되었으므로 로깅만 하고 계속 진행)
-            this.emailService
+            this.mailService
                 .sendInvitationEmail({
                 to: guestEmail,
-                invitationId: invitation.id,
                 projectName: invitation.project.name,
                 hostName: invitation.host.name,
                 invitationLink,
