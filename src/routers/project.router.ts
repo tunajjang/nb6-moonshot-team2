@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { ProjectController, MemberController, InvitationController } from '@controllers';
 import { CreateInvitationSchema } from '@superstructs';
-import { authenticate, asyncHandler } from '@middlewares'; // asyncHandler 잊지 말고 임포트!
-import swaggerJSDoc from 'swagger-jsdoc';
+import { authenticate, asyncHandler } from '@middlewares';
 
 export const projectRouter = (
   projectController: ProjectController,
