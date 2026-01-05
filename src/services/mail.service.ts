@@ -5,7 +5,7 @@ export class MailService {
 
   constructor() {
     // 환경 변수 체크
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
       console.warn('⚠️ SMTP 설정이 누락되었습니다. 메일 발송 기능이 작동하지 않을 수 있습니다.');
     }
 
@@ -14,7 +14,7 @@ export class MailService {
       service: 'gmail', // 우리 서버가 어느 메일 서버를 이용할 것인지? => 일단 Gmail 사용 (네이버 등으로 변경 가능)
       auth: {
         user: process.env.SMTP_USER, // 내 이메일 주소 (보내는 사람)
-        pass: process.env.SMTP_PASS, // 이메일 앱 비밀번호
+        pass: process.env.SMTP_PASSWORD, // 이메일 앱 비밀번호
       },
     });
   }

@@ -15,6 +15,7 @@ import {
   MemberService,
   ProjectService,
   MailService,
+  InvitationService,
 } from '@services';
 import {
   UserController,
@@ -22,6 +23,7 @@ import {
   CommentController,
   MemberController,
   ProjectController,
+  InvitationController,
 } from '@controllers';
 
 import { authRouter } from './auth.router';
@@ -51,6 +53,7 @@ const userController = new UserController(userService);
 const authController = new AuthController(authService);
 const commentController = new CommentController();
 const memberController = new MemberController();
+const invitationController = new InvitationController();
 const projectController = new ProjectController(projectService);
 
 router.route('/').get((req, res) => {
@@ -60,7 +63,7 @@ router.route('/').get((req, res) => {
 router.use('/api', commentRouter);
 router.use('/auth', authRouter(authController));
 router.use('/users', userRouter(userController));
-router.use('/projects', projectRouter(projectController, memberController));
+router.use('/projects', projectRouter(projectController, memberController, invitationController));
 router.use('/members', memberRouter);
 router.use('/invitations', invitationRouter);
 // router.use('/tasks', taskRouter);
