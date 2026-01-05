@@ -29,11 +29,11 @@ export class ProjectService {
 
   // 프로젝트 상세 조회
   async getProjectDetail(projectId: number, userId: number): Promise<ProjectDetailDto> {
-    const isMember = await this.projectRepository.isMember(projectId, userId);
-    if (!isMember) throw new ForbiddenError('프로젝트 멤버가 아닙니다');
-
     const projectDetail = await this.projectRepository.getProjectDetailData(projectId);
     if (!projectDetail) throw new NotFoundError();
+
+    const isMember = await this.projectRepository.isMember(projectId, userId);
+    if (!isMember) throw new ForbiddenError('프로젝트 멤버가 아닙니다');
 
     return projectDetail;
   }
