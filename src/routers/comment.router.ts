@@ -17,8 +17,11 @@ router.post(
   asyncHandler(commentController.createComment),
 );
 
+// 댓글 조회 (인증 불필요)
+router.get('/comments/:commentId', asyncHandler(commentController.getCommentById));
+
 // 댓글 수정 (인증 필요)
-router.put(
+router.patch(
   '/comments/:commentId',
   authenticate,
   ...UpdateCommentSchema,
