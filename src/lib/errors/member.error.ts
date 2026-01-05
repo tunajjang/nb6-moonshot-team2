@@ -3,41 +3,38 @@ import { NotFoundError, ForbiddenError, ConflictError, BadRequestError } from '.
 // 멤버 관련 특화 에러 클래스들
 export class MemberNotFoundError extends NotFoundError {
   constructor(memberId?: number) {
-    super(memberId ? `Member with id ${memberId} not found` : 'Member not found');
+    super(
+      memberId ? `ID ${memberId}에 해당하는 멤버를 찾을 수 없습니다` : '멤버를 찾을 수 없습니다',
+    );
     this.name = 'MemberNotFoundError';
   }
 }
 
-export class ProjectNotFoundError extends NotFoundError {
-  constructor(projectId?: number) {
-    super(projectId ? `Project with id ${projectId} not found` : 'Project not found');
-    this.name = 'ProjectNotFoundError';
-  }
-}
+// ProjectNotFoundError는 project.error.ts로 이동됨
 
 export class MemberUnauthorizedError extends ForbiddenError {
-  constructor(message: string = 'You do not have permission to perform this action') {
+  constructor(message: string = '이 작업을 수행할 권한이 없습니다') {
     super(message);
     this.name = 'MemberUnauthorizedError';
   }
 }
 
 export class MemberAlreadyExistsError extends ConflictError {
-  constructor(message: string = 'User is already a member of this project') {
+  constructor(message: string = '이미 프로젝트 멤버입니다') {
     super(message);
     this.name = 'MemberAlreadyExistsError';
   }
 }
 
 export class MemberValidationError extends BadRequestError {
-  constructor(message: string = 'Invalid member data') {
+  constructor(message: string = '유효하지 않은 멤버 데이터입니다') {
     super(message);
     this.name = 'MemberValidationError';
   }
 }
 
 export class OwnerCannotLeaveError extends BadRequestError {
-  constructor(message: string = 'Project owner cannot leave the project') {
+  constructor(message: string = '프로젝트 소유자는 프로젝트를 떠날 수 없습니다') {
     super(message);
     this.name = 'OwnerCannotLeaveError';
   }
@@ -46,35 +43,32 @@ export class OwnerCannotLeaveError extends BadRequestError {
 // 초대 관련 에러 클래스들 (멤버 기능에 포함)
 export class InvitationNotFoundError extends NotFoundError {
   constructor(invitationId?: string) {
-    super(invitationId ? `Invitation with id ${invitationId} not found` : 'Invitation not found');
+    super(
+      invitationId
+        ? `ID ${invitationId}에 해당하는 초대를 찾을 수 없습니다`
+        : '초대를 찾을 수 없습니다',
+    );
     this.name = 'InvitationNotFoundError';
   }
 }
 
 export class InvitationAlreadyAcceptedError extends BadRequestError {
-  constructor(message: string = 'Invitation has already been accepted') {
+  constructor(message: string = '이미 수락된 초대입니다') {
     super(message);
     this.name = 'InvitationAlreadyAcceptedError';
   }
 }
 
 export class InvitationAlreadyCanceledError extends BadRequestError {
-  constructor(message: string = 'Invitation has already been canceled') {
+  constructor(message: string = '이미 취소된 초대입니다') {
     super(message);
     this.name = 'InvitationAlreadyCanceledError';
   }
 }
 
 export class InvitationAlreadyExistsError extends ConflictError {
-  constructor(message: string = 'Invitation already exists for this user and project') {
+  constructor(message: string = '이 사용자와 프로젝트에 대한 초대가 이미 존재합니다') {
     super(message);
     this.name = 'InvitationAlreadyExistsError';
-  }
-}
-
-export class UserNotFoundError extends NotFoundError {
-  constructor(email?: string) {
-    super(email ? `User with email ${email} not found` : 'User not found');
-    this.name = 'UserNotFoundError';
   }
 }

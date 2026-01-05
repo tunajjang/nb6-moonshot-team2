@@ -17,5 +17,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./prisma"), exports);
 // errors
 __exportStar(require("./errors/app.error"), exports);
+__exportStar(require("./errors/auth.error"), exports);
 __exportStar(require("./errors/comment.error"), exports);
 __exportStar(require("./errors/member.error"), exports);
+__exportStar(require("./errors/project.error"), exports);
+__exportStar(require("./errors/tag.error"), exports);
+__exportStar(require("./errors/task.error"), exports);
+__exportStar(require("./errors/user.error"), exports);
