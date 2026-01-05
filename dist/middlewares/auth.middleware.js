@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticate = void 0;
+exports.optionalAuthenticate = exports.authenticate = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const _lib_1 = require("@lib");
 /**
@@ -46,3 +46,35 @@ const authenticate = (req, res, next) => {
     }
 };
 exports.authenticate = authenticate;
+/**
+ * 선택적 인증 미들웨어 - 토큰이 있으면 검증하고, 없으면 그냥 통과
+ * 초대 링크 접속 시 사용 (로그인되어 있으면 자동 수락, 없으면 로그인 페이지로 리다이렉트)
+ */
+const optionalAuthenticate = (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7);
+            const jwtSecret = process.env.JWT_SECRET;
+            if (token && jwtSecret) {
+                try {
+                    const decoded = jsonwebtoken_1.default.verify(token, jwtSecret);
+                    req.user = {
+                        id: decoded.id,
+                        email: decoded.email,
+                    };
+                }
+                catch (error) {
+                    // 토큰이 유효하지 않아도 에러를 던지지 않고 그냥 통과
+                    // req.user는 undefined로 유지됨
+                }
+            }
+        }
+        next();
+    }
+    catch (error) {
+        // 에러가 발생해도 그냥 통과 (인증 실패 시 req.user는 undefined)
+        next();
+    }
+};
+exports.optionalAuthenticate = optionalAuthenticate;
