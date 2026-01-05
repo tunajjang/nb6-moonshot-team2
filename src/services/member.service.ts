@@ -13,14 +13,17 @@ import {
   UserNotFoundError,
   OwnerCannotLeaveError,
 } from '@lib';
+import { EmailService } from './email.service';
 
 export class MemberService {
   private memberRepository: MemberRepository;
   private invitationRepository: InvitationRepository;
+  private emailService: EmailService;
 
   constructor() {
     this.memberRepository = new MemberRepository();
     this.invitationRepository = new InvitationRepository();
+    this.emailService = new EmailService();
   }
 
   // 프로젝트 멤버 목록 조회
@@ -159,12 +162,32 @@ export class MemberService {
       throw new InvitationAlreadyExistsError('Invitation already exists for this user and project');
     }
     // 초대 생성
-    return await this.invitationRepository.create({
+    const invitation = await this.invitationRepository.create({
       project: { connect: { id: projectId } },
       host: { connect: { id: hostId } },
       guest: { connect: { id: guest.id } },
       invitationStatus: 'PENDING',
     });
+
+    // 초대 링크 생성
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const invitationLink = `${frontendUrl}/invitations/${invitation.id}/accept`;
+
+    // 이메일 발송 (비동기, 에러가 발생해도 초대는 생성되었으므로 로깅만 하고 계속 진행)
+    this.emailService
+      .sendInvitationEmail({
+        to: guestEmail,
+        invitationId: invitation.id,
+        projectName: invitation.project.name,
+        hostName: invitation.host.name,
+        invitationLink,
+      })
+      .catch((error) => {
+        console.error('초대 이메일 발송 실패 (초대는 생성됨):', error);
+        // 이메일 발송 실패해도 초대는 이미 생성되었으므로 에러를 던지지 않음
+      });
+
+    return invitation;
   }
 
   // 초대 수락 (초대 링크 접속 시)
