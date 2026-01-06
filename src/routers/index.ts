@@ -17,6 +17,7 @@ import memberRouter from './member.router';
 import commentRouter from './comment.router';
 import imageRouter from './image.router';
 import taskRouter from './task.router';
+import subTaskRouter from './subTask.router';
 
 const router = Router();
 
@@ -47,7 +48,7 @@ router.use('/projects', projectRouter);
 router.use('/members', memberRouter);
 router.use('/file', imageRouter);
 router.use('/tasks', taskRouter);
-// router.use('/subtasks', subtaskRouter);
+router.use('/subtasks', subTaskRouter);
 // router.use('/invitations', invitationRouter);
 
 export default router;

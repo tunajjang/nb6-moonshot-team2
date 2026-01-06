@@ -6,6 +6,10 @@ export const IdParamStruct = s.object({
   taskId: integerString,
 });
 
+export const SubTaskIdParamStruct = s.object({
+  subTaskId: integerString,
+});
+
 export const ProjectIdParamStruct = s.object({
   projectId: integerString,
 });

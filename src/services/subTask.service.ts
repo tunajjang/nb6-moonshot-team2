@@ -1,78 +1,101 @@
-import { ProjectMember, User } from '@prisma/client';
-import { CreateSubTaskInput, UpdateSubTaskInput } from '../superstructs/subTask.struct';
+import { User } from '@prisma/client';
 import { subTaskRepository } from '../repositories/subTask.repository';
+import { ForbiddenError, NotFoundError, UnauthorizedError } from '@/lib';
+import { SubTaskDto } from '@/types/subTask.dto';
+
+type CreateSubTaskData = Omit<
+  SubTaskDto,
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'taskId'
+>;
+type UpdateSubTaskData = Partial<CreateSubTaskData>;
 
 export const subTaskService = {
   async createSubTask(
-    data: CreateSubTaskInput,
+    data: CreateSubTaskData,
     user: User | null | undefined,
-    projectMember: ProjectMember,
-  ) {
+    taskId: number,
+  ): Promise<SubTaskDto> {
     if (!user) {
-      throw console.error('unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
     }
 
-    if (user.id != projectMember.userId) {
-      throw console.error('Unauthorized');
-    }
+    type CreateSubTaskDbData = CreateSubTaskData & {
+      taskId: number;
+    };
 
-    return subTaskRepository.create(data);
+    const createData: CreateSubTaskDbData = {
+      ...data,
+      taskId: taskId,
+    };
+
+    return subTaskRepository.create(createData);
+  },
+
+  async getSubTaskList(taskId: number, user: User | null | undefined) {
+    if (!user) {
+      throw new UnauthorizedError('로그인이 필요합니다.');
+    }
+    const subTaskList = subTaskRepository.findList(taskId);
+    return subTaskList;
   },
 
   async updateSubTask(
-    data: UpdateSubTaskInput,
+    data: UpdateSubTaskData,
     user: User | null | undefined,
-    projectMember: ProjectMember,
-    taskId: number,
-  ) {
+    subTaskId: number,
+  ): Promise<SubTaskDto> {
     if (!user) {
-      throw console.error('unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
     }
 
-    if (user.id != projectMember.userId) {
-      throw console.error('Unauthorized');
+    const subTaskFindById = await subTaskRepository.findById(subTaskId);
+    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
+
+    if (!subTaskFindById) {
+      throw new NotFoundError('존재하지 않는 Task번호입니다.');
     }
 
-    return subTaskRepository.update(data, taskId);
+    if (!subTaskFindByIdWithAuth) {
+      throw new ForbiddenError('프로젝트 멤버가 아닙니다');
+    }
+
+    return subTaskRepository.update(data, subTaskId);
   },
 
-  async deleteSubTask(id: number, user: User | null | undefined, projectMember: ProjectMember) {
+  async deleteSubTask(subTaskId: number, user: User | null | undefined) {
     if (!user) {
-      throw console.error('unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
     }
 
-    if (user.id != projectMember.userId) {
-      throw console.error('Unauthorized');
+    const subTaskFindById = await subTaskRepository.findById(subTaskId);
+    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
+
+    if (!subTaskFindById) {
+      throw new NotFoundError('존재하지 않는 Task번호입니다.');
     }
 
-    return subTaskRepository.delete(id);
+    if (!subTaskFindByIdWithAuth) {
+      throw new ForbiddenError('프로젝트 멤버가 아닙니다');
+    }
+
+    return subTaskRepository.delete(subTaskId);
   },
 
-  async getSubTaskList(
-    taskId: number,
-    user: User | null | undefined,
-    projectMember: ProjectMember,
-  ) {
+  async getSubTask(subTaskId: number, user: User | null | undefined) {
     if (!user) {
-      throw console.error('unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
+    }
+    const subTaskFindById = await subTaskRepository.findById(subTaskId);
+    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
+
+    if (!subTaskFindById) {
+      throw new NotFoundError('존재하지 않는 Task번호입니다.');
     }
 
-    if (user.id != projectMember.userId) {
-      throw console.error('Unauthorized');
+    if (!subTaskFindByIdWithAuth) {
+      throw new ForbiddenError('프로젝트 멤버가 아닙니다');
     }
 
-    return subTaskRepository.findList(taskId);
-  },
-
-  async getSubTaskById(id: number, user: User | null | undefined, projectMember: ProjectMember) {
-    if (!user) {
-      throw console.error('unauthorized');
-    }
-
-    if (user.id != projectMember.userId) {
-      throw console.error('Unauthorized');
-    }
-
-    return subTaskRepository.findById(id);
+    return subTaskFindByIdWithAuth;
   },
 };

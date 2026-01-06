@@ -127,7 +127,7 @@ async function main() {
           projectId: project.id,
           title: faker.hacker.phrase(),
           assigneeId: randomAssignee.id,
-          status: faker.helpers.arrayElement(['TODO', 'IN_PROGRESS', 'DONE']),
+          status: faker.helpers.arrayElement(['PENDING', 'IN_PROGRESS', 'DONE']),
           startYear: startDate.getFullYear(),
           startMonth: startDate.getMonth() + 1,
           startDay: startDate.getDate(),
