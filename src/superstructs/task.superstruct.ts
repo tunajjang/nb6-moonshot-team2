@@ -1,12 +1,11 @@
 import * as s from 'superstruct';
 import { PageParamsStrict } from './common.structs';
 
-const TaskStatusStruct = s.enums(['TODO', 'IN_PROGRESS', 'DONE']);
+const TaskStatusStruct = s.enums(['PENDING', 'IN_PROGRESS', 'DONE']);
 
 export const GetTaskListParamsStruct = PageParamsStrict;
 
 export const CreateTaskBodyStruct = s.object({
-  projectId: s.number(),
   title: s.nonempty(s.string()),
   startYear: s.number(),
   startMonth: s.number(),
@@ -15,9 +14,8 @@ export const CreateTaskBodyStruct = s.object({
   endMonth: s.number(),
   endDay: s.number(),
   status: TaskStatusStruct,
-  assigneeId: s.number(),
-  tagId: s.optional(s.array(s.number())),
-  attachmentId: s.optional(s.array(s.number())),
+  tags: s.optional(s.array(s.string())),
+  attachments: s.optional(s.array(s.string())),
 });
 
 export const UpdateTaskBodyStruct = s.partial(CreateTaskBodyStruct);

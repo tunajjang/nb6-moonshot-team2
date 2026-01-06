@@ -165,7 +165,7 @@ model Comment {
 
 model Tag {
   id       Int       @id @default(autoincrement())
-  name     String
+  name     String    @unique
   taskTags TaskTag[]
 }
 
@@ -198,7 +198,7 @@ enum MemberStatus {
 }
 
 enum TaskStatus {
-  TODO
+  PENDING
   IN_PROGRESS
   DONE
 }

@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import { CreateSubTaskInput, UpdateSubTaskInput } from '../superstructs/subtask.struct';
+import { CreateSubTaskInput, UpdateSubTaskInput } from '../superstructs/subTask.struct';
 
 export const subTaskRepository = {
   create(data: CreateSubTaskInput) {

@@ -1,22 +1,14 @@
 import { Router } from 'express';
 import { withAsync } from '../lib/withAsync';
-import {
-  createTask,
-  updateTask,
-  deleteTask,
-  getTaskList,
-  getTaskById,
-} from '../controllers/task.controller';
+import { updateTask, deleteTask, getTaskList, getTaskById } from '../controllers/task.controller';
+import { authenticate, validate } from '@/middlewares';
+import { CreateTaskBodyStruct, UpdateTaskBodyStruct } from '@/superstructs/task.superstruct';
 
 const taskRouter = Router();
 
-taskRouter.post('/projects/:projectId/tasks', withAsync(createTask));
-taskRouter.get('/projects/:projectId/tasks', withAsync(getTaskList));
-taskRouter.get('/:taskId', withAsync(getTaskById));
-taskRouter.patch('/:taskId', withAsync(updateTask));
-taskRouter.delete('/:taskId', withAsync(deleteTask));
-
-//taskRouter.get('/:id', withAsync(getTaskDebug));
+taskRouter.get('/:taskId', authenticate, withAsync(getTaskById));
+taskRouter.patch('/:taskId', authenticate, validate(UpdateTaskBodyStruct), withAsync(updateTask));
+taskRouter.delete('/:taskId', authenticate, withAsync(deleteTask));
 
 export default taskRouter;
 

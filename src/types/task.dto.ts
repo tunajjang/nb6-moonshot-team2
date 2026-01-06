@@ -8,7 +8,7 @@ export interface TaskDto {
   endYear: number;
   endMonth: number;
   endDay: number;
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  status: 'PENDING' | 'IN_PROGRESS' | 'DONE';
   assigneeId: number;
   tagId?: number[];
   attachmentId?: number[];

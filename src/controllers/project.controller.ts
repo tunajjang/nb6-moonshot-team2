@@ -5,7 +5,7 @@ import { NotFoundError, BadRequestError } from '@lib';
 export class ProjectController {
   private projectService: ProjectService;
 
-  constructor(projectService: ProjectService) {
+  constructor(projectService: ProjectService){
     this.projectService = projectService;
   }
 

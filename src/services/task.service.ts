@@ -1,10 +1,13 @@
-import { ProjectMember, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { TaskDto } from '@/types/task.dto';
-import { projectMemberRepository, taskRepository } from '../repositories/task.repository';
 import { PaginationParams } from '../types/taskPagination';
-import { NotFoundError, UnauthorizedError } from '@/lib';
+import { ForbiddenError, NotFoundError, UnauthorizedError } from '@/lib';
+import { taskRepository } from '@/repositories';
 
-type CreateTaskData = Omit<TaskDto, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
+type CreateTaskData = Omit<
+  TaskDto,
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'projectId' | 'assigneeId'
+>;
 type UpdateTaskData = Partial<CreateTaskData>;
 
 export const taskService = {
@@ -17,7 +20,12 @@ export const taskService = {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
 
-    const createData: CreateTaskData = {
+    type CreateTaskDbData = CreateTaskData & {
+      projectId: number;
+      assigneeId: number;
+    };
+
+    const createData: CreateTaskDbData = {
       ...data,
       assigneeId: user.id,
       projectId: projectId,
@@ -36,9 +44,14 @@ export const taskService = {
     }
 
     const taskFindById = await taskRepository.findById(id);
+    const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
 
     if (!taskFindById) {
-      throw new NotFoundError();
+      throw new NotFoundError('존재하지 않는 Task번호입니다.');
+    }
+
+    if (!taskFindByIdWithAuth) {
+      throw new ForbiddenError('프로젝트 멤버가 아닙니다');
     }
 
     return taskRepository.update(id, data);
@@ -48,40 +61,46 @@ export const taskService = {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-
     const taskFindById = await taskRepository.findById(id);
+    const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
 
     if (!taskFindById) {
-      throw new NotFoundError();
+      throw new NotFoundError('존재하지 않는 Task번호입니다.');
     }
-    return taskFindById;
+
+    if (!taskFindByIdWithAuth) {
+      throw new ForbiddenError('프로젝트 멤버가 아닙니다');
+    }
+    return taskFindByIdWithAuth;
   },
 
-  async getTaskList(params: PaginationParams, user: User | null | undefined) {
+  async getTaskList(projectId: number, params: PaginationParams, user: User | null | undefined) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    return taskRepository.findList(params);
+    const taskList = taskRepository.findList(projectId, params);
+    if (!taskList) {
+      throw new NotFoundError('Task 목록이 존재하지 않습니다');
+    }
+    return taskList;
   },
 
   async deleteTask(id: number, user: User | null | undefined) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
+
     const taskFindById = await taskRepository.findById(id);
+    const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
 
     if (!taskFindById) {
-      throw new NotFoundError();
+      throw new NotFoundError('존재하지 않는 Task번호입니다.');
+    }
+
+    if (!taskFindByIdWithAuth) {
+      throw new ForbiddenError('프로젝트 멤버가 아닙니다');
     }
 
     return taskRepository.delete(id);
-  },
-};
-
-//이하는 projectMember를 찾는 임시 코드.
-//차후에 merge할떄 project 폴더내에 있는 member코드를 활용할 예정
-export const projectMemberService = {
-  async getProjectMember(projectId: number, userId: number) {
-    return projectMemberRepository.findByProject(projectId, userId);
   },
 };
