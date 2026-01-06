@@ -6,7 +6,7 @@ import { UpdateUserStruct } from '@superstructs';
 export const userRouter = (userController: UserController) => {
   const router = Router();
 
-  /**
+  /** 사용자 목록
    * @swagger
    * /users:
    *   get:
@@ -33,7 +33,7 @@ export const userRouter = (userController: UserController) => {
    */
   router.route('/').get(asyncHandler(userController.findUsers));
 
-  /**
+  /** 이메일로 회원 찾기
    * @swagger
    * /users/search:
    *   get:
@@ -71,7 +71,7 @@ export const userRouter = (userController: UserController) => {
    */
   router.route('/search').get(asyncHandler(userController.findUserByEmail)); // 단순 검색은 공개 가능
 
-  /**
+  /** 내 정보 조회
    * @swagger
    * /users/me:
    *   get:
@@ -130,7 +130,7 @@ export const userRouter = (userController: UserController) => {
     .get(authenticate, asyncHandler(userController.getMe)) // 조회는 인증 필요
     .delete(authenticate, asyncHandler(userController.deleteUser)); // 삭제는 인증 필요
 
-  /**
+  /** 비밀번호 확인 (정보 수정 전 등)
    * @swagger
    * /users/me/verify-password:
    *   post:
@@ -160,7 +160,7 @@ export const userRouter = (userController: UserController) => {
     .route('/me/verify-password')
     .post(authenticate, asyncHandler(userController.verifyPassword));
 
-  /**
+  /** 비밀번호 변경
    * @swagger
    * /users/me/password:
    *   patch:
@@ -189,7 +189,7 @@ export const userRouter = (userController: UserController) => {
    */
   router.route('/me/password').patch(authenticate, asyncHandler(userController.updatePassword));
 
-  /**
+  /** 내가 속한 프로젝트 목록 조회
    * @swagger
    * /users/me/projects:
    *   get:
@@ -203,7 +203,7 @@ export const userRouter = (userController: UserController) => {
    */
   router.route('/me/projects').get(authenticate, asyncHandler(userController.getMyProjects));
 
-  /**
+  /** 내가 속한 프로젝트 목록 조회
    * @swagger
    * /users/me/tasks:
    *   get:
