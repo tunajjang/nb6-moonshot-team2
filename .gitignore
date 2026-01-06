@@ -4,5 +4,6 @@
 node_modules/
 .env
 __http__/
+dist/
 
 # Uploaded files

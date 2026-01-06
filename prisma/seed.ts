@@ -38,10 +38,6 @@ async function main() {
         name: faker.book.title() + ' 프로젝트',
         description: faker.lorem.sentence(10),
         ownerId: randomUser.id,
-        memberCount: 0,
-        todoCount: 0,
-        inProgressCount: 0,
-        doneCount: 0,
       },
     });
   }
@@ -113,6 +109,12 @@ async function main() {
     },
   });
 
+  const startDate = faker.date.past({ years: 1 });
+  const endDate = faker.date.between({
+    from: startDate,
+    to: new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000),
+  });
+
   for (const project of projectWithMembers) {
     const members = project.projectMembers.map((pm) => pm.user);
     if (members.length === 0) continue;
@@ -125,9 +127,13 @@ async function main() {
           projectId: project.id,
           title: faker.hacker.phrase(),
           assigneeId: randomAssignee.id,
-          status: faker.helpers.arrayElement(['PENDING', 'IN_PROGRESS', 'DONE']),
-          startAt: faker.date.recent({ days: 30 }),
-          endAt: faker.date.future({ years: 1 }),
+          status: faker.helpers.arrayElement(['TODO', 'IN_PROGRESS', 'DONE']),
+          startYear: startDate.getFullYear(),
+          startMonth: startDate.getMonth() + 1,
+          startDay: startDate.getDate(),
+          endYear: endDate.getFullYear(),
+          endMonth: endDate.getMonth() + 1,
+          endDay: endDate.getDate(),
         },
       });
 

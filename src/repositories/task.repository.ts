@@ -1,9 +1,9 @@
-import { prisma, taskStatus } from '../lib/prisma';
-import { CreateTaskInput, UpdateTaskInput } from '../superstructs/task.struct';
-import { PaginationParams } from '../types/pagination';
+import { prisma } from '@lib';
+import { TaskStatus, Task } from '@prisma/client';
+import { PaginationParams } from '../types/taskPagination';
 
 export const taskRepository = {
-  create(data: CreateTaskInput) {
+  create(data: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>) {
     return prisma.task.create({ data });
   },
 
@@ -11,7 +11,7 @@ export const taskRepository = {
     const where = {
       title: keyword ? { contains: keyword } : undefined,
       userId: assigneeId ? { equals: assigneeId } : undefined,
-      status: status ? taskStatus[status] : undefined,
+      status: status ? TaskStatus[status] : undefined,
     };
 
     const orderByMap = {
@@ -28,16 +28,23 @@ export const taskRepository = {
     });
   },
   findById(id: number) {
-    return prisma.task.findUnique({ where: { id } });
+    return prisma.task.findUnique({
+      where: { id },
+      include: {
+        attachments: true,
+      },
+    });
   },
-  update(id: number, data: UpdateTaskInput) {
+  update(id: number, data: Partial<Task>) {
     return prisma.task.update({ where: { id }, data });
   },
   delete(id: number) {
-    return prisma.task.delete({ where: { id } });
-  },
-  findTaskDebug(id: number) {
-    return prisma.task.findUnique({ where: { id } });
+    return prisma.task.update({
+      where: { id: id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
   },
 };
 

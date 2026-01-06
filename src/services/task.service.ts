@@ -1,31 +1,44 @@
 import { ProjectMember, User } from '@prisma/client';
-import { CreateTaskInput, UpdateTaskInput } from '../superstructs/task.struct';
+import { TaskDto } from '@/types/task.dto';
 import { projectMemberRepository, taskRepository } from '../repositories/task.repository';
-import { PaginationParams } from '../types/pagination';
+import { PaginationParams } from '../types/taskPagination';
+import { NotFoundError, UnauthorizedError } from '@/lib';
+
+type CreateTaskData = Omit<TaskDto, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
+type UpdateTaskData = Partial<CreateTaskData>;
 
 export const taskService = {
   async createTask(
-    data: CreateTaskInput,
+    data: CreateTaskData,
     user: User | null | undefined,
-    projectMember: ProjectMember,
-  ) {
+    projectId: number,
+  ): Promise<TaskDto> {
     if (!user) {
-      throw console.error('Unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
     }
 
-    if (user.id != projectMember.userId) {
-      throw console.error('Unauthorized');
-    }
-
-    return taskRepository.create({
+    const createData: CreateTaskData = {
       ...data,
       assigneeId: user.id,
-    });
+      projectId: projectId,
+    };
+
+    return taskRepository.create(createData);
   },
 
-  async updateTask(data: UpdateTaskInput, id: number, user: User | null | undefined) {
+  async updateTask(
+    data: UpdateTaskData,
+    id: number,
+    user: User | null | undefined,
+  ): Promise<TaskDto> {
     if (!user) {
-      throw console.error('Unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
+    }
+
+    const taskFindById = await taskRepository.findById(id);
+
+    if (!taskFindById) {
+      throw new NotFoundError();
     }
 
     return taskRepository.update(id, data);
@@ -33,27 +46,35 @@ export const taskService = {
 
   async getTask(id: number, user: User | null | undefined) {
     if (!user) {
-      throw console.error('Unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    return taskRepository.findById(id);
+
+    const taskFindById = await taskRepository.findById(id);
+
+    if (!taskFindById) {
+      throw new NotFoundError();
+    }
+    return taskFindById;
   },
 
   async getTaskList(params: PaginationParams, user: User | null | undefined) {
     if (!user) {
-      throw console.error('Unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
     }
     return taskRepository.findList(params);
   },
 
   async deleteTask(id: number, user: User | null | undefined) {
     if (!user) {
-      throw console.error('Unauthorized');
+      throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    return taskRepository.delete(id);
-  },
+    const taskFindById = await taskRepository.findById(id);
 
-  async getTaskDebug(id: number) {
-    return taskRepository.findTaskDebug(id);
+    if (!taskFindById) {
+      throw new NotFoundError();
+    }
+
+    return taskRepository.delete(id);
   },
 };
 

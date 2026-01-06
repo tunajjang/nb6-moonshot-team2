@@ -1,7 +1,7 @@
 export interface PaginationParams {
   page: number;
   limit: number;
-  status?: 'PENDING' | 'IN_PROGRESS' | 'DONE';
+  status?: 'TODO' | 'IN_PROGRESS' | 'DONE';
   assigneeId?: number;
   keyword?: string;
   order: 'asc' | 'desc';

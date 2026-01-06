@@ -56,6 +56,7 @@ export interface UpdateMemberRoleDto {
   role: 'OWNER' | 'MEMBER';
 }
 
+
 export interface UpdateMemberStatusDto {
   memberStatus: 'PENDING' | 'ACCEPTED';
 }

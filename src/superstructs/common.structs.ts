@@ -20,6 +20,6 @@ export const PageParamsStrict = s.object({
   orderBy: s.defaulted(s.enums(['created_at', 'name', 'end_date']), 'created_at'),
   order: s.defaulted(s.enums(['asc', 'desc']), 'desc'),
   keyword: s.optional(s.nonempty(s.string())),
-  status: s.optional(s.enums(['PENDING', 'IN_PROGRESS', 'DONE'])),
+  status: s.optional(s.enums(['TODO', 'IN_PROGRESS', 'DONE'])),
   assigneeId: s.optional(integerString),
 });

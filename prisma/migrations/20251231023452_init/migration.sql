@@ -11,7 +11,7 @@ CREATE TYPE "ProjectRole" AS ENUM ('OWNER', 'MEMBER');
 CREATE TYPE "MemberStatus" AS ENUM ('PENDING', 'ACCEPTED');
 
 -- CreateEnum
-CREATE TYPE "TaskStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'DONE');
+CREATE TYPE "TaskStatus" AS ENUM ('TODO', 'IN_PROGRESS', 'DONE');
 
 -- CreateEnum
 CREATE TYPE "InvitationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'CANCELED');
@@ -22,7 +22,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "profileImage" TEXT NOT NULL,
+    "profileImage" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
@@ -93,8 +93,12 @@ CREATE TABLE "Task" (
     "id" SERIAL NOT NULL,
     "projectId" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
-    "startAt" TIMESTAMP(3) NOT NULL,
-    "endAt" TIMESTAMP(3) NOT NULL,
+    "startYear" INTEGER NOT NULL,
+    "startMonth" INTEGER NOT NULL,
+    "startDay" INTEGER NOT NULL,
+    "endYear" INTEGER NOT NULL,
+    "endMonth" INTEGER NOT NULL,
+    "endDay" INTEGER NOT NULL,
     "status" "TaskStatus" NOT NULL,
     "assigneeId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
