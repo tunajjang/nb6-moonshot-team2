@@ -1,8 +1,9 @@
 import * as s from 'superstruct';
 
 const NonEmptyString = (min: number, max: number) =>
-  s.refine(s.size(s.string(), min, max), 'NonEmptyString', (value) => {
-    return value.trim().length > 0;
+  s.refine(s.string(), 'TrimmedString', (value) => {
+    const trimmed = value.trim();
+    return trimmed.length >= min && trimmed.length <= max;
   });
 
 export const CreateProjectStruct = s.object({
