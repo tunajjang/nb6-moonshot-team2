@@ -13,7 +13,7 @@ export class ProjectRepository {
     });
   }
 
-  // 프로젝트 생성 (트랜잭션 포함: 프로젝트 생성 + 멤버 추가)
+  // 프로젝트 생성
   async createProject(userId: User['id'], name: string, description: string): Promise<Project> {
     return await this.prisma.project.create({
       data: {
@@ -47,7 +47,7 @@ export class ProjectRepository {
 
     if (!project) return null;
 
-    // 상태별 할 일 개수 (Promise.all로 병렬 처리 - 성능 최적화): 꺼내오지 않고 count()만 호출하여 DB 레벨에서 계산
+    // 상태별 할 일 개수
     const [todoCount, inProgressCount, doneCount] = await Promise.all([
       this.prisma.task.count({ where: { projectId, status: 'PENDING', deletedAt: null } }),
       this.prisma.task.count({ where: { projectId, status: 'IN_PROGRESS', deletedAt: null } }),
@@ -90,7 +90,7 @@ export class ProjectRepository {
     return !!member;
   }
 
-  // 프로젝트 ID로 조회 (Soft Delete )
+  // 프로젝트 ID로 조회
   async findProjectById(projectId: number): Promise<Project | null> {
     return this.prisma.project.findUnique({
       where: {
@@ -102,14 +102,22 @@ export class ProjectRepository {
 
   // 프로젝트 삭제
   async deleteProject(projectId: number): Promise<void> {
-    await this.prisma.project.update({
-      where: {
-        id: projectId,
-        deletedAt: null,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
+    await this.prisma.$transaction([
+      this.prisma.project.update({
+        where: {
+          id: projectId,
+          deletedAt: null,
+        },
+        data: { deletedAt: new Date() },
+      }),
+      this.prisma.projectMember.updateMany({
+        where: { projectId, deletedAt: null },
+        data: { deletedAt: new Date() },
+      }),
+      this.prisma.task.updateMany({
+        where: { projectId, deletedAt: null },
+        data: { deletedAt: new Date() },
+      }),
+    ]);
   }
 }
