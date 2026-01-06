@@ -8,6 +8,17 @@ import { MailService } from '@services';
 // 유저당 최대 5개의 프로젝트만 생성 가능
 const MAX_PROJECT_COUNT = 5;
 
+interface ProjectWithMembers {
+  id: number;
+  name: string;
+  ownerId: number;
+  projectMembers: {
+    user: {
+      email: string;
+    };
+  }[];
+}
+
 export class ProjectService {
   constructor(private projectRepository: ProjectRepository, private mailService: MailService) {}
 
@@ -54,13 +65,11 @@ export class ProjectService {
     const name = dto.name?.trim();
     const description = dto.description?.trim();
 
-    // [1] 수정 내용을 둘 다 안 보냈거나(undefined)
-    // [2] 보냈는데 내용이 없거나(공백)
-    const isNothingToUpdate = dto.name === undefined && dto.description === undefined;
-    const isNameEmpty = dto.name !== undefined && name?.length === 0;
-    const isDescEmpty = dto.description !== undefined && description?.length === 0;
+    const hasNoValidName = dto.name !== undefined && !name;
+    const hasNoValidDesc = dto.description !== undefined && !description;
+    const isAllEmpty = dto.name === undefined && dto.description === undefined;
 
-    if (isNothingToUpdate || isNameEmpty || isDescEmpty) {
+    if (hasNoValidName || hasNoValidDesc || isAllEmpty) {
       throw new BadRequestError('잘못된 데이터 형식');
     }
 
@@ -75,17 +84,18 @@ export class ProjectService {
       throw new BadRequestError('잘못된 데이터 형식');
     }
 
-    const project = (await this.projectRepository.findProjectById(projectId)) as any;
+    const project = (await this.projectRepository.findProjectById(
+      projectId,
+    )) as ProjectWithMembers | null;
     if (!project) throw new NotFoundError();
 
     if (project.ownerId !== userId) {
       throw new ForbiddenError('프로젝트 관리자가 아닙니다');
     }
 
-    const memberEmails =
-      project.projectMembers
-        ?.map((m: any) => m.user?.email)
-        .filter((email: string | undefined) => !!email) || [];
+    const memberEmails = project.projectMembers
+      .map((member) => member.user?.email)
+      .filter((email): email is string => !!email);
 
     await this.projectRepository.deleteProject(projectId);
 
