@@ -11,8 +11,9 @@ export class UserController {
   // 비밀번호 검증
   verifyPassword = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
+    const { password } = req.body;
 
-    await this.userService.verifyPassword(userId, req.body);
+    await this.userService.verifyPassword(userId, password);
     return res.status(StatusCodes.OK).json({ message: 'Password verified successfully!' });
   };
 
@@ -44,7 +45,8 @@ export class UserController {
   // 비밀번호 수정
   updatePassword = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id as number;
-    await this.userService.updatePassword(userId, req.body.password);
+    const { password } = req.body;
+    await this.userService.updatePassword(userId, { password });
     return res.status(StatusCodes.OK).json({ message: '비밀번호가 변경되었습니다.' });
   };
 

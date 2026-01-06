@@ -15,6 +15,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundError('User Not Found!');
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new AppError('비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
@@ -51,8 +52,7 @@ export class UserService {
    */
   async updatePassword(userId: User['id'], userData: Prisma.UserUpdateInput) {
     await this.getUserById(userId);
-    const newPassword = userData.password as string;
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(userData.password as string, 10);
     return await this.userRepository.updatePassword(userId, { password: hashedPassword });
   }
 
