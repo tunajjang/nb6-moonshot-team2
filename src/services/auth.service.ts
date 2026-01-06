@@ -70,11 +70,11 @@ export class AuthService {
    * 토큰 재발급
    */
   async refreshTokens(refreshToken: Token['refreshToken']) {
+    // 리프래시 토큰 상태 확인
     const foundToken = await this.authRepository.findToken(refreshToken);
     if (!foundToken || foundToken.tokenStatus === TokenStatus.EXPIRED) {
       throw new AppError('토큰이 유효하지 않습니다.', StatusCodes.UNAUTHORIZED);
     }
-
     const payload = jwt.verify(refreshToken, process.env.JWT_SECRET || '') as {
       id: User['id'];
       email: User['email'];
@@ -83,11 +83,13 @@ export class AuthService {
       throw new AppError('토큰이 만료되었거나 유효하지 않습니다.', StatusCodes.UNAUTHORIZED);
     }
 
+    // 사용자 확인
     const user = await this.userRepository.getUserById(payload.id);
     if (!user) {
       throw new AppError('사용자를 찾을 수 없습니다.', StatusCodes.UNAUTHORIZED);
     }
 
+    // 토큰 발급
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } = this._issueToken(user);
 
     const newExpiresAt = new Date();

@@ -24,13 +24,13 @@ export const authRouter = (authController: AuthController) => {
    *             properties:
    *               email:
    *                 type: string
-   *                 example: user@example.com
+   *                 example: sadqueen@naver.com
    *               password:
    *                 type: string
-   *                 example: password123!
+   *                 example: password1234
    *               name:
    *                 type: string
-   *                 example: 홍길동
+   *                 example: 호랭이
    *     responses:
    *       201:
    *         description: 회원가입 성공
@@ -57,10 +57,10 @@ export const authRouter = (authController: AuthController) => {
    *             properties:
    *               email:
    *                 type: string
-   *                 example: user@example.com
+   *                 example: sadqueen@naver.com
    *               password:
    *                 type: string
-   *                 example: password123!
+   *                 example: password1234
    *     responses:
    *       200:
    *         description: 로그인 성공 (토큰 발급)
@@ -91,10 +91,95 @@ export const authRouter = (authController: AuthController) => {
    */
   router.route('/logout').post(asyncHandler(authController.logout));
 
+  /**
+   * @swagger
+   * /auth/refresh:
+   *   post:
+   *     summary: 리프래시 토큰 재발급
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - refreshToken
+   *             properties:
+   *               refreshToken:
+   *                 type: string
+   *                 example: eyJhbGciOiJIUzI1NiIsI...
+   *     responses:
+   *       200:
+   *         description: OK - 리프래시 토큰 재발급 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 accessToken:
+   *                   type: string
+   *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   *                 refreshToken:
+   *                   type: string
+   *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   *       401:
+   *         description: Unauthorized - 토큰이 유효하지 않습니다.
+   */
   router.route('/refresh').post(asyncHandler(authController.refreshTokens));
 
+  /**
+   * @swagger
+   * /auth/google:
+   *   get:
+   *     summary: 구글 로그인 페이지로 리다이렉트
+   *     tags: [Auth]
+   *     responses:
+   *       302:
+   *         description: 구글 로그인 페이지로 이동
+   *         headers:
+   *           Location:
+   *             schema:
+   *               type: string
+   *               example: https://accounts.google.com/o/oauth2/v2/auth?...
+   */
   router.route('/google').get(authController.googleAuth);
 
+  /**
+   * @swagger
+   * /auth/google/callback:
+   *   get:
+   *     summary: 구글 로그인 콜백 (구글에서 리다이렉트됨)
+   *     tags: [Auth]
+   *     parameters:
+   *       - in: query
+   *         name: code
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: 구글에서 받은 인증 코드
+   *     responses:
+   *       200:
+   *         description: 구글 로그인/회원가입 성공 및 토큰 발급
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 accessToken:
+   *                   type: string
+   *                 refreshToken:
+   *                   type: string
+   *                 user:
+   *                   type: object
+   *                   properties:
+   *                     email:
+   *                       type: string
+   *                     name:
+   *                       type: string
+   *       400:
+   *         description: 인증 코드가 없음
+   */
   router.route('/google/callback').get(asyncHandler(authController.googleAuthCallback));
 
   return router;

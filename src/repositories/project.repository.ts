@@ -97,13 +97,6 @@ export class ProjectRepository {
         id: projectId,
         deletedAt: null,
       },
-      include: {
-        projectMembers: {
-          include: {
-            user: true,
-          },
-        },
-      },
     });
   }
 
