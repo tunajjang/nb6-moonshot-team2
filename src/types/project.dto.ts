@@ -17,3 +17,14 @@ export interface ProjectDetailDto {
   inProgressCount: number;
   doneCount: number;
 }
+
+export interface ProjectWithMembers {
+  id: number;
+  name: string;
+  ownerId: number;
+  projectMembers: {
+    user: {
+      email: string;
+    };
+  }[];
+}
