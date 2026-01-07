@@ -45,7 +45,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectService = void 0;
 const _lib_1 = require("@lib");
 const s = __importStar(require("superstruct"));
-const superstructs_1 = require("@/superstructs");
+const _superstructs_1 = require("@superstructs");
 // 유저당 최대 5개의 프로젝트만 생성 가능
 const MAX_PROJECT_COUNT = 5;
 class ProjectService {
@@ -56,7 +56,7 @@ class ProjectService {
     // 프로젝트 생성
     createProject(userId, dto) {
         return __awaiter(this, void 0, void 0, function* () {
-            s.assert(dto, superstructs_1.CreateProjectStruct);
+            s.assert(dto, _superstructs_1.CreateProjectStruct);
             const count = yield this.projectRepository.countOwnedProjectsByUserId(userId);
             if (count >= MAX_PROJECT_COUNT)
                 throw new _lib_1.BadRequestError('최대 5개까지 생성 가능합니다.');
@@ -80,7 +80,7 @@ class ProjectService {
     updateProject(projectId, userId, dto) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
-            s.assert(dto, superstructs_1.UpdateProjectStruct);
+            s.assert(dto, _superstructs_1.UpdateProjectStruct);
             const project = yield this.projectRepository.findProjectById(projectId);
             if (!project)
                 throw new _lib_1.NotFoundError();

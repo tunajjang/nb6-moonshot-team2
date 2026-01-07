@@ -10,8 +10,8 @@ import {
 export class CommentService {
   private commentRepository: CommentRepository;
 
-  constructor() {
-    this.commentRepository = new CommentRepository();
+  constructor(commentRepository?: CommentRepository) {
+    this.commentRepository = commentRepository || new CommentRepository();
   }
 
   // 댓글 생성

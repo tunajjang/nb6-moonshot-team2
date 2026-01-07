@@ -17,3 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./comment.dto"), exports);
 __exportStar(require("./member.dto"), exports);
 __exportStar(require("./project.dto"), exports);
+__exportStar(require("./taskPagination"), exports);
+__exportStar(require("./subTask.dto"), exports);
+__exportStar(require("./task.dto"), exports);
+__exportStar(require("./express"), exports);

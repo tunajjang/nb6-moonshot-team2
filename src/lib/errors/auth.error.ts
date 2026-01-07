@@ -1,5 +1,8 @@
 import { UnauthorizedError, ConflictError, BadRequestError } from './app.error';
 
+// ConflictError re-export (다른 파일에서 @lib를 통해 사용할 수 있도록)
+export { ConflictError };
+
 // 인증 관련 특화 에러 클래스들
 export class InvalidCredentialsError extends UnauthorizedError {
   constructor(message: string = '이메일 또는 비밀번호가 일치하지 않습니다') {

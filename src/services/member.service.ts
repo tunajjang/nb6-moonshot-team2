@@ -10,8 +10,8 @@ import {
 export class MemberService {
   private memberRepository: MemberRepository;
 
-  constructor() {
-    this.memberRepository = new MemberRepository();
+  constructor(memberRepository?: MemberRepository) {
+    this.memberRepository = memberRepository || new MemberRepository();
   }
 
   // 프로젝트 멤버 목록 조회

@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OAuthError = exports.SocialAuthError = exports.RefreshTokenInvalidError = exports.TokenNotFoundError = exports.TokenExpiredError = exports.TokenInvalidError = exports.InvalidCredentialsError = void 0;
+exports.OAuthError = exports.SocialAuthError = exports.RefreshTokenInvalidError = exports.TokenNotFoundError = exports.TokenExpiredError = exports.TokenInvalidError = exports.InvalidCredentialsError = exports.ConflictError = void 0;
 const app_error_1 = require("./app.error");
+Object.defineProperty(exports, "ConflictError", { enumerable: true, get: function () { return app_error_1.ConflictError; } });
 // 인증 관련 특화 에러 클래스들
 class InvalidCredentialsError extends app_error_1.UnauthorizedError {
     constructor(message = '이메일 또는 비밀번호가 일치하지 않습니다') {

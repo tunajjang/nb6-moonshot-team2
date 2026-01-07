@@ -15,6 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./prisma"), exports);
+__exportStar(require("./taskStructValidate"), exports);
 // errors
 __exportStar(require("./errors/app.error"), exports);
 __exportStar(require("./errors/auth.error"), exports);

@@ -15,6 +15,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./comment.superstruct"), exports);
+__exportStar(require("./common.structs"), exports);
 __exportStar(require("./member.superstruct"), exports);
 __exportStar(require("./project.superstruct"), exports);
+__exportStar(require("./subTask.struct"), exports);
+__exportStar(require("./task.superstruct"), exports);
 __exportStar(require("./user.superstruct"), exports);

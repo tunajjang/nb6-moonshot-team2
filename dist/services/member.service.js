@@ -13,8 +13,8 @@ exports.MemberService = void 0;
 const _repositories_1 = require("@repositories");
 const _lib_1 = require("@lib");
 class MemberService {
-    constructor() {
-        this.memberRepository = new _repositories_1.MemberRepository();
+    constructor(memberRepository) {
+        this.memberRepository = memberRepository || new _repositories_1.MemberRepository();
     }
     // 프로젝트 멤버 목록 조회
     getMembersByProjectId(projectId, userId) {

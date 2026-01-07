@@ -11,7 +11,7 @@ const express_1 = __importDefault(require("express"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const _lib_1 = require("@lib");
 const _middlewares_1 = require("@middlewares");
-const routers_1 = __importDefault(require("./routers"));
+const _routers_1 = __importDefault(require("@routers"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use((0, cookie_parser_1.default)());
@@ -19,7 +19,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 // swagger
 app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.specs));
-app.use(routers_1.default);
+app.use(_routers_1.default);
 app.use(_middlewares_1.errorHandler);
 app.listen(_lib_1.PORT, () => {
     console.log(`Server is running on port ${_lib_1.PORT}`);

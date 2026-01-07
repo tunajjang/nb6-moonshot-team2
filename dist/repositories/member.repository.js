@@ -12,31 +12,50 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemberRepository = void 0;
 const _lib_1 = require("@lib");
 class MemberRepository {
+    constructor() {
+        // 공통: 사용자 정보 select 필드
+        this.userSelect = {
+            id: true,
+            name: true,
+            email: true,
+            profileImage: true,
+        };
+        // 공통: 초대 정보 select 필드
+        this.invitationSelect = {
+            id: true,
+            invitationStatus: true,
+            createdAt: true,
+        };
+    }
+    // 공통: 사용자 정보를 포함한 include 옵션
+    get userInclude() {
+        return {
+            user: {
+                select: this.userSelect,
+            },
+        };
+    }
+    // 공통: 사용자와 초대 정보를 포함한 include 옵션
+    get userWithInvitationInclude() {
+        return {
+            user: {
+                select: this.userSelect,
+            },
+            invitation: {
+                select: this.invitationSelect,
+            },
+        };
+    }
+    // 공통: 삭제되지 않은 멤버 조건
+    get notDeletedCondition() {
+        return { deletedAt: null };
+    }
     // 프로젝트 멤버 목록 조회 (삭제되지 않은 멤버만, 초대 정보 포함)
     findByProjectId(projectId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield _lib_1.prisma.projectMember.findMany({
-                where: {
-                    projectId,
-                    deletedAt: null,
-                },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                    invitation: {
-                        select: {
-                            id: true,
-                            invitationStatus: true,
-                            createdAt: true,
-                        },
-                    },
-                },
+                where: Object.assign({ projectId }, this.notDeletedCondition),
+                include: this.userWithInvitationInclude,
                 orderBy: {
                     createdAt: 'asc',
                 },
@@ -47,20 +66,8 @@ class MemberRepository {
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield _lib_1.prisma.projectMember.findFirst({
-                where: {
-                    id,
-                    deletedAt: null,
-                },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                where: Object.assign({ id }, this.notDeletedCondition),
+                include: this.userInclude,
             });
         });
     }
@@ -68,21 +75,9 @@ class MemberRepository {
     findByProjectAndUser(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield _lib_1.prisma.projectMember.findFirst({
-                where: {
-                    projectId,
-                    userId,
-                    deletedAt: null,
-                },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                where: Object.assign({ projectId,
+                    userId }, this.notDeletedCondition),
+                include: this.userInclude,
             });
         });
     }
@@ -92,16 +87,7 @@ class MemberRepository {
             return yield _lib_1.prisma.projectMember.update({
                 where: { id },
                 data: { role },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                include: this.userInclude,
             });
         });
     }
@@ -111,16 +97,7 @@ class MemberRepository {
             return yield _lib_1.prisma.projectMember.update({
                 where: { id },
                 data: { memberStatus },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                include: this.userInclude,
             });
         });
     }
@@ -130,16 +107,7 @@ class MemberRepository {
             return yield _lib_1.prisma.projectMember.update({
                 where: { id },
                 data: { deletedAt: new Date() },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                include: this.userInclude,
             });
         });
     }

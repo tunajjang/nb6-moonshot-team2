@@ -18,3 +18,4 @@ __exportStar(require("./asyncHandler.middleware"), exports);
 __exportStar(require("./auth.middleware"), exports);
 __exportStar(require("./error.middleware"), exports);
 __exportStar(require("./validate.middleware"), exports);
+__exportStar(require("./imageUpload.middleware"), exports);

@@ -47,31 +47,35 @@ const projectRepository = new ProjectRepository(prisma);
 
 const userService = new UserService(userRepository);
 const authService = new AuthService(authRepository, userRepository);
-const commentService = new CommentService();
-const memberService = new MemberService();
-const invitationService = new InvitationService();
 const mailService = new MailService();
+const commentService = new CommentService(commentRepository);
+const memberService = new MemberService(memberRepository);
+const invitationService = new InvitationService(
+  memberRepository,
+  invitationRepository,
+  mailService,
+);
 const projectService = new ProjectService(projectRepository, mailService);
 
 const userController = new UserController(userService);
 const authController = new AuthController(authService);
-const commentController = new CommentController();
-const memberController = new MemberController();
-const invitationController = new InvitationController();
+const commentController = new CommentController(commentService);
+const memberController = new MemberController(memberService);
+const invitationController = new InvitationController(invitationService);
 const projectController = new ProjectController(projectService);
 
 router.route('/').get((req, res) => {
   res.send('ok');
 });
 
-router.use('/api', commentRouter);
+router.use('/api', commentRouter(commentController));
 router.use('/auth', authRouter(authController));
 router.use('/users', userRouter(userController));
 router.use('/projects', projectRouter(projectController, memberController, invitationController));
-router.use('/members', memberRouter);
+router.use('/members', memberRouter(memberController));
 router.use('/file', imageRouter);
 router.use('/tasks', taskRouter);
 router.use('/subtasks', subTaskRouter);
-router.use('/invitations', invitationRouter);
+router.use('/invitations', invitationRouter(invitationController));
 
 export default router;

@@ -20,3 +20,6 @@ __exportStar(require("./invitation.controller"), exports);
 __exportStar(require("./member.controller"), exports);
 __exportStar(require("./project.controller"), exports);
 __exportStar(require("./user.controller"), exports);
+__exportStar(require("./image.controller"), exports);
+__exportStar(require("./subTask.controller"), exports);
+__exportStar(require("./task.controller"), exports);

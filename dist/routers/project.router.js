@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.projectRouter = void 0;
 const express_1 = require("express");
+const _controllers_1 = require("@controllers");
 const _superstructs_1 = require("@superstructs");
 const _middlewares_1 = require("@middlewares");
 const projectRouter = (projectController, memberController, invitationController) => {
@@ -207,9 +208,9 @@ const projectRouter = (projectController, memberController, invitationController
      *          description: "존재하지 않는 프로젝트입니다 (응답 바디 없음)"
      */
     router.delete('/:projectId', (0, _middlewares_1.asyncHandler)(projectController.deleteProject));
-    // //아래는 Task 생성/목록조회 라우터
-    router.post('/:projectId/tasks', _middlewares_1.authenticate, withAsync(createTask));
-    router.get('/:projectId/tasks', _middlewares_1.authenticate, withAsync(getTaskList));
+    //아래는 Task 생성/목록조회 라우터
+    router.post('/:projectId/tasks', _middlewares_1.authenticate, (0, _middlewares_1.asyncHandler)(_controllers_1.createTask));
+    router.get('/:projectId/tasks', _middlewares_1.authenticate, (0, _middlewares_1.asyncHandler)(_controllers_1.getTaskList));
     return router;
 };
 exports.projectRouter = projectRouter;

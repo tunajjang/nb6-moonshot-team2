@@ -14,92 +14,72 @@ const express_validator_1 = require("express-validator");
 const _services_1 = require("@services");
 const _lib_1 = require("@lib");
 class CommentController {
-    constructor() {
+    constructor(commentService) {
         // 댓글 생성
-        this.createComment = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.createComment = (req, res) => __awaiter(this, void 0, void 0, function* () {
             var _a;
-            try {
-                const { taskId } = req.params;
-                const authorId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
-                if (!authorId) {
-                    throw new _lib_1.UnauthorizedError('User authentication required');
-                }
-                // 요청 데이터 검증
-                const errors = (0, express_validator_1.validationResult)(req);
-                if (!errors.isEmpty()) {
-                    throw new _lib_1.BadRequestError('Invalid input');
-                }
-                const comment = yield this.commentService.createComment(req.body.content, parseInt(taskId), authorId);
-                res.status(201).json({
-                    success: true,
-                    message: 'Comment created successfully',
-                    data: comment,
-                });
+            const { taskId } = req.params;
+            const authorId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
+            if (!authorId) {
+                throw new _lib_1.UnauthorizedError('User authentication required');
             }
-            catch (err) {
-                next(err);
+            // 요청 데이터 검증
+            const errors = (0, express_validator_1.validationResult)(req);
+            if (!errors.isEmpty()) {
+                throw new _lib_1.BadRequestError('Invalid input');
             }
+            const comment = yield this.commentService.createComment(req.body.content, parseInt(taskId), authorId);
+            res.status(201).json({
+                success: true,
+                message: 'Comment created successfully',
+                data: comment,
+            });
         });
         // 특정 태스크의 댓글 목록 조회
-        this.getCommentsByTaskId = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { taskId } = req.params;
-                const comments = yield this.commentService.getCommentsByTaskId(parseInt(taskId));
-                res.status(200).json({
-                    success: true,
-                    message: 'Comments retrieved successfully',
-                    data: comments,
-                });
-            }
-            catch (err) {
-                next(err);
-            }
+        this.getCommentsByTaskId = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { taskId } = req.params;
+            const comments = yield this.commentService.getCommentsByTaskId(parseInt(taskId));
+            res.status(200).json({
+                success: true,
+                message: 'Comments retrieved successfully',
+                data: comments,
+            });
         });
         // 댓글 수정
-        this.updateComment = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.updateComment = (req, res) => __awaiter(this, void 0, void 0, function* () {
             var _a;
-            try {
-                const { commentId } = req.params;
-                const authorId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
-                if (!authorId) {
-                    throw new _lib_1.UnauthorizedError('User authentication required');
-                }
-                // 요청 데이터 검증
-                const errors = (0, express_validator_1.validationResult)(req);
-                if (!errors.isEmpty()) {
-                    throw new _lib_1.BadRequestError('Invalid input');
-                }
-                const comment = yield this.commentService.updateComment(parseInt(commentId), req.body.content, authorId);
-                res.status(200).json({
-                    success: true,
-                    message: 'Comment updated successfully',
-                    data: comment,
-                });
+            const { commentId } = req.params;
+            const authorId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
+            if (!authorId) {
+                throw new _lib_1.UnauthorizedError('User authentication required');
             }
-            catch (err) {
-                next(err);
+            // 요청 데이터 검증
+            const errors = (0, express_validator_1.validationResult)(req);
+            if (!errors.isEmpty()) {
+                throw new _lib_1.BadRequestError('Invalid input');
             }
+            const comment = yield this.commentService.updateComment(parseInt(commentId), req.body.content, authorId);
+            res.status(200).json({
+                success: true,
+                message: 'Comment updated successfully',
+                data: comment,
+            });
         });
         // 댓글 삭제
-        this.deleteComment = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.deleteComment = (req, res) => __awaiter(this, void 0, void 0, function* () {
             var _a;
-            try {
-                const { commentId } = req.params;
-                const authorId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
-                if (!authorId) {
-                    throw new _lib_1.UnauthorizedError('User authentication required');
-                }
-                yield this.commentService.deleteComment(parseInt(commentId), authorId);
-                res.status(200).json({
-                    success: true,
-                    message: 'Comment deleted successfully',
-                });
+            const { commentId } = req.params;
+            const authorId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // 인증 미들웨어에서 설정된 사용자 ID
+            if (!authorId) {
+                throw new _lib_1.UnauthorizedError('User authentication required');
             }
-            catch (err) {
-                next(err);
-            }
+            yield this.commentService.deleteComment(parseInt(commentId), authorId);
+            res.status(200).json({
+                success: true,
+                message: 'Comment deleted successfully',
+            });
         });
-        this.commentService = new _services_1.CommentService();
+        this.commentService = commentService || new _services_1.CommentService();
     }
 }
 exports.CommentController = CommentController;

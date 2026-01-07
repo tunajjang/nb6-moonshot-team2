@@ -6,8 +6,8 @@ import { UnauthorizedError, BadRequestError } from '@lib';
 export class MemberController {
   private memberService: MemberService;
 
-  constructor() {
-    this.memberService = new MemberService();
+  constructor(memberService?: MemberService) {
+    this.memberService = memberService || new MemberService();
   }
 
   // 프로젝트 멤버 목록 조회

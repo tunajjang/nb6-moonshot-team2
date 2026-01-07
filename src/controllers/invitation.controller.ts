@@ -6,8 +6,8 @@ import { UnauthorizedError, BadRequestError } from '@lib';
 export class InvitationController {
   private invitationService: InvitationService;
 
-  constructor() {
-    this.invitationService = new InvitationService();
+  constructor(invitationService?: InvitationService) {
+    this.invitationService = invitationService || new InvitationService();
   }
 
   // 초대 생성

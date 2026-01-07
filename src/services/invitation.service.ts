@@ -17,10 +17,14 @@ export class InvitationService {
   private invitationRepository: InvitationRepository;
   private mailService: MailService;
 
-  constructor() {
-    this.memberRepository = new MemberRepository();
-    this.invitationRepository = new InvitationRepository();
-    this.mailService = new MailService();
+  constructor(
+    memberRepository?: MemberRepository,
+    invitationRepository?: InvitationRepository,
+    mailService?: MailService,
+  ) {
+    this.memberRepository = memberRepository || new MemberRepository();
+    this.invitationRepository = invitationRepository || new InvitationRepository();
+    this.mailService = mailService || new MailService();
   }
 
   // 초대 생성

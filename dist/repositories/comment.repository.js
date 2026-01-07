@@ -12,21 +12,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentRepository = void 0;
 const _lib_1 = require("@lib");
 class CommentRepository {
+    constructor() {
+        // 공통: 작성자 정보 select 필드
+        this.authorSelect = {
+            id: true,
+            name: true,
+            email: true,
+            profileImage: true,
+        };
+    }
+    // 공통: 작성자 정보를 포함한 include 옵션
+    get authorInclude() {
+        return {
+            author: {
+                select: this.authorSelect,
+            },
+        };
+    }
+    // 공통: 삭제되지 않은 댓글 조건
+    get notDeletedCondition() {
+        return { deletedAt: null };
+    }
     // 댓글 생성
     create(data) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield _lib_1.prisma.comment.create({
                 data,
-                include: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                include: this.authorInclude,
             });
         });
     }
@@ -34,20 +46,8 @@ class CommentRepository {
     findByTaskId(taskId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield _lib_1.prisma.comment.findMany({
-                where: {
-                    taskId,
-                    deletedAt: null,
-                },
-                include: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                where: Object.assign({ taskId }, this.notDeletedCondition),
+                include: this.authorInclude,
                 orderBy: {
                     createdAt: 'asc',
                 },
@@ -58,20 +58,8 @@ class CommentRepository {
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield _lib_1.prisma.comment.findFirst({
-                where: {
-                    id,
-                    deletedAt: null,
-                },
-                include: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                where: Object.assign({ id }, this.notDeletedCondition),
+                include: this.authorInclude,
             });
         });
     }
@@ -81,16 +69,7 @@ class CommentRepository {
             return yield _lib_1.prisma.comment.update({
                 where: { id },
                 data: { content },
-                include: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                include: this.authorInclude,
             });
         });
     }
@@ -100,16 +79,7 @@ class CommentRepository {
             return yield _lib_1.prisma.comment.update({
                 where: { id },
                 data: { deletedAt: new Date() },
-                include: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            profileImage: true,
-                        },
-                    },
-                },
+                include: this.authorInclude,
             });
         });
     }

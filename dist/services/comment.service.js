@@ -13,8 +13,8 @@ exports.CommentService = void 0;
 const _repositories_1 = require("@repositories");
 const _lib_1 = require("@lib");
 class CommentService {
-    constructor() {
-        this.commentRepository = new _repositories_1.CommentRepository();
+    constructor(commentRepository) {
+        this.commentRepository = commentRepository || new _repositories_1.CommentRepository();
     }
     // 댓글 생성
     createComment(content, taskId, authorId) {
