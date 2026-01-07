@@ -19,30 +19,20 @@ export const errorHandler = (
 ): void => {
   // AppError 인스턴스인 경우
   if (err instanceof AppError) {
-    const response: ErrorResponse = {
-      success: false,
-      error: {
-        message: err.message,
-        statusCode: err.statusCode,
-      },
-    };
-
-    res.status(err.statusCode).json(response);
+    // 404 에러는 응답 바디 X
+    if (err.statusCode === 404) {
+      res.status(404).send();
+      return;
+    }
+    res.status(err.statusCode).json({
+      message: err.message, // 명세서대로 메시지만 나오게
+    });
     return;
   }
 
   // ValidationError인 경우 (express-validator)
   if (err.name === 'ValidationError' || Array.isArray((err as any).errors)) {
-    const response: ErrorResponse = {
-      success: false,
-      error: {
-        message: 'Validation failed',
-        statusCode: 400,
-        details: (err as any).errors || err.message,
-      },
-    };
-
-    res.status(400).json(response);
+    res.status(400).json({ message: '잘못된 데이터 형식' });
     return;
   }
 
@@ -63,16 +53,17 @@ export const errorHandler = (
     }
 
     if (prismaError.code === 'P2025') {
-      const response: ErrorResponse = {
-        success: false,
-        error: {
-          message: 'Record not found',
-          statusCode: 404,
-        },
-      };
-      res.status(404).json(response);
+      res.status(404).send();
       return;
     }
+  }
+
+  // superstruct 에러 처리
+  if (err.name === 'StructError') {
+    res.status(400).json({
+      message: '잘못된 데이터 형식',
+    });
+    return;
   }
 
   // 알 수 없는 에러인 경우

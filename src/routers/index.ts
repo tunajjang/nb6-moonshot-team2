@@ -6,18 +6,35 @@ import {
   CommentRepository,
   MemberRepository,
   InvitationRepository,
+  ProjectRepository,
 } from '@repositories';
-import { UserService, AuthService, CommentService, MemberService } from '@services';
-import { UserController, AuthController, CommentController, MemberController } from '@controllers';
+import {
+  UserService,
+  AuthService,
+  CommentService,
+  MemberService,
+  ProjectService,
+  MailService,
+  InvitationService,
+} from '@services';
+import {
+  UserController,
+  AuthController,
+  CommentController,
+  MemberController,
+  ProjectController,
+  InvitationController,
+} from '@controllers';
 
 import { authRouter } from './auth.router';
 import { userRouter } from './user.router';
-import projectRouter from './project.router';
+import { projectRouter } from './project.router';
 import memberRouter from './member.router';
 import commentRouter from './comment.router';
 import imageRouter from './image.router';
 import taskRouter from './task.router';
 import subTaskRouter from './subTask.router';
+import invitationRouter from './invitation.router';
 
 const router = Router();
 
@@ -26,16 +43,21 @@ const authRepository = new AuthRepository(prisma);
 const commentRepository = new CommentRepository();
 const memberRepository = new MemberRepository();
 const invitationRepository = new InvitationRepository();
+const projectRepository = new ProjectRepository(prisma);
 
 const userService = new UserService(userRepository);
 const authService = new AuthService(authRepository, userRepository);
 const commentService = new CommentService();
 const memberService = new MemberService();
+const mailService = new MailService();
+const projectService = new ProjectService(projectRepository, mailService);
 
 const userController = new UserController(userService);
 const authController = new AuthController(authService);
 const commentController = new CommentController();
 const memberController = new MemberController();
+const invitationController = new InvitationController();
+const projectController = new ProjectController(projectService);
 
 router.route('/').get((req, res) => {
   res.send('ok');
@@ -44,11 +66,11 @@ router.route('/').get((req, res) => {
 router.use('/api', commentRouter);
 router.use('/auth', authRouter(authController));
 router.use('/users', userRouter(userController));
-router.use('/projects', projectRouter);
+router.use('/projects', projectRouter(projectController, memberController, invitationController));
 router.use('/members', memberRouter);
 router.use('/file', imageRouter);
 router.use('/tasks', taskRouter);
 router.use('/subtasks', subTaskRouter);
-// router.use('/invitations', invitationRouter);
+router.use('/invitations', invitationRouter);
 
 export default router;
