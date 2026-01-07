@@ -234,6 +234,167 @@ export const projectRouter = (
   router.delete('/:projectId', asyncHandler(projectController.deleteProject));
 
   //아래는 Task 생성/목록조회 라우터
+
+  /**
+   * @swagger
+   * /projects/{projectId}/tasks:
+   *   post:
+   *     summary: 할 일 생성
+   *     tags: [Task]
+   *     parameters:
+   *       - in: path
+   *         name: projectId
+   *         required: true
+   *         schema:
+   *           type: integer
+   *         description: 프로젝트 ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - title
+   *               - startYear
+   *               - startMonth
+   *               - startDay
+   *               - endYear
+   *               - endMonth
+   *               - endDay
+   *             properties:
+   *               title:
+   *                 type: string
+   *               startYear:
+   *                 type: integer
+   *               startMonth:
+   *                 type: integer
+   *               startDay:
+   *                 type: integer
+   *               endYear:
+   *                 type: integer
+   *               endMonth:
+   *                 type: integer
+   *               endDay:
+   *                 type: integer
+   *               status:
+   *                 type: string
+   *                 enum: [PENDING, IN_PROGRESS, DONE]
+   *               tags:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *               attachments:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *     responses:
+   *       201:
+   *         description: 생성 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/TaskDetail'
+   *       400:
+   *          description: "잘못된 요청 형식"
+   *       401:
+   *          description: "로그인이 필요합니다"
+   *       403:
+   *          description: "프로젝트 맴버가 아닙니다"
+   *       404:
+   *          description: ""
+   *
+   *   get:
+   *     summary: 할 일 리스트 조회
+   *     tags: [Task]
+   *     parameters:
+   *       - in: path
+   *         name: projectId
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: 조회 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/TaskDetail'
+   *                 total:
+   *                   type: integer
+   *                   example: 1
+   *       400:
+   *          description: "잘못된 요청 형식"
+   *       401:
+   *          description: "로그인이 필요합니다"
+   *       403:
+   *          description: "프로젝트 맴버가 아닙니다"
+   *       404:
+   *          description: ""
+   * components:
+   *   schemas:
+   *     TaskDetail:
+   *       type: object
+   *       properties:
+   *         id:
+   *           type: integer
+   *         projectId:
+   *           type: integer
+   *         title:
+   *           type: string
+   *         startYear:
+   *           type: integer
+   *         startMonth:
+   *           type: integer
+   *         startDay:
+   *           type: integer
+   *         endYear:
+   *           type: integer
+   *         endMonth:
+   *           type: integer
+   *         endDay:
+   *           type: integer
+   *         status:
+   *           type: string
+   *           enum: [PENDING, IN_PROGRESS, DONE]
+   *         assignee:
+   *           type: object
+   *           nullable: true
+   *           properties:
+   *             id:
+   *               type: integer
+   *             name:
+   *               type: string
+   *             email:
+   *               type: string
+   *             profileImage:
+   *               type: string
+   *         tags:
+   *           type: array
+   *           items:
+   *             type: object
+   *             properties:
+   *               id:
+   *                 type: integer
+   *               name:
+   *                 type: string
+   *         attachments:
+   *           type: array
+   *           items:
+   *             type: string
+   *         createdAt:
+   *           type: string
+   *           format: date-time
+   *         updatedAt:
+   *           type: string
+   *           format: date-time
+   */
+
   router.post('/:projectId/tasks', authenticate, asyncHandler(createTask));
   router.get('/:projectId/tasks', authenticate, asyncHandler(getTaskList));
 
