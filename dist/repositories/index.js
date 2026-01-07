@@ -20,3 +20,4 @@ __exportStar(require("./invitation.repository"), exports);
 __exportStar(require("./member.repository"), exports);
 __exportStar(require("./project.repository"), exports);
 __exportStar(require("./user.repository"), exports);
+__exportStar(require("./task.repository"), exports);

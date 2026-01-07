@@ -67,12 +67,12 @@ class ProjectService {
     // 프로젝트 상세 조회
     getProjectDetail(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const isMember = yield this.projectRepository.isMember(projectId, userId);
-            if (!isMember)
-                throw new _lib_1.ForbiddenError('프로젝트 멤버가 아닙니다');
             const projectDetail = yield this.projectRepository.getProjectDetailData(projectId);
             if (!projectDetail)
                 throw new _lib_1.NotFoundError();
+            const isMember = yield this.projectRepository.isMember(projectId, userId);
+            if (!isMember)
+                throw new _lib_1.ForbiddenError('프로젝트 멤버가 아닙니다');
             return projectDetail;
         });
     }
@@ -88,12 +88,10 @@ class ProjectService {
                 throw new _lib_1.ForbiddenError('프로젝트 관리자가 아닙니다');
             const name = (_a = dto.name) === null || _a === void 0 ? void 0 : _a.trim();
             const description = (_b = dto.description) === null || _b === void 0 ? void 0 : _b.trim();
-            // [1] 수정 내용을 둘 다 안 보냈거나(undefined)
-            // [2] 보냈는데 내용이 없거나(공백)
-            const isNothingToUpdate = dto.name === undefined && dto.description === undefined;
-            const isNameEmpty = dto.name !== undefined && (name === null || name === void 0 ? void 0 : name.length) === 0;
-            const isDescEmpty = dto.description !== undefined && (description === null || description === void 0 ? void 0 : description.length) === 0;
-            if (isNothingToUpdate || isNameEmpty || isDescEmpty) {
+            const hasNoValidName = dto.name !== undefined && !name;
+            const hasNoValidDesc = dto.description !== undefined && !description;
+            const isAllEmpty = dto.name === undefined && dto.description === undefined;
+            if (hasNoValidName || hasNoValidDesc || isAllEmpty) {
                 throw new _lib_1.BadRequestError('잘못된 데이터 형식');
             }
             yield this.projectRepository.updateProject(projectId, { name, description });
@@ -103,7 +101,6 @@ class ProjectService {
     // 프로젝트 삭제
     deleteProject(projectId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             if (!projectId || isNaN(projectId)) {
                 throw new _lib_1.BadRequestError('잘못된 데이터 형식');
             }
@@ -113,7 +110,9 @@ class ProjectService {
             if (project.ownerId !== userId) {
                 throw new _lib_1.ForbiddenError('프로젝트 관리자가 아닙니다');
             }
-            const memberEmails = ((_a = project.projectMembers) === null || _a === void 0 ? void 0 : _a.map((m) => { var _a; return (_a = m.user) === null || _a === void 0 ? void 0 : _a.email; }).filter((email) => !!email)) || [];
+            const memberEmails = project.projectMembers
+                .map((member) => { var _a; return (_a = member.user) === null || _a === void 0 ? void 0 : _a.email; })
+                .filter((email) => !!email);
             yield this.projectRepository.deleteProject(projectId);
             if (memberEmails.length > 0) {
                 this.mailService.sendProjectDeletionEmail(memberEmails, project.name);

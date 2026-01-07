@@ -154,5 +154,25 @@ class MemberService {
             return yield this.memberRepository.softDelete(member.id);
         });
     }
+    /**
+     * 할 일 담당자 지정 시 프로젝트 멤버인지 검증
+     * @param projectId 프로젝트 ID
+     * @param assigneeId 담당자로 지정할 사용자 ID
+     * @throws BadRequestError 담당자가 프로젝트 멤버가 아닌 경우
+     */
+    validateAssignee(projectId, assigneeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // 프로젝트 존재 여부 확인
+            const projectExists = yield this.memberRepository.projectExists(projectId);
+            if (!projectExists) {
+                throw new _lib_1.ProjectNotFoundError(projectId);
+            }
+            // 담당자가 프로젝트 멤버인지 확인 (ACCEPTED 상태이고 삭제되지 않은 멤버만)
+            const isMember = yield this.memberRepository.isProjectMember(projectId, assigneeId);
+            if (!isMember) {
+                throw new _lib_1.MemberUnauthorizedError('담당자는 해당 프로젝트에 참여하는 멤버여야 합니다.');
+            }
+        });
+    }
 }
 exports.MemberService = MemberService;

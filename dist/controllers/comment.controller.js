@@ -55,21 +55,6 @@ class CommentController {
                 next(err);
             }
         });
-        // 댓글 조회
-        this.getCommentById = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { commentId } = req.params;
-                const comment = yield this.commentService.getCommentById(parseInt(commentId));
-                res.status(200).json({
-                    success: true,
-                    message: 'Comment retrieved successfully',
-                    data: comment,
-                });
-            }
-            catch (err) {
-                next(err);
-            }
-        });
         // 댓글 수정
         this.updateComment = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             var _a;

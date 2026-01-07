@@ -35,8 +35,9 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateProjectStruct = exports.CreateProjectStruct = void 0;
 const s = __importStar(require("superstruct"));
-const NonEmptyString = (min, max) => s.refine(s.size(s.string(), min, max), 'NonEmptyString', (value) => {
-    return value.trim().length > 0;
+const NonEmptyString = (min, max) => s.refine(s.string(), 'TrimmedString', (value) => {
+    const trimmed = value.trim();
+    return trimmed.length >= min && trimmed.length <= max;
 });
 exports.CreateProjectStruct = s.object({
     name: NonEmptyString(1, 10),

@@ -14,6 +14,7 @@ export const CreateTaskBodyStruct = s.object({
   endMonth: s.number(),
   endDay: s.number(),
   status: TaskStatusStruct,
+  assigneeId: s.optional(s.number()),
   tags: s.optional(s.array(s.string())),
   attachments: s.optional(s.array(s.string())),
 });

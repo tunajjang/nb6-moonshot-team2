@@ -10,16 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectController = void 0;
+const lib_1 = require("@/lib");
 class ProjectController {
     constructor(projectService) {
         this.projectService = projectService;
         this.createProject = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const userId = req.user.id;
-            const result = yield this.projectService.createProject(userId, req.body);
+            const user = req.user;
+            if (!user) {
+                throw new lib_1.UnauthorizedError('인증 정보가 없습니다.');
+            }
+            const result = yield this.projectService.createProject(user.id, req.body);
             return res.status(201).json(result);
         });
         this.getProjectDetail = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { projectId } = req.params;
+            const id = parseInt(projectId, 10);
+            if (isNaN(id)) {
+                throw new lib_1.BadRequestError('프로젝트 ID는 숫자여야 합니다.');
+            }
             const userId = req.user.id;
             const result = yield this.projectService.getProjectDetail(Number(projectId), userId);
             return res.status(200).json(result);

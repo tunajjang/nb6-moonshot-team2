@@ -92,6 +92,7 @@ class AuthService {
      */
     refreshTokens(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
+            // 리프래시 토큰 상태 확인
             const foundToken = yield this.authRepository.findToken(refreshToken);
             if (!foundToken || foundToken.tokenStatus === client_1.TokenStatus.EXPIRED) {
                 throw new _lib_1.AppError('토큰이 유효하지 않습니다.', http_status_codes_1.StatusCodes.UNAUTHORIZED);
@@ -100,10 +101,12 @@ class AuthService {
             if (!payload) {
                 throw new _lib_1.AppError('토큰이 만료되었거나 유효하지 않습니다.', http_status_codes_1.StatusCodes.UNAUTHORIZED);
             }
+            // 사용자 확인
             const user = yield this.userRepository.getUserById(payload.id);
             if (!user) {
                 throw new _lib_1.AppError('사용자를 찾을 수 없습니다.', http_status_codes_1.StatusCodes.UNAUTHORIZED);
             }
+            // 토큰 발급
             const { accessToken: newAccessToken, refreshToken: newRefreshToken } = this._issueToken(user);
             const newExpiresAt = new Date();
             newExpiresAt.setDate(newExpiresAt.getDate() + 7);

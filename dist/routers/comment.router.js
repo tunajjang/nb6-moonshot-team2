@@ -10,10 +10,8 @@ const commentController = new _controllers_1.CommentController();
 router.get('/tasks/:taskId/comments', (0, _middlewares_1.asyncHandler)(commentController.getCommentsByTaskId));
 // 댓글 생성 (인증 필요)
 router.post('/tasks/:taskId/comments', _middlewares_1.authenticate, ..._superstructs_1.CreateCommentSchema, (0, _middlewares_1.asyncHandler)(commentController.createComment));
-// 댓글 조회 (인증 불필요)
-router.get('/comments/:commentId', (0, _middlewares_1.asyncHandler)(commentController.getCommentById));
 // 댓글 수정 (인증 필요)
-router.patch('/comments/:commentId', _middlewares_1.authenticate, ..._superstructs_1.UpdateCommentSchema, (0, _middlewares_1.asyncHandler)(commentController.updateComment));
+router.put('/comments/:commentId', _middlewares_1.authenticate, ..._superstructs_1.UpdateCommentSchema, (0, _middlewares_1.asyncHandler)(commentController.updateComment));
 // 댓글 삭제 (인증 필요)
 router.delete('/comments/:commentId', _middlewares_1.authenticate, (0, _middlewares_1.asyncHandler)(commentController.deleteComment));
 exports.default = router;

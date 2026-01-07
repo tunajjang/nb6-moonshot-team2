@@ -34,6 +34,17 @@ class UserRepository {
         });
     }
     /**
+     * 비밀번호 정보 수정
+     */
+    updatePassword(userId, userData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.prisma.user.update({
+                where: { id: userId },
+                data: { password: userData.password },
+            });
+        });
+    }
+    /**
      * 사용자 정보 삭제 soft delete
      */
     deleteUser(userId) {

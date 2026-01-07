@@ -61,6 +61,16 @@ class UserService {
         });
     }
     /**
+     * 비밀번호 수정
+     */
+    updatePassword(userId, userData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.getUserById(userId);
+            const hashedPassword = yield bcrypt_1.default.hash(userData.password, 10);
+            return yield this.userRepository.updatePassword(userId, { password: hashedPassword });
+        });
+    }
+    /**
      * 사용자 정보 삭제(soft delete)
      */
     deleteUser(userId) {

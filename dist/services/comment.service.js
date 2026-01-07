@@ -53,16 +53,6 @@ class CommentService {
             return yield this.commentRepository.findByTaskId(taskId);
         });
     }
-    // 댓글 조회
-    getCommentById(commentId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const comment = yield this.commentRepository.findById(commentId);
-            if (!comment) {
-                throw new _lib_1.CommentNotFoundError(commentId);
-            }
-            return comment;
-        });
-    }
     // 댓글 수정
     updateComment(commentId, content, authorId) {
         return __awaiter(this, void 0, void 0, function* () {
