@@ -12,7 +12,7 @@ import { validate } from '@lib';
 
 export async function createTask(req: Request, res: Response) {
   const { projectId } = create(req.params, ProjectIdParamStruct);
-
+  
   const data = validate(req.body, CreateTaskBodyStruct);
 
   const result = await taskService.createTask(data as any, req.user, projectId);
