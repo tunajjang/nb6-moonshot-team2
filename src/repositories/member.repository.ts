@@ -2,30 +2,55 @@ import { prisma } from '@lib';
 import { ProjectRole, MemberStatus } from '@prisma/client';
 
 export class MemberRepository {
+  // 공통: 사용자 정보 select 필드
+  private readonly userSelect = {
+    id: true,
+    name: true,
+    email: true,
+    profileImage: true,
+  } as const;
+
+  // 공통: 초대 정보 select 필드
+  private readonly invitationSelect = {
+    id: true,
+    invitationStatus: true,
+    createdAt: true,
+  } as const;
+
+  // 공통: 사용자 정보를 포함한 include 옵션
+  private get userInclude() {
+    return {
+      user: {
+        select: this.userSelect,
+      },
+    };
+  }
+
+  // 공통: 사용자와 초대 정보를 포함한 include 옵션
+  private get userWithInvitationInclude() {
+    return {
+      user: {
+        select: this.userSelect,
+      },
+      invitation: {
+        select: this.invitationSelect,
+      },
+    };
+  }
+
+  // 공통: 삭제되지 않은 멤버 조건
+  private get notDeletedCondition() {
+    return { deletedAt: null };
+  }
+
   // 프로젝트 멤버 목록 조회 (삭제되지 않은 멤버만, 초대 정보 포함)
   async findByProjectId(projectId: number) {
     return await prisma.projectMember.findMany({
       where: {
         projectId,
-        deletedAt: null,
+        ...this.notDeletedCondition,
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        invitation: {
-          select: {
-            id: true,
-            invitationStatus: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: this.userWithInvitationInclude,
       orderBy: {
         createdAt: 'asc',
       },
@@ -37,18 +62,9 @@ export class MemberRepository {
     return await prisma.projectMember.findFirst({
       where: {
         id,
-        deletedAt: null,
+        ...this.notDeletedCondition,
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.userInclude,
     });
   }
 
@@ -58,18 +74,9 @@ export class MemberRepository {
       where: {
         projectId,
         userId,
-        deletedAt: null,
+        ...this.notDeletedCondition,
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.userInclude,
     });
   }
 
@@ -78,16 +85,7 @@ export class MemberRepository {
     return await prisma.projectMember.update({
       where: { id },
       data: { role },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.userInclude,
     });
   }
 
@@ -96,16 +94,7 @@ export class MemberRepository {
     return await prisma.projectMember.update({
       where: { id },
       data: { memberStatus },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.userInclude,
     });
   }
 
@@ -114,16 +103,7 @@ export class MemberRepository {
     return await prisma.projectMember.update({
       where: { id },
       data: { deletedAt: new Date() },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.userInclude,
     });
   }
 

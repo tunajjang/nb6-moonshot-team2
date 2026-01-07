@@ -2,20 +2,33 @@ import { prisma } from '@lib';
 import { Comment } from '@prisma/client';
 
 export class CommentRepository {
+  // 공통: 작성자 정보 select 필드
+  private readonly authorSelect = {
+    id: true,
+    name: true,
+    email: true,
+    profileImage: true,
+  } as const;
+
+  // 공통: 작성자 정보를 포함한 include 옵션
+  private get authorInclude() {
+    return {
+      author: {
+        select: this.authorSelect,
+      },
+    };
+  }
+
+  // 공통: 삭제되지 않은 댓글 조건
+  private get notDeletedCondition() {
+    return { deletedAt: null };
+  }
+
   // 댓글 생성
   async create(data: { content: string; taskId: number; authorId: number }): Promise<Comment> {
     return await prisma.comment.create({
       data,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.authorInclude,
     });
   }
 
@@ -24,18 +37,9 @@ export class CommentRepository {
     return await prisma.comment.findMany({
       where: {
         taskId,
-        deletedAt: null,
+        ...this.notDeletedCondition,
       },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.authorInclude,
       orderBy: {
         createdAt: 'asc',
       },
@@ -47,18 +51,9 @@ export class CommentRepository {
     return await prisma.comment.findFirst({
       where: {
         id,
-        deletedAt: null,
+        ...this.notDeletedCondition,
       },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.authorInclude,
     });
   }
 
@@ -67,16 +62,7 @@ export class CommentRepository {
     return await prisma.comment.update({
       where: { id },
       data: { content },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.authorInclude,
     });
   }
 
@@ -85,16 +71,7 @@ export class CommentRepository {
     return await prisma.comment.update({
       where: { id },
       data: { deletedAt: new Date() },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.authorInclude,
     });
   }
 

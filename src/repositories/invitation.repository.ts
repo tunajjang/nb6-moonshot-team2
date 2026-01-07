@@ -2,35 +2,50 @@ import { prisma } from '@lib';
 import { InvitationStatus, Prisma } from '@prisma/client';
 
 export class InvitationRepository {
+  // 공통: 사용자 정보 select 필드
+  private readonly userSelect = {
+    id: true,
+    name: true,
+    email: true,
+    profileImage: true,
+  } as const;
+
+  // 공통: 프로젝트 정보 select 필드
+  private readonly projectSelect = {
+    id: true,
+    name: true,
+    description: true,
+  } as const;
+
+  // 공통: 초대 정보를 포함한 include 옵션 (host, guest, project)
+  private get invitationInclude() {
+    return {
+      host: {
+        select: this.userSelect,
+      },
+      guest: {
+        select: this.userSelect,
+      },
+      project: {
+        select: this.projectSelect,
+      },
+    };
+  }
+
+  // 공통: 사용자 정보를 포함한 include 옵션
+  private get userInclude() {
+    return {
+      user: {
+        select: this.userSelect,
+      },
+    };
+  }
+
   // 초대 생성
   async create(data: Prisma.InvitationCreateInput) {
     return await prisma.invitation.create({
       data,
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        guest: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        project: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-          },
-        },
-      },
+      include: this.invitationInclude,
     });
   }
 
@@ -38,31 +53,7 @@ export class InvitationRepository {
   async findById(id: string) {
     return await prisma.invitation.findUnique({
       where: { id },
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        guest: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        project: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-          },
-        },
-      },
+      include: this.invitationInclude,
     });
   }
 
@@ -74,31 +65,7 @@ export class InvitationRepository {
         guestId,
         invitationStatus: 'PENDING',
       },
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        guest: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        project: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-          },
-        },
-      },
+      include: this.invitationInclude,
     });
   }
 
@@ -108,31 +75,7 @@ export class InvitationRepository {
       where: {
         projectId,
       },
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        guest: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        project: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-          },
-        },
-      },
+      include: this.invitationInclude,
       orderBy: {
         createdAt: 'desc',
       },
@@ -144,31 +87,7 @@ export class InvitationRepository {
     return await prisma.invitation.update({
       where: { id },
       data: { invitationStatus },
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        guest: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-        project: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-          },
-        },
-      },
+      include: this.invitationInclude,
     });
   }
 
@@ -176,12 +95,7 @@ export class InvitationRepository {
   async findUserByEmail(email: string) {
     return await prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        profileImage: true,
-      },
+      select: this.userSelect,
     });
   }
 
@@ -189,16 +103,7 @@ export class InvitationRepository {
   async createProjectMember(data: Prisma.ProjectMemberCreateInput) {
     return await prisma.projectMember.create({
       data,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
-          },
-        },
-      },
+      include: this.userInclude,
     });
   }
 }
