@@ -1,21 +1,20 @@
-import { User } from '@prisma/client';
-import { TaskDto } from '@/types/task.dto';
-import { PaginationParams } from '../types/taskPagination';
-import { ForbiddenError, NotFoundError, UnauthorizedError } from '@/lib';
-import { taskRepository } from '@/repositories';
+import { Task, TaskStatus } from '@prisma/client';
+import { PaginationParams } from '@types';
+import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
+import { taskRepository } from '@repositories';
 
 type CreateTaskData = Omit<
-  TaskDto,
+  Task,
   'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'projectId' | 'assigneeId'
->;
+> & { tags?: string[]; attachments?: string[] };
 type UpdateTaskData = Partial<CreateTaskData>;
 
 export const taskService = {
   async createTask(
     data: CreateTaskData,
-    user: User | null | undefined,
+    user: AuthUser | null | undefined,
     projectId: number,
-  ): Promise<TaskDto> {
+  ): Promise<Task> {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -37,8 +36,8 @@ export const taskService = {
   async updateTask(
     data: UpdateTaskData,
     id: number,
-    user: User | null | undefined,
-  ): Promise<TaskDto> {
+    user: AuthUser | null | undefined,
+  ): Promise<Task> {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -57,7 +56,7 @@ export const taskService = {
     return taskRepository.update(id, data);
   },
 
-  async getTask(id: number, user: User | null | undefined) {
+  async getTask(id: number, user: AuthUser | null | undefined) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -74,7 +73,11 @@ export const taskService = {
     return taskFindByIdWithAuth;
   },
 
-  async getTaskList(projectId: number, params: PaginationParams, user: User | null | undefined) {
+  async getTaskList(
+    projectId: number,
+    params: PaginationParams,
+    user: AuthUser | null | undefined,
+  ) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -85,7 +88,7 @@ export const taskService = {
     return taskList;
   },
 
-  async deleteTask(id: number, user: User | null | undefined) {
+  async deleteTask(id: number, user: AuthUser | null | undefined) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }

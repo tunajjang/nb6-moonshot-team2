@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { ProjectController, MemberController, InvitationController } from '@controllers';
+import {
+  ProjectController,
+  MemberController,
+  InvitationController,
+  createTask,
+  getTaskList,
+} from '@controllers';
 import { CreateInvitationSchema } from '@superstructs';
 import { authenticate, asyncHandler } from '@middlewares';
 
@@ -226,10 +232,10 @@ export const projectRouter = (
    *          description: "존재하지 않는 프로젝트입니다 (응답 바디 없음)"
    */
   router.delete('/:projectId', asyncHandler(projectController.deleteProject));
-  
-  // //아래는 Task 생성/목록조회 라우터
-router.post('/:projectId/tasks', authenticate, withAsync(createTask));
-router.get('/:projectId/tasks', authenticate, withAsync(getTaskList));
+
+  //아래는 Task 생성/목록조회 라우터
+  router.post('/:projectId/tasks', authenticate, asyncHandler(createTask));
+  router.get('/:projectId/tasks', authenticate, asyncHandler(getTaskList));
 
   return router;
 };

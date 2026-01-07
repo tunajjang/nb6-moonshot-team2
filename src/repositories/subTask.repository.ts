@@ -1,5 +1,5 @@
 import { SubTask } from '@prisma/client';
-import { prisma } from '../lib/prisma';
+import { prisma } from '@lib';
 
 export const subTaskRepository = {
   create(data: Omit<SubTask, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>) {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '@/lib';
+import { prisma } from '@lib';
 
 export const uploadImages = async (req: Request, res: Response) => {
   const taskId = Number(req.body.taskId);

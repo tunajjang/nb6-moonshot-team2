@@ -2,19 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '@lib';
 
-// 인증된 요청의 타입 확장
-export interface AuthRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-  };
-}
-
 /**
  * Access Token을 검증하고 req.user에 사용자 정보를 설정하는 미들웨어
  * Authorization 헤더에서 Bearer 토큰을 추출하여 검증합니다.
  */
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
     // Authorization 헤더에서 토큰 추출
     const authHeader = req.headers.authorization;
@@ -60,7 +52,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
  * 선택적 인증 미들웨어 - 토큰이 있으면 검증하고, 없으면 그냥 통과
  * 초대 링크 접속 시 사용 (로그인되어 있으면 자동 수락, 없으면 로그인 페이지로 리다이렉트)
  */
-export const optionalAuthenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const optionalAuthenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
 

@@ -7,7 +7,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import { PORT } from '@lib';
 import { errorHandler } from '@middlewares';
-import router from './routers';
+import router from '@routers';
 
 const app = express();
 

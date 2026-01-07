@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import { uploadMulti } from '../middlewares/imageUpload.middleware';
-import { uploadImages } from '../controllers/image.controller';
-import { withAsync } from '../lib/withAsync';
+import { uploadMulti, asyncHandler } from '@middlewares';
+import { uploadImages } from '@controllers';
 
 const imageRouter = Router();
 
-imageRouter.post('/', uploadMulti, withAsync(uploadImages));
+imageRouter.post('/', uploadMulti, asyncHandler(uploadImages));
 
 export default imageRouter;

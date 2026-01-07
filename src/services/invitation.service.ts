@@ -2,7 +2,6 @@ import { MemberRepository, InvitationRepository } from '@repositories';
 import {
   prisma,
   ProjectNotFoundError,
-  MemberNotFoundError,
   MemberUnauthorizedError,
   MemberAlreadyExistsError,
   InvitationAlreadyExistsError,
