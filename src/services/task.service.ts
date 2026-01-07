@@ -2,13 +2,12 @@ import { Task, TaskStatus } from '@prisma/client';
 import { PaginationParams } from '@types';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
 import { taskRepository } from '@repositories';
-import { MemberService } from '@services/member.service';
 
 type CreateTaskData = Omit<
   Task,
   'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'projectId' | 'assigneeId'
-> & { tags?: string[]; attachments?: string[]; assigneeId?: number };
-type UpdateTaskData = Partial<CreateTaskData & { assigneeId?: number }>;
+> & { tags?: string[]; attachments?: string[] };
+type UpdateTaskData = Partial<CreateTaskData>;
 
 export const taskService = {
   async createTask(
@@ -20,14 +19,6 @@ export const taskService = {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
 
-    const memberService = new MemberService();
-
-    // 담당자 지정 시 프로젝트 멤버인지 확인
-    const assigneeId = data.assigneeId ?? user.id;
-    if (data.assigneeId) {
-      await memberService.validateAssignee(projectId, assigneeId);
-    }
-
     type CreateTaskDbData = CreateTaskData & {
       projectId: number;
       assigneeId: number;
@@ -35,7 +26,7 @@ export const taskService = {
 
     const createData: CreateTaskDbData = {
       ...data,
-      assigneeId,
+      assigneeId: user.id,
       projectId: projectId,
     };
 
@@ -60,12 +51,6 @@ export const taskService = {
 
     if (!taskFindByIdWithAuth) {
       throw new ForbiddenError('프로젝트 멤버가 아닙니다');
-    }
-
-    // 담당자 변경 시 프로젝트 멤버인지 확인
-    if (data.assigneeId !== undefined) {
-      const memberService = new MemberService();
-      await memberService.validateAssignee(taskFindById.projectId, data.assigneeId);
     }
 
     return taskRepository.update(id, data);
