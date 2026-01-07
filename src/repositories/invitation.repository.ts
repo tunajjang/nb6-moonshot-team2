@@ -1,5 +1,5 @@
 import { prisma } from '@lib';
-import { Invitation, InvitationStatus, Prisma } from '@prisma/client';
+import { InvitationStatus, Prisma } from '@prisma/client';
 
 export class InvitationRepository {
   // 초대 생성

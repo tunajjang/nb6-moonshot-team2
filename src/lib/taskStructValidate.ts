@@ -1,5 +1,5 @@
 import { Struct, StructError, create } from 'superstruct';
-import { BadRequestError } from './errors/app.error';
+import { BadRequestError } from '@lib';
 
 function throwBadRequest(err: unknown): never {
   //반환타입이 없는 함수

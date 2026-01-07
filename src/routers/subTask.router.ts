@@ -1,24 +1,17 @@
-import {
-  deleteSubTask,
-  getSubTaskById,
-  getSubTaskList,
-  updateSubTask,
-} from '@/controllers/subTask.controller';
-import { updateTask } from '@/controllers/task.controller';
-import { withAsync } from '@/lib/withAsync';
-import { authenticate, validate } from '@/middlewares';
-import { UpdateSubTaskBodyStruct } from '@/superstructs/subTask.struct';
+import { deleteSubTask, getSubTaskById, updateSubTask } from '@controllers';
+import { authenticate, validate, asyncHandler } from '@middlewares';
+import { UpdateSubTaskBodyStruct } from '@superstructs';
 import { Router } from 'express';
 
 const subTaskRouter = Router();
 
-subTaskRouter.get('/:subTaskId', authenticate, withAsync(getSubTaskById));
+subTaskRouter.get('/:subTaskId', authenticate, asyncHandler(getSubTaskById));
 subTaskRouter.patch(
   '/:subTaskId',
   authenticate,
   validate(UpdateSubTaskBodyStruct),
-  withAsync(updateSubTask),
+  asyncHandler(updateSubTask),
 );
-subTaskRouter.delete('/:subTaskId', authenticate, withAsync(deleteSubTask));
+subTaskRouter.delete('/:subTaskId', authenticate, asyncHandler(deleteSubTask));
 
 export default subTaskRouter;

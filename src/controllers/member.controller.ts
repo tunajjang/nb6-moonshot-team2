@@ -1,8 +1,7 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import { MemberService } from '@services';
 import { UnauthorizedError, BadRequestError } from '@lib';
-import { AuthRequest } from '@middlewares';
 
 export class MemberController {
   private memberService: MemberService;
@@ -13,7 +12,7 @@ export class MemberController {
 
   // 프로젝트 멤버 목록 조회
   getMembersByProjectId = async (
-    req: AuthRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
@@ -35,7 +34,7 @@ export class MemberController {
   };
 
   // 멤버 역할 변경
-  updateMemberRole = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  updateMemberRole = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
       const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
@@ -63,11 +62,7 @@ export class MemberController {
   };
 
   // 멤버 상태 변경
-  updateMemberStatus = async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+  updateMemberStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
       const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
@@ -95,7 +90,7 @@ export class MemberController {
   };
 
   // 멤버 삭제 (탈퇴)
-  deleteMember = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  deleteMember = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
       const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
@@ -113,7 +108,7 @@ export class MemberController {
   };
 
   // 멤버 강제 제외 (프로젝트 생성자만 가능)
-  removeMember = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  removeMember = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
       const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
@@ -132,7 +127,7 @@ export class MemberController {
 
   // 프로젝트에서 유저 제외하기
   removeUserFromProject = async (
-    req: AuthRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {

@@ -1,8 +1,8 @@
 import { ProjectRepository } from '@repositories';
 import { NotFoundError, BadRequestError, ForbiddenError } from '@lib';
-import { CreateProjectDto, ProjectDetailDto, UpdateProjectDto } from '@/types';
+import { CreateProjectDto, ProjectDetailDto, UpdateProjectDto } from '@types';
 import * as s from 'superstruct';
-import { CreateProjectStruct, UpdateProjectStruct } from '@/superstructs';
+import { CreateProjectStruct, UpdateProjectStruct } from '@superstructs';
 import { MailService } from '@services';
 
 // 유저당 최대 5개의 프로젝트만 생성 가능

@@ -6,3 +6,4 @@ export * from './project.service';
 export * from './user.service';
 export * from './task.service';
 export * from './mail.service';
+export * from './subTask.service';

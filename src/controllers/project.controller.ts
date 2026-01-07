@@ -1,12 +1,11 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ProjectService } from '@services';
-import { AuthRequest } from '@middlewares';
 import { BadRequestError, UnauthorizedError } from '@/lib';
 
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
-  createProject = async (req: AuthRequest, res: Response) => {
+  createProject = async (req: Request, res: Response) => {
     const user = req.user;
 
     if (!user) {
@@ -16,7 +15,7 @@ export class ProjectController {
     return res.status(201).json(result);
   };
 
-  getProjectDetail = async (req: AuthRequest, res: Response) => {
+  getProjectDetail = async (req: Request, res: Response) => {
     const { projectId } = req.params;
 
     const id = parseInt(projectId, 10);
@@ -31,7 +30,7 @@ export class ProjectController {
     return res.status(200).json(result);
   };
 
-  updateProject = async (req: AuthRequest, res: Response) => {
+  updateProject = async (req: Request, res: Response) => {
     const { projectId } = req.params;
     const userId = req.user!.id;
     const result = await this.projectService.updateProject(Number(projectId), userId, req.body);
@@ -39,7 +38,7 @@ export class ProjectController {
     return res.status(200).json(result);
   };
 
-  deleteProject = async (req: AuthRequest, res: Response) => {
+  deleteProject = async (req: Request, res: Response) => {
     const { projectId } = req.params;
     const userId = req.user!.id;
     await this.projectService.deleteProject(Number(projectId), userId);

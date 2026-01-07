@@ -49,6 +49,7 @@ const userService = new UserService(userRepository);
 const authService = new AuthService(authRepository, userRepository);
 const commentService = new CommentService();
 const memberService = new MemberService();
+const invitationService = new InvitationService();
 const mailService = new MailService();
 const projectService = new ProjectService(projectRepository, mailService);
 

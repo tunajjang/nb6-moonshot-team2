@@ -1,4 +1,5 @@
 export * from './prisma';
+export * from './taskStructValidate';
 
 // errors
 export * from './errors/app.error';

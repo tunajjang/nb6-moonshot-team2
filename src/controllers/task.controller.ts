@@ -1,20 +1,21 @@
 import { create } from 'superstruct';
 import { Request, Response } from 'express';
-import { taskService } from '../services/task.service';
-import { IdParamStruct, ProjectIdParamStruct } from '../superstructs/common.structs';
+import { taskService } from '@services';
 import {
+  IdParamStruct,
+  ProjectIdParamStruct,
   CreateTaskBodyStruct,
   GetTaskListParamsStruct,
   UpdateTaskBodyStruct,
-} from '../superstructs/task.superstruct';
-import { validate } from '@/lib/taskStructValidate';
+} from '@superstructs';
+import { validate } from '@lib';
 
 export async function createTask(req: Request, res: Response) {
   const { projectId } = create(req.params, ProjectIdParamStruct);
 
   const data = validate(req.body, CreateTaskBodyStruct);
 
-  const result = await taskService.createTask(data, req.user, projectId);
+  const result = await taskService.createTask(data as any, req.user, projectId);
 
   return res.send(result);
 }

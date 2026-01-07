@@ -1,8 +1,7 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import { CommentService } from '@services';
 import { UnauthorizedError, BadRequestError } from '@lib';
-import { AuthRequest } from '@middlewares';
 
 export class CommentController {
   private commentService: CommentService;
@@ -12,7 +11,7 @@ export class CommentController {
   }
 
   // 댓글 생성
-  createComment = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  createComment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { taskId } = req.params;
       const authorId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
@@ -44,11 +43,7 @@ export class CommentController {
   };
 
   // 특정 태스크의 댓글 목록 조회
-  getCommentsByTaskId = async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+  getCommentsByTaskId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { taskId } = req.params;
 
@@ -65,7 +60,7 @@ export class CommentController {
   };
 
   // 댓글 수정
-  updateComment = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  updateComment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { commentId } = req.params;
       const authorId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
@@ -97,7 +92,7 @@ export class CommentController {
   };
 
   // 댓글 삭제
-  deleteComment = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  deleteComment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { commentId } = req.params;
       const authorId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID

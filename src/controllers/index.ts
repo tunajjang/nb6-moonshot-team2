@@ -4,3 +4,6 @@ export * from './invitation.controller';
 export * from './member.controller';
 export * from './project.controller';
 export * from './user.controller';
+export * from './image.controller';
+export * from './subTask.controller';
+export * from './task.controller';

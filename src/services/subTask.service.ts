@@ -1,20 +1,16 @@
-import { User } from '@prisma/client';
-import { subTaskRepository } from '../repositories/subTask.repository';
-import { ForbiddenError, NotFoundError, UnauthorizedError } from '@/lib';
-import { SubTaskDto } from '@/types/subTask.dto';
+import { SubTask } from '@prisma/client';
+import { subTaskRepository } from '@repositories';
+import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
 
-type CreateSubTaskData = Omit<
-  SubTaskDto,
-  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'taskId'
->;
+type CreateSubTaskData = Omit<SubTask, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'taskId'>;
 type UpdateSubTaskData = Partial<CreateSubTaskData>;
 
 export const subTaskService = {
   async createSubTask(
     data: CreateSubTaskData,
-    user: User | null | undefined,
+    user: AuthUser | null | undefined,
     taskId: number,
-  ): Promise<SubTaskDto> {
+  ): Promise<SubTask> {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -31,7 +27,7 @@ export const subTaskService = {
     return subTaskRepository.create(createData);
   },
 
-  async getSubTaskList(taskId: number, user: User | null | undefined) {
+  async getSubTaskList(taskId: number, user: AuthUser | null | undefined) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -41,9 +37,9 @@ export const subTaskService = {
 
   async updateSubTask(
     data: UpdateSubTaskData,
-    user: User | null | undefined,
+    user: AuthUser | null | undefined,
     subTaskId: number,
-  ): Promise<SubTaskDto> {
+  ): Promise<SubTask> {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -62,7 +58,7 @@ export const subTaskService = {
     return subTaskRepository.update(data, subTaskId);
   },
 
-  async deleteSubTask(subTaskId: number, user: User | null | undefined) {
+  async deleteSubTask(subTaskId: number, user: AuthUser | null | undefined) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
@@ -81,7 +77,7 @@ export const subTaskService = {
     return subTaskRepository.delete(subTaskId);
   },
 
-  async getSubTask(subTaskId: number, user: User | null | undefined) {
+  async getSubTask(subTaskId: number, user: AuthUser | null | undefined) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }

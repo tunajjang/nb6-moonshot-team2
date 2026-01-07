@@ -1,5 +1,5 @@
 import { prisma } from '@lib';
-import { ProjectMember, ProjectRole, MemberStatus, Prisma } from '@prisma/client';
+import { ProjectRole, MemberStatus } from '@prisma/client';
 
 export class MemberRepository {
   // 프로젝트 멤버 목록 조회 (삭제되지 않은 멤버만, 초대 정보 포함)

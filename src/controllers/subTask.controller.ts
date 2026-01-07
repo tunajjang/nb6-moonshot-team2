@@ -1,9 +1,13 @@
 import { create } from 'superstruct';
 import { Request, Response } from 'express';
-import { SubTaskIdParamStruct, TaskIdParamsStruct } from '../superstructs/common.structs';
-import { CreateSubTaskBodyStruct, UpdateSubTaskBodyStruct } from '../superstructs/subTask.struct';
-import { validate } from '@/lib/taskStructValidate';
-import { subTaskService } from '@/services/subTask.service';
+import {
+  SubTaskIdParamStruct,
+  TaskIdParamsStruct,
+  CreateSubTaskBodyStruct,
+  UpdateSubTaskBodyStruct,
+} from '@superstructs';
+import { validate } from '@lib';
+import { subTaskService } from '@services';
 
 export async function createSubTask(req: Request, res: Response) {
   const { taskId } = create(req.params, TaskIdParamsStruct);
@@ -31,7 +35,6 @@ export async function getSubTaskById(req: Request, res: Response) {
 }
 
 export async function updateSubTask(req: Request, res: Response) {
-
   const data = validate(req.body, UpdateSubTaskBodyStruct);
   const { subTaskId } = create(req.params, SubTaskIdParamStruct);
 

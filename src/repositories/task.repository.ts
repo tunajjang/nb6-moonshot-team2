@@ -1,6 +1,6 @@
 import { prisma } from '@lib';
-import { TaskStatus, Task } from '@prisma/client';
-import { PaginationParams } from '../types/taskPagination';
+import { Prisma, TaskStatus, Task } from '@prisma/client';
+import { PaginationParams } from '@types';
 
 export const taskRepository = {
   create(
@@ -32,7 +32,7 @@ export const taskRepository = {
             })),
           },
         }),
-      },
+      } as Prisma.TaskUncheckedCreateInput,
     });
   },
 
@@ -44,7 +44,7 @@ export const taskRepository = {
       projectId,
       deletedAt: null,
       title: keyword ? { contains: keyword } : undefined,
-      userId: assigneeId ? { equals: assigneeId } : undefined,
+      assigneeId: assigneeId ? { equals: assigneeId } : undefined,
       status: status ? TaskStatus[status] : undefined,
     };
 
@@ -132,7 +132,7 @@ export const taskRepository = {
             })),
           },
         }),
-      },
+      } as Prisma.TaskUncheckedCreateInput,
     });
   },
   delete(id: number) {
