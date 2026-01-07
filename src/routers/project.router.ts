@@ -226,6 +226,10 @@ export const projectRouter = (
    *          description: "존재하지 않는 프로젝트입니다 (응답 바디 없음)"
    */
   router.delete('/:projectId', asyncHandler(projectController.deleteProject));
+  
+  // //아래는 Task 생성/목록조회 라우터
+router.post('/:projectId/tasks', authenticate, withAsync(createTask));
+router.get('/:projectId/tasks', authenticate, withAsync(getTaskList));
 
   return router;
 };

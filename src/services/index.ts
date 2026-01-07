@@ -4,4 +4,5 @@ export * from './invitation.service';
 export * from './member.service';
 export * from './project.service';
 export * from './user.service';
+export * from './task.service';
 export * from './mail.service';

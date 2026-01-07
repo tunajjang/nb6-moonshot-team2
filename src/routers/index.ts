@@ -31,6 +31,9 @@ import { userRouter } from './user.router';
 import { projectRouter } from './project.router';
 import memberRouter from './member.router';
 import commentRouter from './comment.router';
+import imageRouter from './image.router';
+import taskRouter from './task.router';
+import subTaskRouter from './subTask.router';
 import invitationRouter from './invitation.router';
 
 const router = Router();
@@ -65,6 +68,9 @@ router.use('/auth', authRouter(authController));
 router.use('/users', userRouter(userController));
 router.use('/projects', projectRouter(projectController, memberController, invitationController));
 router.use('/members', memberRouter);
+router.use('/file', imageRouter);
+router.use('/tasks', taskRouter);
+router.use('/subtasks', subTaskRouter);
 router.use('/invitations', invitationRouter);
 
 export default router;
