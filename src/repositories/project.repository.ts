@@ -14,12 +14,15 @@ export class ProjectRepository {
   }
 
   // 프로젝트 생성
-  async createProject(userId: User['id'], name: string, description: string): Promise<Project> {
+  async createProject(userId: User['id'], name: string, description: string, googleCalendarId : string | null | undefined): Promise<Project> {
     return await this.prisma.project.create({
       data: {
         ownerId: userId,
         name,
         description,
+        //구글캘린더 id
+        googleCalendarId,
+        //
         projectMembers: {
           create: {
             userId,

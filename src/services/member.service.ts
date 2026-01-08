@@ -6,6 +6,16 @@ import {
   MemberUnauthorizedError,
   OwnerCannotLeaveError,
 } from '@lib';
+//구글 캘린더 
+import { google } from 'googleapis';
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: 'service-account-key.json', // 서비스 계정 키 경로
+  scopes: ['https://www.googleapis.com/auth/calendar'],
+});
+
+const calendar = google.calendar({ version: 'v3', auth });
+//
 
 export class MemberService {
   private memberRepository: MemberRepository;
@@ -65,6 +75,32 @@ export class MemberService {
     if (!isOwner && !isSelf) {
       throw new MemberUnauthorizedError('You can only update your own member status');
     }
+
+    //구글 캘린더 공유 권한 부여
+    if (memberStatus === 'ACCEPTED') {
+      const project = await this.memberRepository.gerProjectWithCalendar(member.projectId);
+      const user = await this.memberRepository.getUserEmail(member.userId);
+
+      if (project.googleCalenderId && user) {
+        await calendar.acl.insert({
+          calendarId: project.googleCalendarId,
+          requestBody: {
+            role: 'writer',
+            scope: {
+              type: 'user',
+              value: user.email,
+            },
+          },
+        });
+        console.log(`구글캘린더 공유 완료: ${user.email}`);
+      } else {
+        console.log(
+          `구글 캘린더 공유 실패 project Id : ${project.googleCalenderId}, user : ${user.email}`,
+        );
+      }
+    }
+    //
+
     return await this.memberRepository.updateStatus(memberId, memberStatus);
   }
 

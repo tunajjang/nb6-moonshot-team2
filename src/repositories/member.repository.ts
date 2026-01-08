@@ -153,4 +153,11 @@ export class MemberRepository {
       },
     });
   }
+
+  //구글 캘린더용 프로젝트 ID get
+  async gerProjectWithCalendar(projectId: number): Promise<number> {
+    
+  }
+
+  //구글 캘린더용 프로젝트 member email get
 }
