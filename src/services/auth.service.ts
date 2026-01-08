@@ -27,7 +27,7 @@ export class AuthService {
       ...userData,
       password: hashedPassword,
     });
-    const { password, ...newUser } = createUser;
+    const { password, deletedAt, ...newUser } = createUser;
     return newUser;
   }
 
@@ -56,7 +56,8 @@ export class AuthService {
       user: { connect: { id: user.id } },
     });
     const { password, ...userInfo } = user;
-    return { user: userInfo, accessToken, refreshToken };
+    // return { user: userInfo, accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
   /**

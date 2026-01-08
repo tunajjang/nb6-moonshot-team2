@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { UserRepository } from '@repositories';
 import { NotFoundError, AppError } from '@lib';
 import { StatusCodes } from 'http-status-codes';
+import { UpdateUserRequest } from '@types';
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -31,20 +32,29 @@ export class UserService {
     if (!user) {
       throw new NotFoundError('User not found!');
     }
-    return user;
+    const { deletedAt, ...userData } = user;
+    return userData;
   }
 
   /**
    * 사용자 정보 수정
    */
-  async updateUser(userId: User['id'], userData: Prisma.UserUpdateInput) {
-    await this.getUserById(userId);
-
-    if (userData.password && typeof userData.password === 'string') {
-      userData.password = await bcrypt.hash(userData.password, 10);
+  async updateUser(userId: User['id'], userData: UpdateUserRequest) {
+    const user = await this.getUserById(userId);
+    const isPassword = await bcrypt.compare(userData.currentPassword, user.password);
+    if (!isPassword) {
+      throw new AppError('현재 비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
     }
 
-    return this.userRepository.updateUser(userId, userData);
+    const updateData: any = {};
+    if (userData.email) updateData.email = userData.email;
+    if (userData.name) updateData.name = userData.name;
+    if (userData.profileImage !== undefined) updateData.profileImage = userData.profileImage;
+    if (userData.newPassword && typeof userData.newPassword === 'string') {
+      updateData.password = await bcrypt.hash(userData.newPassword, 10);
+    }
+
+    return this.userRepository.updateUser(userId, updateData);
   }
 
   /**
@@ -79,16 +89,20 @@ export class UserService {
     if (!user) {
       throw new NotFoundError('User not found');
     }
-
-    return user;
+    const { deletedAt, ...userData } = user;
+    return userData;
   }
 
   /**
    * 내 프로젝트 목록 조회
    */
   async getMyProjects(userId: User['id']) {
-    const members = await this.userRepository.findProjectsByUserId(userId);
-    return members.map((member) => member.project);
+    const projects = await this.userRepository.findProjectsByUserId(userId);
+    // return members.map((member) => member.project);
+    return {
+      data: projects,
+      total: projects.length,
+    };
   }
 
   /**

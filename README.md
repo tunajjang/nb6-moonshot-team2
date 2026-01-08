@@ -90,7 +90,7 @@
 - Authentication: JWT (jsonwebtoken), bcrypt
 - File Upload: Multer
 
-## 아키텍처
+### 아키텍처
 
 본 프로젝트는 관심사의 분리(SoC)를 위해 3-Layer Architecture를 따릅니다.
 

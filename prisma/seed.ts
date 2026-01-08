@@ -23,8 +23,11 @@ async function main() {
 
   console.log('태그생성시작');
   for (let i = 0; i < 30; i++) {
-    await prisma.tag.create({
-      data: { name: faker.animal.petName() },
+    const tagName = faker.animal.petName();
+    await prisma.tag.upsert({
+      where: { name: tagName },
+      update: {},
+      create: { name: tagName },
     });
   }
   console.log('태그생성완료');

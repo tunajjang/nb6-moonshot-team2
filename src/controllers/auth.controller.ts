@@ -71,12 +71,28 @@ export class AuthController {
   /**
    * 구글 로그인 콜백 처리
    */
+  // googleAuthCallback = async (req: Request, res: Response) => {
+  //   const { code } = req.query;
+  //   if (!code) {
+  //     throw new AppError('인증 코드가 없습니다.', StatusCodes.BAD_REQUEST);
+  //   }
+  //   const result = await this.authService.googleLogin(code as string);
+  //   res.cookie('accessToken', result.accessToken, { httpOnly: true });
+  //   res.cookie('refreshToken', result.refreshToken, { httpOnly: true });
+
+  //   // return res.status(StatusCodes.OK).json(result).redirect('http://localhost:3001/projects');
+  //   return res.status(StatusCodes.OK).redirect('http://localhost:3001/projects');
+  // };
   googleAuthCallback = async (req: Request, res: Response) => {
     const { code } = req.query;
     if (!code) {
       throw new AppError('인증 코드가 없습니다.', StatusCodes.BAD_REQUEST);
     }
     const result = await this.authService.googleLogin(code as string);
-    return res.status(StatusCodes.OK).json(result);
+
+    // JSON 응답 대신, URL 뒤에 토큰을 붙여서 리다이렉트
+    const redirectUrl = `http://localhost:3001/projects?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}`;
+
+    return res.redirect(redirectUrl);
   };
 }

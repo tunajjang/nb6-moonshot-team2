@@ -10,7 +10,7 @@ export const signUpStruct = s.object({
   name: s.size(s.string(), 2, 20),
   email: EmailStruct,
   password: s.size(s.string(), 4, 20),
-  profileImage: s.optional(s.string()),
+  profileImage: s.optional(s.nullable(s.string())),
 });
 
 export const loginStruct = s.object({
@@ -19,8 +19,9 @@ export const loginStruct = s.object({
 });
 
 export const UpdateUserStruct = s.object({
-  name: s.optional(s.size(s.string(), 2, 20)),
   email: s.optional(EmailStruct),
-  password: s.optional(s.size(s.string(), 4, 20)),
-  profileImage: s.optional(s.string()),
+  name: s.optional(s.size(s.string(), 2, 20)),
+  currentPassword: s.optional(s.size(s.string(), 4, 20)),
+  newPassword: s.optional(s.size(s.string(), 4, 20)),
+  profileImage: s.optional(s.nullable(s.string())),
 });
