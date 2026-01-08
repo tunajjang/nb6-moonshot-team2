@@ -141,7 +141,7 @@ taskRouter.delete('/:taskId', authenticate, asyncHandler(deleteTask));
  *     tags: [Subtask]
  *     parameters:
  *       - in: path
- *         name: projectId
+ *         name: taskId
  *         required: true
  *         schema:
  *           type: integer
