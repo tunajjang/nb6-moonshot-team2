@@ -66,12 +66,47 @@ export class UserRepository {
    * 내가 멤버로 속한 프로젝트 목록 조회
    */
   async findProjectsByUserId(userId: User['id']) {
-    const projects = await this.prisma.projectMember.findMany({
-      where: { userId, deletedAt: null },
-      include: { project: true },
-      orderBy: { createdAt: 'desc' },
+    const projects = await this.prisma.project.findMany({
+      where: {
+        projectMembers: {
+          some: {
+            userId,
+            deletedAt: null,
+          },
+        },
+        deletedAt: null,
+      },
+      include: {
+        _count: {
+          select: { projectMembers: { where: { deletedAt: null } } },
+        },
+        tasks: {
+          where: { deletedAt: null },
+          select: { status: true },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
-    return projects;
+
+    return projects.map((project) => {
+      const todoCount = project.tasks.filter((task) => task.status === 'PENDING').length;
+      const inProgressCount = project.tasks.filter((task) => task.status === 'IN_PROGRESS').length;
+      const doneCount = project.tasks.filter((task) => task.status === 'DONE').length;
+
+      return {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        memberCount: project._count.projectMembers,
+        todoCount,
+        inProgressCount,
+        doneCount,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+      };
+    });
   }
 
   /**
@@ -80,9 +115,42 @@ export class UserRepository {
   async findTasksByUserId(userId: User['id']) {
     const tasks = await this.prisma.task.findMany({
       where: { assigneeId: userId, deletedAt: null },
-      include: { project: true },
+      include: {
+        project: true,
+        assignee: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profileImage: true,
+          },
+        },
+        taskTags: {
+          include: { tag: true },
+        },
+        attachments: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
-    return tasks;
+    // return tasks;
+    return tasks.map((task) => {
+      return {
+        id: task.id,
+        projectId: task.projectId,
+        title: task.title,
+        startYear: task.startYear,
+        startMonth: task.startMonth,
+        startDay: task.startDay,
+        endYear: task.endYear,
+        endMonth: task.endMonth,
+        endDay: task.endDay,
+        status: task.status,
+        assignee: task.assignee,
+        tags: task.taskTags.map((tt) => ({ id: tt.tag.id, name: tt.tag.name })),
+        attachments: task.attachments.map((a) => a.url),
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
+      };
+    });
   }
 }

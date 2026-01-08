@@ -37,7 +37,11 @@ export class UserController {
   // 내정보 수정
   updateUser = async (req: Request, res: Response) => {
     const userId = req.user?.id as number;
-    const { password, ...userData } = await this.userService.updateUser(userId, req.body);
+
+    const { password, deletedAt, ...userData } = await this.userService.updateUser(
+      userId,
+      req.body,
+    );
     return res.status(StatusCodes.OK).json(userData);
   };
 
