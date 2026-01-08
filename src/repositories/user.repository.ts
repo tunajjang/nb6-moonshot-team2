@@ -96,26 +96,48 @@ export class UserRepository {
   /**
    * 나에게 할당된 태스크 목록 조회
    */
-  async findTasksByUserId(userId: User['id']) {
-    const tasks = await this.prisma.task.findMany({
-      where: { assigneeId: userId, deletedAt: null },
-      include: {
-        project: true,
-        assignee: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImage: true,
+  async findTasksByUserId(userId: User['id'], params: any) {
+    const { page, limit, from, to, projectId, status, assigneeId, keyword, orderBy } = params;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.TaskWhereInput = {
+      assigneeId: userId,
+      deletedAt: null,
+      projectId,
+      status,
+      title: keyword ? { contains: keyword } : undefined,
+    };
+
+    if (assigneeId) {
+      where.assigneeId = assigneeId;
+    }
+
+    if (from || to) {
+      where.createdAt = {};
+      if (from) where.createdAt.gte = new Date(from);
+      if (to) {
+        const toData = new Date(to);
+        toData.setHours(23, 59, 59, 999);
+        where.createdAt.lte = toData;
+      }
+    }
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.task.count({ where }),
+      this.prisma.task.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+        include: {
+          project: true,
+          assignee: {
+            select: { id: true, name: true, email: true, profileImage: true },
           },
+          taskTags: { include: { tag: true } },
+          attachments: true,
         },
-        taskTags: {
-          include: { tag: true },
-        },
-        attachments: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-    return tasks;
+      }),
+    ]);
+    return { total, data };
   }
 }

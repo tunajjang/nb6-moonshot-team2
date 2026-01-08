@@ -8,6 +8,29 @@ export interface PaginationParams {
   orderBy: 'created_at' | 'name' | 'end_date';
 }
 
+export interface GetTaskListArgs {
+  page: number;
+  limit: number;
+  status?: 'todo' | 'in_progress' | 'done';
+  assignee?: number;
+  keyword?: string;
+  order: 'asc' | 'desc';
+  order_by: 'created_at' | 'name' | 'end_date';
+}
+
+export interface GetMyTasksQuery {
+  page: number;
+  limit: number;
+  from?: string;
+  to?: string;
+  project_id?: number;
+  status?: 'todo' | 'in_progress' | 'done';
+  assignee_id?: number;
+  keyword?: string;
+  order: 'asc' | 'desc';
+  order_by: 'created_at' | 'name' | 'end_date';
+}
+
 /*
 Request params
 - page: `number`

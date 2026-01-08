@@ -45,7 +45,7 @@ export const taskRepository = {
       deletedAt: null,
       title: keyword ? { contains: keyword } : undefined,
       assigneeId: assigneeId ? { equals: assigneeId } : undefined,
-      status: status ? TaskStatus[status] : undefined,
+      status: status,
     };
 
     const orderByMap = {

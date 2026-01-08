@@ -1,5 +1,5 @@
-import { Task, TaskStatus } from '@prisma/client';
-import { PaginationParams } from '@types';
+import { Project, Task, TaskStatus } from '@prisma/client';
+import { PaginationParams, GetTaskListArgs } from '@types';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
 import { taskRepository } from '@repositories';
 import { MemberService } from '@services';
@@ -89,17 +89,33 @@ export const taskService = {
   },
 
   async getTaskList(
-    projectId: number,
-    params: PaginationParams,
+    projectId: Project['id'],
+    args: GetTaskListArgs,
     user: AuthUser | null | undefined,
   ) {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    const taskList = await taskRepository.findList(projectId, params);
-    if (!taskList) {
-      throw new NotFoundError('Task 목록이 존재하지 않습니다');
-    }
+
+    let status: TaskStatus | undefined;
+    if (args.status === 'todo') status = TaskStatus.PENDING;
+    else if (args.status === 'in_progress') status = TaskStatus.IN_PROGRESS;
+    else if (args.status === 'done') status = TaskStatus.DONE;
+
+    const params: PaginationParams = {
+      page: args.page,
+      limit: args.limit,
+      status,
+      assigneeId: args.assignee,
+      keyword: args.keyword,
+      order: args.order,
+      orderBy: args.order_by as PaginationParams['orderBy'],
+    };
+
+    // const taskList = await taskRepository.findList(projectId, params);
+    // if (!taskList) {
+    //   throw new NotFoundError('Task 목록이 존재하지 않습니다');
+    // }
     const { tasks, total } = await taskRepository.findList(projectId, params);
 
     const formattedTasks = tasks.map((task) => ({
@@ -112,7 +128,7 @@ export const taskService = {
       endYear: task.endYear,
       endMonth: task.endMonth,
       endDay: task.endDay,
-      status: task.status,
+      status: task.status === 'PENDING' ? 'todo' : task.status.toLocaleLowerCase(),
 
       assignee: task.assignee
         ? {

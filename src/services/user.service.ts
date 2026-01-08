@@ -1,9 +1,9 @@
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User, TaskStatus } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { UserRepository } from '@repositories';
 import { NotFoundError, AppError } from '@lib';
 import { StatusCodes } from 'http-status-codes';
-import { UpdateUserRequest } from '@types';
+import { UpdateUserRequest, GetMyTasksQuery } from '@types';
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -126,10 +126,34 @@ export class UserService {
   /**
    * 내 태스크 목록 조회
    */
-  async getMyTasks(userId: User['id']) {
-    const tasks = await this.userRepository.findTasksByUserId(userId);
+  async getMyTasks(userId: User['id'], query: GetMyTasksQuery) {
+    const { page, limit, from, to, project_id, status, assignee_id, keyword, order, order_by } =
+      query;
 
-    const taskList = tasks.map((task) => {
+    let mappedStatus: TaskStatus | undefined;
+    if (status === 'todo') mappedStatus = 'PENDING';
+    if (status === 'in_progress') mappedStatus = 'IN_PROGRESS';
+    if (status === 'done') mappedStatus = 'DONE';
+
+    let prismaOrderBy: any = { createdAt: order };
+    if (order_by === 'name') prismaOrderBy = { title: order };
+    if (order_by === 'end_date') {
+      prismaOrderBy = [{ endYear: order }, { endMonth: order }, { endDay: order }];
+    }
+
+    const { total, data } = await this.userRepository.findTasksByUserId(userId, {
+      page,
+      limit,
+      from,
+      to,
+      projectId: project_id,
+      status: mappedStatus,
+      assigneeId: assignee_id,
+      keyword,
+      orderBy: prismaOrderBy,
+    });
+
+    const taskList = data.map((task) => {
       return {
         id: task.id,
         projectId: task.projectId,

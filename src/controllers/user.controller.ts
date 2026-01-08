@@ -1,8 +1,9 @@
-import { is } from 'superstruct';
+import { is, create } from 'superstruct';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { EmailStruct } from '@superstructs';
+import { EmailStruct, GetMyTasksQueryStruct } from '@superstructs';
 import { UserService } from '@services';
+import { GetMyTasksQuery } from '@types';
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -90,7 +91,8 @@ export class UserController {
   // 내 할일 목록 보기
   getMyTasks = async (req: Request, res: Response) => {
     const userId = req.user?.id as number;
-    const tasks = await this.userService.getMyTasks(userId);
+    const query = create(req.query, GetMyTasksQueryStruct) as GetMyTasksQuery;
+    const tasks = await this.userService.getMyTasks(userId, query);
     return res.status(StatusCodes.OK).json(tasks);
   };
 }
