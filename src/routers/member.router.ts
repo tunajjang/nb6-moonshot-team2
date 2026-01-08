@@ -22,11 +22,17 @@ const memberRouter = (memberController: MemberController) => {
    *           type: integer
    *         description: 프로젝트 ID
    *       - in: query
-   *         name: limit
-   *         required: false
+   *         name: page
    *         schema:
    *           type: integer
-   *         description: 조회할 멤버 수 제한
+   *           default: 1
+   *         description: 페이지 번호
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *           default: 10
+   *         description: 한 페이지당 반환할 멤버 수
    *     responses:
    *       200:
    *         description: 멤버 목록 조회 성공
@@ -67,10 +73,36 @@ const memberRouter = (memberController: MemberController) => {
    *                 total:
    *                   type: integer
    *                   example: 10
+   *       400:
+   *         description: 잘못된 요청 형식
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "잘못된 요청 형식"
    *       401:
    *         description: 인증이 필요함
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "로그인이 필요합니다"
    *       403:
    *         description: 프로젝트 멤버만 조회 가능
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "프로젝트 멤버가 아닙니다"
    *       404:
    *         description: 프로젝트를 찾을 수 없음
    */
@@ -298,25 +330,38 @@ const memberRouter = (memberController: MemberController) => {
    *           type: integer
    *         description: 멤버 ID
    *     responses:
-   *       200:
+   *       204:
    *         description: 멤버 제외 성공
+   *       400:
+   *         description: 잘못된 요청 형식
    *         content:
    *           application/json:
    *             schema:
    *               type: object
    *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
    *                 message:
    *                   type: string
-   *                   example: Member removed successfully
-   *       400:
-   *         description: 프로젝트 소유자는 제외 불가
+   *                   example: "잘못된 요청 형식"
    *       401:
    *         description: 인증이 필요함
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "로그인이 필요합니다"
    *       403:
    *         description: 프로젝트 소유자만 제외 가능
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "프로젝트 관리자가 아닙니다"
    *       404:
    *         description: 멤버를 찾을 수 없음
    */

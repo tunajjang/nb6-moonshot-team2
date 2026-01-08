@@ -44,7 +44,7 @@ export class MemberRepository {
   }
 
   // 프로젝트 멤버 목록 조회 (삭제되지 않은 멤버만, 초대 정보 포함)
-  async findByProjectId(projectId: number, limit?: number) {
+  async findByProjectId(projectId: number, limit: number, offset: number) {
     return await prisma.projectMember.findMany({
       where: {
         projectId,
@@ -54,7 +54,8 @@ export class MemberRepository {
       orderBy: {
         createdAt: 'asc',
       },
-      ...(limit && { take: limit }),
+      take: limit,
+      skip: offset,
     });
   }
 

@@ -42,33 +42,40 @@ const invitationRouter = (invitationController: InvitationController) => {
    *             schema:
    *               type: object
    *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
+   *                 invitationId:
+   *                   type: string
+   *                   format: uuid
+   *                   example: "550e8400-e29b-41d4-a716-446655440000"
+   *       400:
+   *         description: 잘못된 요청 형식
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
    *                 message:
    *                   type: string
-   *                   example: Invitation created successfully
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     id:
-   *                       type: string
-   *                       format: uuid
-   *                     projectId:
-   *                       type: integer
-   *                     hostId:
-   *                       type: integer
-   *                     guestId:
-   *                       type: integer
-   *                     invitationStatus:
-   *                       type: string
-   *                       enum: [PENDING, ACCEPTED, CANCELED]
-   *       400:
-   *         description: 잘못된 요청
+   *                   example: "잘못된 요청 형식"
    *       401:
    *         description: 인증이 필요함
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "로그인이 필요합니다"
    *       403:
    *         description: 프로젝트 소유자만 초대 가능
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "프로젝트 관리자가 아닙니다"
    *       404:
    *         description: 프로젝트를 찾을 수 없음
    *       409:
@@ -126,34 +133,8 @@ const invitationRouter = (invitationController: InvitationController) => {
    *     responses:
    *       200:
    *         description: 초대 수락 성공
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
-   *                 message:
-   *                   type: string
-   *                   example: Invitation accepted successfully
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     id:
-   *                       type: string
-   *                     invitationStatus:
-   *                       type: string
-   *                       enum: [ACCEPTED]
-   *                     project:
-   *                       type: object
-   *                       properties:
-   *                         id:
-   *                           type: integer
-   *                         name:
-   *                           type: string
    *       400:
-   *         description: 이미 수락되었거나 취소된 초대
+   *         description: 잘못된 요청
    *       401:
    *         description: 인증이 필요함
    *       403:
@@ -184,25 +165,38 @@ const invitationRouter = (invitationController: InvitationController) => {
    *           format: uuid
    *         description: 초대 ID
    *     responses:
-   *       200:
+   *       204:
    *         description: 초대 삭제 성공
+   *       400:
+   *         description: 잘못된 요청 형식
    *         content:
    *           application/json:
    *             schema:
    *               type: object
    *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
    *                 message:
    *                   type: string
-   *                   example: Invitation deleted successfully
-   *       400:
-   *         description: 이미 수락된 초대는 삭제 불가
+   *                   example: "잘못된 요청 형식"
    *       401:
    *         description: 인증이 필요함
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "로그인이 필요합니다."
    *       403:
-   *         description: 프로젝트 소유자만 삭제 가능
+   *         description: 권한이 없음
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "권한이 없습니다."
    *       404:
    *         description: 초대를 찾을 수 없음
    */
@@ -231,31 +225,16 @@ const invitationRouter = (invitationController: InvitationController) => {
    *     responses:
    *       200:
    *         description: 초대 취소 성공
+   *       400:
+   *         description: 잘못된 요청 형식
    *         content:
    *           application/json:
    *             schema:
    *               type: object
    *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
    *                 message:
    *                   type: string
-   *                   example: Invitation canceled successfully
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     id:
-   *                       type: string
-   *                     invitationStatus:
-   *                       type: string
-   *                       enum: [CANCELED]
-   *       400:
-   *         description: 이미 수락된 초대는 취소 불가
-   *       401:
-   *         description: 인증이 필요함
-   *       403:
-   *         description: 프로젝트 소유자만 취소 가능
+   *                   example: "잘못된 요청 형식"
    *       404:
    *         description: 초대를 찾을 수 없음
    */

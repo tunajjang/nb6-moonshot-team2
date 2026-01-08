@@ -37,7 +37,7 @@ export class InvitationService {
     // 프로젝트 소유자만 초대 가능
     const isOwner = await this.memberRepository.isProjectOwner(projectId, hostId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('Only project owner can invite members');
+      throw new MemberUnauthorizedError('프로젝트 관리자가 아닙니다');
     }
     // 이메일로 사용자 조회
     const guest = await this.invitationRepository.findUserByEmail(guestEmail);
@@ -46,12 +46,12 @@ export class InvitationService {
     }
     // 자신을 초대할 수 없음
     if (guest.id === hostId) {
-      throw new MemberUnauthorizedError('You cannot invite yourself');
+      throw new MemberUnauthorizedError('자신을 초대할 수 없습니다');
     }
     // 이미 프로젝트 멤버인지 확인
     const existingMember = await this.memberRepository.findByProjectAndUser(projectId, guest.id);
     if (existingMember) {
-      throw new MemberAlreadyExistsError('User is already a member of this project');
+      throw new MemberAlreadyExistsError('이미 프로젝트 멤버입니다');
     }
     // 이미 PENDING 상태의 초대가 있는지 확인
     const existingInvitation = await this.invitationRepository.findByProjectAndGuest(
@@ -59,7 +59,7 @@ export class InvitationService {
       guest.id,
     );
     if (existingInvitation) {
-      throw new InvitationAlreadyExistsError('Invitation already exists for this user and project');
+      throw new InvitationAlreadyExistsError('이미 초대된 사용자입니다');
     }
     // 초대 생성
     const invitation = await this.invitationRepository.create({
@@ -98,15 +98,15 @@ export class InvitationService {
     }
     // 초대받은 사용자인지 확인
     if (invitation.guestId !== guestId) {
-      throw new MemberUnauthorizedError('You are not authorized to accept this invitation');
+      throw new MemberUnauthorizedError('이 초대를 수락할 권한이 없습니다');
     }
     // 이미 수락된 초대인지 확인
     if (invitation.invitationStatus === 'ACCEPTED') {
-      throw new InvitationAlreadyAcceptedError('Invitation has already been accepted');
+      throw new InvitationAlreadyAcceptedError('이미 수락된 초대입니다');
     }
     // 취소된 초대인지 확인
     if (invitation.invitationStatus === 'CANCELED') {
-      throw new InvitationAlreadyCanceledError('Invitation has been canceled');
+      throw new InvitationAlreadyCanceledError('이미 취소된 초대입니다');
     }
     // 이미 프로젝트 멤버인지 확인
     const existingMember = await this.memberRepository.findByProjectAndUser(
@@ -114,7 +114,7 @@ export class InvitationService {
       guestId,
     );
     if (existingMember) {
-      throw new MemberAlreadyExistsError('User is already a member of this project');
+      throw new MemberAlreadyExistsError('이미 프로젝트 멤버입니다');
     }
     // 트랜잭션으로 초대 수락 및 멤버 생성
     const result = await prisma.$transaction(async (tx) => {
@@ -173,15 +173,15 @@ export class InvitationService {
     // 프로젝트 소유자인지 확인
     const isOwner = await this.memberRepository.isProjectOwner(invitation.projectId, hostId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('Only project owner can cancel invitations');
+      throw new MemberUnauthorizedError('프로젝트 관리자만 초대를 취소할 수 있습니다');
     }
     // 이미 수락된 초대는 취소 불가
     if (invitation.invitationStatus === 'ACCEPTED') {
-      throw new InvitationAlreadyAcceptedError('Cannot cancel an accepted invitation');
+      throw new InvitationAlreadyAcceptedError('이미 수락된 초대는 취소할 수 없습니다');
     }
     // 이미 취소된 초대인지 확인
     if (invitation.invitationStatus === 'CANCELED') {
-      throw new InvitationAlreadyCanceledError('Invitation has already been canceled');
+      throw new InvitationAlreadyCanceledError('이미 취소된 초대입니다');
     }
     // 초대 취소
     return await this.invitationRepository.updateStatus(invitationId, 'CANCELED');
@@ -197,15 +197,15 @@ export class InvitationService {
     // 프로젝트 소유자인지 확인
     const isOwner = await this.memberRepository.isProjectOwner(invitation.projectId, hostId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('Only project owner can delete invitations');
+      throw new MemberUnauthorizedError('권한이 없습니다.');
     }
     // 이미 수락된 초대는 삭제 불가
     if (invitation.invitationStatus === 'ACCEPTED') {
-      throw new InvitationAlreadyAcceptedError('Cannot delete an accepted invitation');
+      throw new InvitationAlreadyAcceptedError('이미 수락된 초대는 삭제할 수 없습니다');
     }
     // 이미 취소된 초대인지 확인
     if (invitation.invitationStatus === 'CANCELED') {
-      throw new InvitationAlreadyCanceledError('Invitation has already been canceled');
+      throw new InvitationAlreadyCanceledError('이미 취소된 초대입니다');
     }
     // 초대 취소
     return await this.invitationRepository.updateStatus(invitationId, 'CANCELED');
@@ -230,7 +230,7 @@ export class InvitationService {
     // 프로젝트 소유자만 초대 목록 조회 가능
     const isOwner = await this.memberRepository.isProjectOwner(projectId, userId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('Only project owner can view invitations');
+      throw new MemberUnauthorizedError('프로젝트 관리자만 초대 목록을 조회할 수 있습니다');
     }
     return await this.invitationRepository.findByProjectId(projectId);
   }

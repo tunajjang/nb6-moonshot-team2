@@ -13,15 +13,25 @@ export class MemberController {
   // 프로젝트 멤버 목록 조회
   getMembersByProjectId = async (req: Request, res: Response) => {
     const { projectId } = req.params;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
     const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
     if (!userId) {
-      throw new UnauthorizedError('User authentication required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
+    // 페이지네이션 파라미터 파싱 (기본값: page=1, limit=10)
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+
+    // limit과 page 유효성 검사
+    if (limit <= 0 || page <= 0) {
+      throw new BadRequestError('잘못된 요청 형식');
+    }
+
     const result = await this.memberService.getMembersByProjectId(
       parseInt(projectId),
       userId,
       limit,
+      offset,
     );
     res.status(200).json(result);
   };
@@ -93,13 +103,11 @@ export class MemberController {
     const { memberId } = req.params;
     const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
     if (!userId) {
-      throw new UnauthorizedError('User authentication required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
     await this.memberService.removeMember(parseInt(memberId), userId);
-    res.status(200).json({
-      success: true,
-      message: 'Member removed successfully',
-    });
+    // 요구사항에 맞는 응답 형식: 204 No Content (응답 본문 없음)
+    res.status(204).send();
   };
 
   // 프로젝트에서 유저 제외하기

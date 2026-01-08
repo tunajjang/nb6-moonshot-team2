@@ -5,6 +5,7 @@ import {
   MemberNotFoundError,
   MemberUnauthorizedError,
   OwnerCannotLeaveError,
+  ProjectMemberRequiredError,
 } from '@lib';
 
 export class MemberService {
@@ -15,7 +16,7 @@ export class MemberService {
   }
 
   // 프로젝트 멤버 목록 조회
-  async getMembersByProjectId(projectId: number, userId: number, limit?: number) {
+  async getMembersByProjectId(projectId: number, userId: number, limit: number, offset: number) {
     // 프로젝트 존재 여부 확인
     const projectExists = await this.memberRepository.projectExists(projectId);
     if (!projectExists) {
@@ -25,11 +26,11 @@ export class MemberService {
     const isOwner = await this.memberRepository.isProjectOwner(projectId, userId);
     const isMember = await this.memberRepository.isProjectMember(projectId, userId);
     if (!isOwner && !isMember) {
-      throw new MemberUnauthorizedError('You must be a project member to view members');
+      throw new ProjectMemberRequiredError('프로젝트 멤버가 아닙니다');
     }
 
     // 멤버 목록 조회
-    const members = await this.memberRepository.findByProjectId(projectId, limit);
+    const members = await this.memberRepository.findByProjectId(projectId, limit, offset);
     const total = await this.memberRepository.countByProjectId(projectId);
 
     // 요구사항에 맞는 형식으로 변환
@@ -76,13 +77,13 @@ export class MemberService {
     // 프로젝트 소유자만 역할 변경 가능
     const isOwner = await this.memberRepository.isProjectOwner(member.projectId, userId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('Only project owner can change member roles');
+      throw new MemberUnauthorizedError('프로젝트 관리자만 멤버 역할을 변경할 수 있습니다');
     }
     // 자신의 역할을 변경하려는 경우
     if (member.userId === userId && role === 'MEMBER') {
       const ownerCount = await this.memberRepository.countOwners(member.projectId);
       if (ownerCount <= 1) {
-        throw new MemberUnauthorizedError('Project must have at least one owner');
+        throw new MemberUnauthorizedError('프로젝트에는 최소 한 명의 관리자가 있어야 합니다');
       }
     }
     return await this.memberRepository.updateRole(memberId, role);
@@ -99,7 +100,7 @@ export class MemberService {
     const isOwner = await this.memberRepository.isProjectOwner(member.projectId, userId);
     const isSelf = member.userId === userId;
     if (!isOwner && !isSelf) {
-      throw new MemberUnauthorizedError('You can only update your own member status');
+      throw new MemberUnauthorizedError('본인의 멤버 상태만 변경할 수 있습니다');
     }
     return await this.memberRepository.updateStatus(memberId, memberStatus);
   }
@@ -113,13 +114,13 @@ export class MemberService {
     }
     // 자신만 탈퇴 가능
     if (member.userId !== userId) {
-      throw new MemberUnauthorizedError('You can only leave the project yourself');
+      throw new MemberUnauthorizedError('본인만 프로젝트를 탈퇴할 수 있습니다');
     }
     // 프로젝트 소유자는 탈퇴 불가
     if (member.role === 'OWNER') {
       const ownerCount = await this.memberRepository.countOwners(member.projectId);
       if (ownerCount <= 1) {
-        throw new OwnerCannotLeaveError('Project owner cannot leave the project');
+        throw new OwnerCannotLeaveError('프로젝트 관리자는 프로젝트를 탈퇴할 수 없습니다');
       }
     }
     return await this.memberRepository.softDelete(memberId);
@@ -135,17 +136,19 @@ export class MemberService {
     // 프로젝트 소유자만 멤버 제외 가능
     const isOwner = await this.memberRepository.isProjectOwner(member.projectId, userId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('Only project owner can remove members');
+      throw new MemberUnauthorizedError('프로젝트 관리자가 아닙니다');
     }
     // 자신을 제외할 수 없음 (탈퇴는 deleteMember 사용)
     if (member.userId === userId) {
-      throw new MemberUnauthorizedError('You cannot remove yourself. Use leave project instead.');
+      throw new MemberUnauthorizedError(
+        '자신을 제외할 수 없습니다. 프로젝트 탈퇴 기능을 사용하세요.',
+      );
     }
     // 프로젝트 소유자를 제외할 수 없음
     if (member.role === 'OWNER') {
       const ownerCount = await this.memberRepository.countOwners(member.projectId);
       if (ownerCount <= 1) {
-        throw new MemberUnauthorizedError('Cannot remove the only owner of the project');
+        throw new MemberUnauthorizedError('프로젝트의 유일한 관리자는 제외할 수 없습니다');
       }
     }
     return await this.memberRepository.softDelete(memberId);
@@ -161,7 +164,7 @@ export class MemberService {
     // 프로젝트 소유자만 멤버 제외 가능
     const isOwner = await this.memberRepository.isProjectOwner(projectId, requesterId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('Only project owner can remove members');
+      throw new MemberUnauthorizedError('프로젝트 관리자만 멤버를 제외할 수 있습니다');
     }
     // 제외할 멤버 조회
     const member = await this.memberRepository.findByProjectAndUser(projectId, userId);
@@ -170,13 +173,15 @@ export class MemberService {
     }
     // 자신을 제외할 수 없음
     if (member.userId === requesterId) {
-      throw new MemberUnauthorizedError('You cannot remove yourself. Use leave project instead.');
+      throw new MemberUnauthorizedError(
+        '자신을 제외할 수 없습니다. 프로젝트 탈퇴 기능을 사용하세요.',
+      );
     }
     // 프로젝트 소유자를 제외할 수 없음
     if (member.role === 'OWNER') {
       const ownerCount = await this.memberRepository.countOwners(projectId);
       if (ownerCount <= 1) {
-        throw new MemberUnauthorizedError('Cannot remove the only owner of the project');
+        throw new MemberUnauthorizedError('프로젝트의 유일한 관리자는 제외할 수 없습니다');
       }
     }
     return await this.memberRepository.softDelete(member.id);

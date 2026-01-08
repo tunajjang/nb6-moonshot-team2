@@ -33,7 +33,7 @@ export class CommentRepository {
   }
 
   // 특정 태스크의 댓글 목록 조회 (삭제되지 않은 댓글만)
-  async findByTaskId(taskId: number): Promise<Comment[]> {
+  async findByTaskId(taskId: number, limit: number, offset: number): Promise<Comment[]> {
     return await prisma.comment.findMany({
       where: {
         taskId,
@@ -42,6 +42,18 @@ export class CommentRepository {
       include: this.authorInclude,
       orderBy: {
         createdAt: 'asc',
+      },
+      take: limit,
+      skip: offset,
+    });
+  }
+
+  // 특정 태스크의 댓글 개수 조회
+  async countByTaskId(taskId: number): Promise<number> {
+    return await prisma.comment.count({
+      where: {
+        taskId,
+        ...this.notDeletedCondition,
       },
     });
   }

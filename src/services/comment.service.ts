@@ -31,7 +31,7 @@ export class CommentService {
     // 프로젝트 멤버 여부 확인
     const isMember = await this.commentRepository.isProjectMember(projectId, authorId);
     if (!isMember) {
-      throw new ProjectMemberRequiredError('You must be a project member to create comments');
+      throw new ProjectMemberRequiredError('프로젝트 멤버가 아닙니다');
     }
 
     // 댓글 생성
@@ -43,14 +43,58 @@ export class CommentService {
   }
 
   // 특정 태스크의 댓글 목록 조회
-  async getCommentsByTaskId(taskId: number): Promise<Comment[]> {
+  async getCommentsByTaskId(
+    taskId: number,
+    limit: number,
+    offset: number,
+    userId: number,
+  ): Promise<{ comments: Comment[]; total: number }> {
     // 태스크 존재 여부 확인
     const taskExists = await this.commentRepository.taskExists(taskId);
     if (!taskExists) {
       throw new TaskNotFoundError(taskId);
     }
 
-    return await this.commentRepository.findByTaskId(taskId);
+    // 태스크의 프로젝트 ID 조회
+    const projectId = await this.commentRepository.getTaskProjectId(taskId);
+    if (!projectId) {
+      throw new TaskNotFoundError(taskId);
+    }
+
+    // 프로젝트 멤버 여부 확인
+    const isMember = await this.commentRepository.isProjectMember(projectId, userId);
+    if (!isMember) {
+      throw new ProjectMemberRequiredError('프로젝트 멤버가 아닙니다');
+    }
+
+    const [comments, total] = await Promise.all([
+      this.commentRepository.findByTaskId(taskId, limit, offset),
+      this.commentRepository.countByTaskId(taskId),
+    ]);
+
+    return { comments, total };
+  }
+
+  // 단일 댓글 조회
+  async getCommentById(commentId: number, userId: number): Promise<Comment> {
+    const comment = await this.commentRepository.findById(commentId);
+    if (!comment) {
+      throw new CommentNotFoundError(commentId);
+    }
+
+    // 태스크의 프로젝트 ID 조회
+    const projectId = await this.commentRepository.getTaskProjectId(comment.taskId);
+    if (!projectId) {
+      throw new TaskNotFoundError(comment.taskId);
+    }
+
+    // 프로젝트 멤버 여부 확인
+    const isMember = await this.commentRepository.isProjectMember(projectId, userId);
+    if (!isMember) {
+      throw new ProjectMemberRequiredError('프로젝트 멤버가 아닙니다');
+    }
+
+    return comment;
   }
 
   // 댓글 수정
@@ -61,9 +105,21 @@ export class CommentService {
       throw new CommentNotFoundError(commentId);
     }
 
+    // 태스크의 프로젝트 ID 조회
+    const projectId = await this.commentRepository.getTaskProjectId(comment.taskId);
+    if (!projectId) {
+      throw new TaskNotFoundError(comment.taskId);
+    }
+
+    // 프로젝트 멤버 여부 확인
+    const isMember = await this.commentRepository.isProjectMember(projectId, authorId);
+    if (!isMember) {
+      throw new ProjectMemberRequiredError('프로젝트 멤버가 아닙니다');
+    }
+
     // 작성자 확인
     if (comment.authorId !== authorId) {
-      throw new CommentUnauthorizedError('You can only update your own comments');
+      throw new CommentUnauthorizedError('자신이 작성한 댓글만 수정할 수 있습니다');
     }
 
     return await this.commentRepository.update(commentId, content);
@@ -77,9 +133,21 @@ export class CommentService {
       throw new CommentNotFoundError(commentId);
     }
 
+    // 태스크의 프로젝트 ID 조회
+    const projectId = await this.commentRepository.getTaskProjectId(comment.taskId);
+    if (!projectId) {
+      throw new TaskNotFoundError(comment.taskId);
+    }
+
+    // 프로젝트 멤버 여부 확인
+    const isMember = await this.commentRepository.isProjectMember(projectId, authorId);
+    if (!isMember) {
+      throw new ProjectMemberRequiredError('프로젝트 멤버가 아닙니다');
+    }
+
     // 작성자 확인
     if (comment.authorId !== authorId) {
-      throw new CommentUnauthorizedError('You can only delete your own comments');
+      throw new CommentUnauthorizedError('자신이 작성한 댓글만 삭제할 수 있습니다');
     }
 
     return await this.commentRepository.softDelete(commentId);
