@@ -1,5 +1,5 @@
 import { prisma } from '@lib';
-import { Prisma, TaskStatus, Task } from '@prisma/client';
+import { Prisma, TaskStatus, Task, Project, User } from '@prisma/client';
 import { PaginationParams } from '@types';
 
 export const taskRepository = {
@@ -36,8 +36,8 @@ export const taskRepository = {
     });
   },
 
-  findList(
-    projectId: number,
+  async findList(
+    projectId: Project['id'],
     { page, limit, status, assigneeId, order, orderBy, keyword }: PaginationParams,
   ) {
     const where = {
@@ -54,15 +54,28 @@ export const taskRepository = {
       end_date: 'endYear',
     } as const;
 
-    return prisma.task.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { [orderByMap[orderBy]]: order },
-      where,
-    });
+    const [tasks, total] = await prisma.$transaction([
+      prisma.task.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { [orderByMap[orderBy]]: order },
+        where,
+        include: {
+          assignee: {
+            select: { id: true, name: true, email: true, profileImage: true },
+          },
+          taskTags: {
+            include: { tag: true },
+          },
+          attachments: true,
+        },
+      }),
+      prisma.task.count({ where }),
+    ]);
+    return { tasks, total };
   },
 
-  findById(taskId: number) {
+  findById(taskId: Task['id']) {
     return prisma.task.findFirst({
       where: {
         id: taskId,
@@ -71,7 +84,7 @@ export const taskRepository = {
     });
   },
 
-  findByIdWithAuth(taskId: number, userId: number) {
+  findByIdWithAuth(taskId: Task['id'], userId: User['id']) {
     return prisma.task.findFirst({
       where: {
         id: taskId,
@@ -148,7 +161,7 @@ export const taskRepository = {
 //이하는 projectMember를 찾는 임시 코드.
 //차후에 merge할떄 project 폴더내에 있는 member코드를 활용할 예정
 export const projectMemberRepository = {
-  findByProject(projectId: number, userId: number) {
+  findByProject(projectId: Project['id'], userId: User['id']) {
     return prisma.projectMember.findUnique({
       where: {
         projectId_userId: {

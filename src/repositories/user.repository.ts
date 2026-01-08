@@ -90,23 +90,7 @@ export class UserRepository {
       },
     });
 
-    return projects.map((project) => {
-      const todoCount = project.tasks.filter((task) => task.status === 'PENDING').length;
-      const inProgressCount = project.tasks.filter((task) => task.status === 'IN_PROGRESS').length;
-      const doneCount = project.tasks.filter((task) => task.status === 'DONE').length;
-
-      return {
-        id: project.id,
-        name: project.name,
-        description: project.description,
-        memberCount: project._count.projectMembers,
-        todoCount,
-        inProgressCount,
-        doneCount,
-        createdAt: project.createdAt,
-        updatedAt: project.updatedAt,
-      };
-    });
+    return projects;
   }
 
   /**
@@ -132,25 +116,6 @@ export class UserRepository {
       },
       orderBy: { createdAt: 'desc' },
     });
-    // return tasks;
-    return tasks.map((task) => {
-      return {
-        id: task.id,
-        projectId: task.projectId,
-        title: task.title,
-        startYear: task.startYear,
-        startMonth: task.startMonth,
-        startDay: task.startDay,
-        endYear: task.endYear,
-        endMonth: task.endMonth,
-        endDay: task.endDay,
-        status: task.status,
-        assignee: task.assignee,
-        tags: task.taskTags.map((tt) => ({ id: tt.tag.id, name: tt.tag.name })),
-        attachments: task.attachments.map((a) => a.url),
-        createdAt: task.createdAt,
-        updatedAt: task.updatedAt,
-      };
-    });
+    return tasks;
   }
 }

@@ -96,11 +96,46 @@ export const taskService = {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    const taskList = taskRepository.findList(projectId, params);
+    const taskList = await taskRepository.findList(projectId, params);
     if (!taskList) {
       throw new NotFoundError('Task 목록이 존재하지 않습니다');
     }
-    return taskList;
+    const { tasks, total } = await taskRepository.findList(projectId, params);
+
+    const formattedTasks = tasks.map((task) => ({
+      id: task.id,
+      projectId: task.projectId,
+      title: task.title,
+      startYear: task.startYear,
+      startMonth: task.startMonth,
+      startDay: task.startDay,
+      endYear: task.endYear,
+      endMonth: task.endMonth,
+      endDay: task.endDay,
+      status: task.status,
+
+      assignee: task.assignee
+        ? {
+            id: task.assignee.id,
+            name: task.assignee.name,
+            email: task.assignee.email,
+            profileImage: task.assignee.profileImage,
+          }
+        : null,
+      tags: task.taskTags.map((tt) => ({
+        id: tt.tag.id,
+        name: tt.tag.name,
+      })),
+      attachments: task.attachments.map((a) => a.url),
+
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    }));
+
+    return {
+      data: formattedTasks,
+      total: total,
+    };
   },
 
   async deleteTask(id: number, user: AuthUser | null | undefined) {

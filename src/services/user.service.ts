@@ -98,18 +98,60 @@ export class UserService {
    */
   async getMyProjects(userId: User['id']) {
     const projects = await this.userRepository.findProjectsByUserId(userId);
-    // return members.map((member) => member.project);
+
+    const projectList = projects.map((project) => {
+      const todoCount = project.tasks.filter((task) => task.status === 'PENDING').length;
+      const inProgressCount = project.tasks.filter((task) => task.status === 'IN_PROGRESS').length;
+      const doneCount = project.tasks.filter((task) => task.status === 'DONE').length;
+
+      return {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        memberCount: project._count.projectMembers,
+        todoCount,
+        inProgressCount,
+        doneCount,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+      };
+    });
+
     return {
-      data: projects,
-      total: projects.length,
+      data: projectList,
+      total: projectList.length,
     };
   }
 
   /**
-   * 내 태크스 목록 조회
+   * 내 태스크 목록 조회
    */
   async getMyTasks(userId: User['id']) {
     const tasks = await this.userRepository.findTasksByUserId(userId);
-    return tasks;
+
+    const taskList = tasks.map((task) => {
+      return {
+        id: task.id,
+        projectId: task.projectId,
+        title: task.title,
+        startYear: task.startYear,
+        startMonth: task.startMonth,
+        startDay: task.startDay,
+        endYear: task.endYear,
+        endMonth: task.endMonth,
+        endDay: task.endDay,
+        status: task.status,
+        assignee: task.assignee,
+        tags: task.taskTags.map((tt) => ({ id: tt.tag.id, name: tt.tag.name })),
+        attachments: task.attachments.map((a) => a.url),
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
+      };
+    });
+
+    return {
+      data: taskList,
+      total: taskList.length,
+    };
   }
 }
