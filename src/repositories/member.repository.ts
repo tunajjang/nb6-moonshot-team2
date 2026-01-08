@@ -44,7 +44,7 @@ export class MemberRepository {
   }
 
   // 프로젝트 멤버 목록 조회 (삭제되지 않은 멤버만, 초대 정보 포함)
-  async findByProjectId(projectId: number) {
+  async findByProjectId(projectId: number, limit?: number) {
     return await prisma.projectMember.findMany({
       where: {
         projectId,
@@ -53,6 +53,28 @@ export class MemberRepository {
       include: this.userWithInvitationInclude,
       orderBy: {
         createdAt: 'asc',
+      },
+      ...(limit && { take: limit }),
+    });
+  }
+
+  // 프로젝트 멤버 총 개수 조회
+  async countByProjectId(projectId: number): Promise<number> {
+    return await prisma.projectMember.count({
+      where: {
+        projectId,
+        ...this.notDeletedCondition,
+      },
+    });
+  }
+
+  // 멤버의 프로젝트 내 태스크 개수 조회
+  async getTaskCountByProjectAndUser(projectId: number, userId: number): Promise<number> {
+    return await prisma.task.count({
+      where: {
+        projectId,
+        assigneeId: userId,
+        deletedAt: null,
       },
     });
   }

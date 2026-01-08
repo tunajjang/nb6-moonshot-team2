@@ -27,10 +27,15 @@ export class CommentController {
       parseInt(taskId),
       authorId,
     );
-    res.status(201).json({
-      success: true,
-      message: 'Comment created successfully',
-      data: comment,
+    // 요구사항에 맞는 응답 형식으로 변환 (authorId, deletedAt 제외)
+    const { authorId: _, deletedAt: __, ...responseData } = comment as any;
+    res.status(200).json({
+      id: responseData.id,
+      content: responseData.content,
+      taskId: responseData.taskId,
+      author: responseData.author,
+      createdAt: responseData.createdAt,
+      updatedAt: responseData.updatedAt,
     });
   };
 
@@ -38,10 +43,18 @@ export class CommentController {
   getCommentsByTaskId = async (req: Request, res: Response) => {
     const { taskId } = req.params;
     const comments = await this.commentService.getCommentsByTaskId(parseInt(taskId));
+    // 요구사항에 맞는 응답 형식으로 변환 (authorId, deletedAt 제외)
+    const formattedComments = comments.map((comment: any) => ({
+      id: comment.id,
+      content: comment.content,
+      taskId: comment.taskId,
+      author: comment.author,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+    }));
     res.status(200).json({
-      success: true,
-      message: 'Comments retrieved successfully',
-      data: comments,
+      data: formattedComments,
+      total: formattedComments.length,
     });
   };
 

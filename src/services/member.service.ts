@@ -15,7 +15,7 @@ export class MemberService {
   }
 
   // 프로젝트 멤버 목록 조회
-  async getMembersByProjectId(projectId: number, userId: number) {
+  async getMembersByProjectId(projectId: number, userId: number, limit?: number) {
     // 프로젝트 존재 여부 확인
     const projectExists = await this.memberRepository.projectExists(projectId);
     if (!projectExists) {
@@ -27,7 +27,43 @@ export class MemberService {
     if (!isOwner && !isMember) {
       throw new MemberUnauthorizedError('You must be a project member to view members');
     }
-    return await this.memberRepository.findByProjectId(projectId);
+
+    // 멤버 목록 조회
+    const members = await this.memberRepository.findByProjectId(projectId, limit);
+    const total = await this.memberRepository.countByProjectId(projectId);
+
+    // 요구사항에 맞는 형식으로 변환
+    const formattedMembers = await Promise.all(
+      members.map(async (member) => {
+        const taskCount = await this.memberRepository.getTaskCountByProjectAndUser(
+          projectId,
+          member.userId,
+        );
+
+        // memberStatus를 소문자로 변환 (PENDING -> pending, ACCEPTED -> accepted)
+        const status =
+          member.memberStatus === 'PENDING'
+            ? 'pending'
+            : member.memberStatus === 'ACCEPTED'
+            ? 'accepted'
+            : 'rejected';
+
+        return {
+          id: member.user.id,
+          name: member.user.name,
+          email: member.user.email,
+          profileImage: member.user.profileImage,
+          taskCount,
+          status,
+          invitationId: member.invitation?.id || null,
+        };
+      }),
+    );
+
+    return {
+      data: formattedMembers,
+      total,
+    };
   }
 
   // 멤버 역할 변경

@@ -13,16 +13,17 @@ export class MemberController {
   // 프로젝트 멤버 목록 조회
   getMembersByProjectId = async (req: Request, res: Response) => {
     const { projectId } = req.params;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
     const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
     if (!userId) {
       throw new UnauthorizedError('User authentication required');
     }
-    const members = await this.memberService.getMembersByProjectId(parseInt(projectId), userId);
-    res.status(200).json({
-      success: true,
-      message: 'Members retrieved successfully',
-      data: members,
-    });
+    const result = await this.memberService.getMembersByProjectId(
+      parseInt(projectId),
+      userId,
+      limit,
+    );
+    res.status(200).json(result);
   };
 
   // 멤버 역할 변경

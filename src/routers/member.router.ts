@@ -21,6 +21,12 @@ const memberRouter = (memberController: MemberController) => {
    *         schema:
    *           type: integer
    *         description: 프로젝트 ID
+   *       - in: query
+   *         name: limit
+   *         required: false
+   *         schema:
+   *           type: integer
+   *         description: 조회할 멤버 수 제한
    *     responses:
    *       200:
    *         description: 멤버 목록 조회 성공
@@ -29,12 +35,6 @@ const memberRouter = (memberController: MemberController) => {
    *             schema:
    *               type: object
    *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
-   *                 message:
-   *                   type: string
-   *                   example: Members retrieved successfully
    *                 data:
    *                   type: array
    *                   items:
@@ -42,33 +42,31 @@ const memberRouter = (memberController: MemberController) => {
    *                     properties:
    *                       id:
    *                         type: integer
-   *                       role:
+   *                         example: 1
+   *                       name:
    *                         type: string
-   *                         enum: [OWNER, MEMBER]
-   *                       memberStatus:
+   *                         example: 홍길동
+   *                       email:
    *                         type: string
-   *                         enum: [PENDING, ACCEPTED]
-   *                       user:
-   *                         type: object
-   *                         properties:
-   *                           id:
-   *                             type: integer
-   *                           name:
-   *                             type: string
-   *                           email:
-   *                             type: string
-   *                           profileImage:
-   *                             type: string
-   *                             nullable: true
-   *                       invitation:
-   *                         type: object
+   *                         example: user@example.com
+   *                       profileImage:
+   *                         type: string
    *                         nullable: true
-   *                         properties:
-   *                           id:
-   *                             type: string
-   *                           invitationStatus:
-   *                             type: string
-   *                             enum: [PENDING, ACCEPTED, CANCELED]
+   *                         example: https://example.com/profile.jpg
+   *                       taskCount:
+   *                         type: integer
+   *                         example: 5
+   *                       status:
+   *                         type: string
+   *                         enum: [pending, accepted, rejected]
+   *                         example: accepted
+   *                       invitationId:
+   *                         type: string
+   *                         nullable: true
+   *                         example: "550e8400-e29b-41d4-a716-446655440000"
+   *                 total:
+   *                   type: integer
+   *                   example: 10
    *       401:
    *         description: 인증이 필요함
    *       403:

@@ -27,12 +27,6 @@ const commentRouter = (commentController: CommentController) => {
    *             schema:
    *               type: object
    *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
-   *                 message:
-   *                   type: string
-   *                   example: Comments retrieved successfully
    *                 data:
    *                   type: array
    *                   items:
@@ -44,11 +38,15 @@ const commentRouter = (commentController: CommentController) => {
    *                       content:
    *                         type: string
    *                         example: 좋은 아이디어네요!
+   *                       taskId:
+   *                         type: integer
+   *                         example: 1
    *                       author:
    *                         type: object
    *                         properties:
    *                           id:
    *                             type: integer
+   *                             example: 1
    *                           name:
    *                             type: string
    *                             example: 홍길동
@@ -63,6 +61,13 @@ const commentRouter = (commentController: CommentController) => {
    *                         type: string
    *                         format: date-time
    *                         example: 2024-01-01T00:00:00.000Z
+   *                       updatedAt:
+   *                         type: string
+   *                         format: date-time
+   *                         example: 2024-01-01T00:00:00.000Z
+   *                 total:
+   *                   type: integer
+   *                   example: 5
    *       404:
    *         description: 태스크를 찾을 수 없음
    */
@@ -98,43 +103,46 @@ const commentRouter = (commentController: CommentController) => {
    *                 maxLength: 1000
    *                 example: 좋은 아이디어네요!
    *     responses:
-   *       201:
+   *       200:
    *         description: 댓글 생성 성공
    *         content:
    *           application/json:
    *             schema:
    *               type: object
    *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: true
-   *                 message:
+   *                 id:
+   *                   type: integer
+   *                   example: 1
+   *                 content:
    *                   type: string
-   *                   example: Comment created successfully
-   *                 data:
+   *                   example: 좋은 아이디어네요!
+   *                 taskId:
+   *                   type: integer
+   *                   example: 1
+   *                 author:
    *                   type: object
    *                   properties:
    *                     id:
    *                       type: integer
    *                       example: 1
-   *                     content:
+   *                     name:
    *                       type: string
-   *                       example: 좋은 아이디어네요!
-   *                     author:
-   *                       type: object
-   *                       properties:
-   *                         id:
-   *                           type: integer
-   *                         name:
-   *                           type: string
-   *                         email:
-   *                           type: string
-   *                         profileImage:
-   *                           type: string
-   *                           nullable: true
-   *                     createdAt:
+   *                       example: 홍길동
+   *                     email:
    *                       type: string
-   *                       format: date-time
+   *                       example: user@example.com
+   *                     profileImage:
+   *                       type: string
+   *                       nullable: true
+   *                       example: https://example.com/profile.jpg
+   *                 createdAt:
+   *                   type: string
+   *                   format: date-time
+   *                   example: 2024-01-01T00:00:00.000Z
+   *                 updatedAt:
+   *                   type: string
+   *                   format: date-time
+   *                   example: 2024-01-01T00:00:00.000Z
    *       400:
    *         description: 잘못된 요청
    *       401:
