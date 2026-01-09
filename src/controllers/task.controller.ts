@@ -15,8 +15,8 @@ export async function createTask(req: Request, res: Response) {
 
   const data = validate(req.body, CreateTaskBodyStruct);
 
-  const result = await taskService.createTask(data as any, req.user, projectId);
-
+  const createData = await taskService.createTask(data as any, req.user, projectId);
+  const result = await taskService.getTask(createData.id, req.user);
   return res.send(result);
 }
 
@@ -40,7 +40,8 @@ export async function updateTask(req: Request, res: Response) {
   const data = validate(req.body, UpdateTaskBodyStruct);
   const { taskId } = create(req.params, IdParamStruct);
 
-  const result = await taskService.updateTask(data, taskId, req.user);
+  const updateData = await taskService.updateTask(data as any, taskId, req.user);
+  const result = await taskService.getTask(updateData.id, req.user);
   return res.send(result);
 }
 

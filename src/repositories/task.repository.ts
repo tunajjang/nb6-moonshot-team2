@@ -81,6 +81,18 @@ export const taskRepository = {
         id: taskId,
         deletedAt: null,
       },
+      include: {
+        assignee: {
+          select: { id: true, name: true, email: true, profileImage: true },
+        },
+        attachments: true,
+        taskTags: {
+          include: {
+            tag: true,
+          },
+        },
+        project: { select: { id: true } },
+      },
     });
   },
 

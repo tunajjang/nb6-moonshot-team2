@@ -28,6 +28,14 @@ export const taskService = {
       await memberService.validateAssignee(projectId, assigneeId);
     }
 
+    const statusMap: Record<string, 'PENDING' | 'IN_PROGRESS' | 'DONE'> = {
+      todo: 'PENDING',
+      in_progress: 'IN_PROGRESS',
+      done: 'DONE',
+    };
+
+    const backendMappingStatus = statusMap[data.status];
+
     type CreateTaskDbData = CreateTaskData & {
       projectId: number;
       assigneeId: number;
@@ -37,6 +45,7 @@ export const taskService = {
       ...data,
       assigneeId,
       projectId: projectId,
+      status: backendMappingStatus,
     };
 
     return taskRepository.create(createData);
@@ -68,7 +77,17 @@ export const taskService = {
       await memberService.validateAssignee(taskFindById.projectId, data.assigneeId);
     }
 
-    return taskRepository.update(id, data);
+    const updateStatusMap: Record<string, any> = {
+      todo: 'PENDING',
+      in_progress: 'IN_PROGRESS',
+      done: 'DONE',
+    };
+    const dbData = { ...data };
+    if (data.status && updateStatusMap[data.status]) {
+      dbData.status = updateStatusMap[data.status];
+    }
+
+    return taskRepository.update(id, dbData);
   },
 
   async getTask(id: number, user: AuthUser | null | undefined) {

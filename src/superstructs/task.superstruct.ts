@@ -1,7 +1,7 @@
 import * as s from 'superstruct';
 import { integerString } from './common.structs';
 
-const TaskStatusStruct = s.enums(['PENDING', 'IN_PROGRESS', 'DONE']);
+const TaskStatusStruct = s.enums(['todo', 'in_progress', 'done']);
 
 export const GetTaskListParamsStruct = s.object({
   page: s.defaulted(integerString, 1),
