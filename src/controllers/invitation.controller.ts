@@ -77,9 +77,16 @@ export class InvitationController {
     if (!guestId) {
       throw new UnauthorizedError('User authentication required');
     }
-    await this.invitationService.acceptInvitation(invitationId, guestId);
-    // 요구사항에 맞는 응답 형식: 200 OK (응답 본문 없음)
-    res.status(200).send();
+    const acceptedInvitation = await this.invitationService.acceptInvitation(invitationId, guestId);
+    // 프로젝트 정보를 포함한 응답 반환 (프론트엔드에서 프로젝트로 이동할 수 있도록)
+    res.status(200).json({
+      success: true,
+      message: '초대가 수락되었습니다',
+      data: {
+        projectId: acceptedInvitation.project.id,
+        projectName: acceptedInvitation.project.name,
+      },
+    });
   };
 
   // 초대 취소
