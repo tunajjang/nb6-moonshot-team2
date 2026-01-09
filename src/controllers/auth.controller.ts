@@ -14,7 +14,7 @@ export class AuthController {
    */
   signUp = async (req: Request, res: Response) => {
     if (!is(req.body, signUpStruct)) {
-      return res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 요청 형식' });
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 데이터 형식' });
     }
 
     const newUser = await this.authService.signUp(req.body as Prisma.UserCreateInput);
@@ -26,7 +26,7 @@ export class AuthController {
    */
   login = async (req: Request, res: Response) => {
     if (!is(req.body, loginStruct)) {
-      return res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 요청 형식' });
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid input data.' });
     }
     const { email, password } = req.body as Prisma.UserCreateInput;
     const userAgent = req.headers['user-agent'] || 'Unknown User Agent';
@@ -53,7 +53,7 @@ export class AuthController {
   refreshTokens = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
-      throw new AppError('리프레시 토큰이 존재하지 않습니다.', StatusCodes.BAD_REQUEST);
+      throw new AppError('잘못된 요청입니다', StatusCodes.BAD_REQUEST);
     }
 
     const tokens = await this.authService.refreshTokens(refreshToken);

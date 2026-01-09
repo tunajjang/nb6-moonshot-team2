@@ -21,7 +21,7 @@ export class UserController {
   getUserById = async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid user Id' });
+      res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 요청입니다' });
       return;
     }
     const { password, ...userData } = await this.userService.getUserById(userId);

@@ -20,7 +20,7 @@ export class AuthService {
   async signUp(userData: Prisma.UserCreateInput) {
     const existingUser = await this.userRepository.findUserByEmail(userData.email);
     if (existingUser) {
-      throw new AppError('이미 존재하는 이메일입니다.', StatusCodes.CONFLICT);
+      throw new AppError('이미 가입한 이메일입니다.', StatusCodes.CONFLICT);
     }
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const createUser = await this.authRepository.signUp({
@@ -37,11 +37,11 @@ export class AuthService {
   async login(email: User['email'], pw: User['password'], userAgent: Token['userAgent']) {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) {
-      throw new AppError('이메일 또는 비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
+      throw new AppError('존재하지 않거나 비밀번호가 일치하지 않습니다', StatusCodes.UNAUTHORIZED);
     }
     const isPasswordValid = await bcrypt.compare(pw, user.password);
     if (!isPasswordValid) {
-      throw new AppError('이메일 또는 비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
+      throw new AppError('존재하지 않거나 비밀번호가 일치하지 않습니다', StatusCodes.UNAUTHORIZED);
     }
     // 토큰 발급
     const { accessToken, refreshToken } = this._issueToken(user);
@@ -55,7 +55,7 @@ export class AuthService {
       expiresAt,
       user: { connect: { id: user.id } },
     });
-    const { password, ...userInfo } = user;
+    // const { password, ...userInfo } = user;
     // return { user: userInfo, accessToken, refreshToken };
     return { accessToken, refreshToken };
   }
@@ -74,20 +74,20 @@ export class AuthService {
     // 리프래시 토큰 상태 확인
     const foundToken = await this.authRepository.findToken(refreshToken);
     if (!foundToken || foundToken.tokenStatus === TokenStatus.EXPIRED) {
-      throw new AppError('토큰이 유효하지 않습니다.', StatusCodes.UNAUTHORIZED);
+      throw new AppError('토큰 만료', StatusCodes.UNAUTHORIZED);
     }
     const payload = jwt.verify(refreshToken, process.env.JWT_SECRET || '') as {
       id: User['id'];
       email: User['email'];
     };
     if (!payload) {
-      throw new AppError('토큰이 만료되었거나 유효하지 않습니다.', StatusCodes.UNAUTHORIZED);
+      throw new AppError('토큰 만료', StatusCodes.UNAUTHORIZED);
     }
 
     // 사용자 확인
     const user = await this.userRepository.getUserById(payload.id);
     if (!user) {
-      throw new AppError('사용자를 찾을 수 없습니다.', StatusCodes.UNAUTHORIZED);
+      throw new AppError('토큰 만료', StatusCodes.UNAUTHORIZED);
     }
 
     // 토큰 발급
