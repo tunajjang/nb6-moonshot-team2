@@ -75,17 +75,51 @@ export const taskService = {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    const taskFindById = await taskRepository.findById(id);
+    //const taskFindById = await taskRepository.findById(id);
     const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
 
-    if (!taskFindById) {
-      throw new NotFoundError('존재하지 않는 Task번호입니다.');
-    }
+    // if (!taskFindById) {
+    //   throw new NotFoundError('존재하지 않는 Task번호입니다.');
+    // }
 
     if (!taskFindByIdWithAuth) {
       throw new ForbiddenError('프로젝트 멤버가 아닙니다');
     }
-    return taskFindByIdWithAuth;
+
+    const formattedTask = {
+      id: taskFindByIdWithAuth.id,
+      projectId: taskFindByIdWithAuth.projectId,
+      title: taskFindByIdWithAuth.title,
+      startYear: taskFindByIdWithAuth.startYear,
+      startMonth: taskFindByIdWithAuth.startMonth,
+      startDay: taskFindByIdWithAuth.startDay,
+      endYear: taskFindByIdWithAuth.endYear,
+      endMonth: taskFindByIdWithAuth.endMonth,
+      endDay: taskFindByIdWithAuth.endDay,
+      status:
+        taskFindByIdWithAuth.status === 'PENDING'
+          ? 'todo'
+          : taskFindByIdWithAuth.status.toLocaleLowerCase(),
+
+      assignee: taskFindByIdWithAuth.assignee
+        ? {
+            id: taskFindByIdWithAuth.assignee.id,
+            name: taskFindByIdWithAuth.assignee.name,
+            email: taskFindByIdWithAuth.assignee.email,
+            profileImage: taskFindByIdWithAuth.assignee.profileImage,
+          }
+        : null,
+      tags: taskFindByIdWithAuth.taskTags.map((tt) => ({
+        id: tt.tag.id,
+        name: tt.tag.name,
+      })),
+      attachments: taskFindByIdWithAuth.attachments.map((a) => a.url),
+
+      createdAt: taskFindByIdWithAuth.createdAt,
+      updatedAt: taskFindByIdWithAuth.updatedAt,
+    };
+
+    return formattedTask;
   },
 
   async getTaskList(

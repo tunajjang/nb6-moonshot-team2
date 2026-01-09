@@ -98,6 +98,9 @@ export const taskRepository = {
         },
       },
       include: {
+        assignee: {
+          select: { id: true, name: true, email: true, profileImage: true },
+        },
         attachments: true,
         taskTags: {
           include: {
