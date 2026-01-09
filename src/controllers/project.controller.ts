@@ -12,7 +12,7 @@ export class ProjectController {
       throw new UnauthorizedError('인증 정보가 없습니다.');
     }
     const result = await this.projectService.createProject(user.id, req.body);
-    return res.status(201).json(result);
+    return res.status(200).json(result);
   };
 
   getProjectDetail = async (req: Request, res: Response) => {
