@@ -14,7 +14,8 @@ export async function createSubTask(req: Request, res: Response) {
 
   const data = validate(req.body, CreateSubTaskBodyStruct);
 
-  const result = await subTaskService.createSubTask(data, req.user, taskId);
+  const createData = await subTaskService.createSubTask(data, req.user, taskId);
+  const result = await subTaskService.getSubTask(createData.id, req.user);
 
   return res.send(result);
 }
@@ -38,7 +39,9 @@ export async function updateSubTask(req: Request, res: Response) {
   const data = validate(req.body, UpdateSubTaskBodyStruct);
   const { subTaskId } = create(req.params, SubTaskIdParamStruct);
 
-  const result = await subTaskService.updateSubTask(data, req.user, subTaskId);
+  const updateData = await subTaskService.updateSubTask(data, req.user, subTaskId);
+  const result = await subTaskService.getSubTask(updateData.id, req.user);
+
   return res.send(result);
 }
 

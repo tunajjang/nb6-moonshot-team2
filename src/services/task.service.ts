@@ -64,7 +64,7 @@ export const taskService = {
     const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
 
     if (!taskFindById) {
-      throw new NotFoundError('존재하지 않는 Task번호입니다.');
+      throw new NotFoundError('');
     }
 
     if (!taskFindByIdWithAuth) {
@@ -94,12 +94,11 @@ export const taskService = {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    //const taskFindById = await taskRepository.findById(id);
+    const taskFindById = await taskRepository.findById(id);
+    if (!taskFindById) {
+      throw new NotFoundError('');
+    }
     const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
-
-    // if (!taskFindById) {
-    //   throw new NotFoundError('존재하지 않는 Task번호입니다.');
-    // }
 
     if (!taskFindByIdWithAuth) {
       throw new ForbiddenError('프로젝트 멤버가 아닙니다');
@@ -165,14 +164,13 @@ export const taskService = {
       orderBy: args.order_by as PaginationParams['orderBy'],
     };
 
-    // const taskList = await taskRepository.findList(projectId, params);
-    // if (!taskList) {
-    //   throw new NotFoundError('Task 목록이 존재하지 않습니다');
-    // }
+    const taskList = await taskRepository.findList(projectId, params);
+    if (!taskList) {
+      throw new NotFoundError('');
+    }
     const { tasks, total } = await taskRepository.findList(projectId, params);
 
     const formattedTasks = tasks.map((task) => ({
-      id: task.id,
       projectId: task.projectId,
       title: task.title,
       startYear: task.startYear,
@@ -213,11 +211,10 @@ export const taskService = {
     }
 
     const taskFindById = await taskRepository.findById(id);
-    const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
-
     if (!taskFindById) {
-      throw new NotFoundError('존재하지 않는 Task번호입니다.');
+      throw new NotFoundError('');
     }
+    const taskFindByIdWithAuth = await taskRepository.findByIdWithAuth(id, user.id);
 
     if (!taskFindByIdWithAuth) {
       throw new ForbiddenError('프로젝트 멤버가 아닙니다');

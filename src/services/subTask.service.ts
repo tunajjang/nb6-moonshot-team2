@@ -1,8 +1,11 @@
-import { SubTask } from '@prisma/client';
-import { subTaskRepository } from '@repositories';
+import { SubTask, TaskStatus } from '@prisma/client';
+import { subTaskRepository, taskRepository } from '@repositories';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
 
-type CreateSubTaskData = Omit<SubTask, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'taskId'>;
+type CreateSubTaskData = Omit<
+  SubTask,
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'taskId' | 'status'
+>;
 type UpdateSubTaskData = Partial<CreateSubTaskData>;
 
 export const subTaskService = {
@@ -17,11 +20,18 @@ export const subTaskService = {
 
     type CreateSubTaskDbData = CreateSubTaskData & {
       taskId: number;
+      status: TaskStatus;
     };
+
+    const parentTask = await taskRepository.findById(taskId);
+    if (!parentTask) {
+      throw new NotFoundError('부모 할일을 찾을 수 없습니다.');
+    }
 
     const createData: CreateSubTaskDbData = {
       ...data,
       taskId: taskId,
+      status: parentTask.status,
     };
 
     return subTaskRepository.create(createData);
@@ -45,11 +55,11 @@ export const subTaskService = {
     }
 
     const subTaskFindById = await subTaskRepository.findById(subTaskId);
-    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
-
     if (!subTaskFindById) {
-      throw new NotFoundError('존재하지 않는 Task번호입니다.');
+      throw new NotFoundError('');
     }
+
+    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
 
     if (!subTaskFindByIdWithAuth) {
       throw new ForbiddenError('프로젝트 멤버가 아닙니다');
@@ -64,11 +74,11 @@ export const subTaskService = {
     }
 
     const subTaskFindById = await subTaskRepository.findById(subTaskId);
-    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
-
     if (!subTaskFindById) {
-      throw new NotFoundError('존재하지 않는 Task번호입니다.');
+      throw new NotFoundError('');
     }
+
+    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
 
     if (!subTaskFindByIdWithAuth) {
       throw new ForbiddenError('프로젝트 멤버가 아닙니다');
@@ -81,17 +91,30 @@ export const subTaskService = {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    const subTaskFindById = await subTaskRepository.findById(subTaskId);
-    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
 
+    const subTaskFindById = await subTaskRepository.findById(subTaskId);
     if (!subTaskFindById) {
-      throw new NotFoundError('존재하지 않는 Task번호입니다.');
+      throw new NotFoundError('');
     }
+
+    const subTaskFindByIdWithAuth = await subTaskRepository.findByIdWithAuth(subTaskId, user.id);
 
     if (!subTaskFindByIdWithAuth) {
       throw new ForbiddenError('프로젝트 멤버가 아닙니다');
     }
 
-    return subTaskFindByIdWithAuth;
+    const formattedSubTask = {
+      id: subTaskFindByIdWithAuth.id,
+      title: subTaskFindByIdWithAuth.title,
+      taskId: subTaskFindByIdWithAuth.taskId,
+      status:
+        subTaskFindByIdWithAuth.status === 'PENDING'
+          ? 'todo'
+          : subTaskFindByIdWithAuth.status.toLocaleLowerCase(),
+      createdAt: subTaskFindByIdWithAuth.createdAt,
+      updatedAt: subTaskFindByIdWithAuth.updatedAt,
+    };
+
+    return formattedSubTask;
   },
 };
