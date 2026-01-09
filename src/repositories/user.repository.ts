@@ -65,32 +65,68 @@ export class UserRepository {
   /**
    * 내가 멤버로 속한 프로젝트 목록 조회
    */
-  async findProjectsByUserId(userId: User['id']) {
-    const projects = await this.prisma.project.findMany({
-      where: {
-        projectMembers: {
-          some: {
-            userId,
-            deletedAt: null,
+  async findProjectsByUserId(
+    userId: User['id'],
+    params: { page: number; limit: number; orderBy: any },
+  ) {
+    const { page, limit, orderBy } = params;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.ProjectWhereInput = {
+      projectMembers: {
+        some: {
+          userId,
+          deletedAt: null,
+        },
+      },
+      deletedAt: null,
+    };
+
+    const [total, data] = await this.prisma.$transaction([
+      this.prisma.project.count({ where }),
+      this.prisma.project.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          _count: {
+            select: { projectMembers: { where: { deletedAt: null } } },
+          },
+          tasks: {
+            where: { deletedAt: null },
+            select: { status: true },
           },
         },
-        deletedAt: null,
-      },
-      include: {
-        _count: {
-          select: { projectMembers: { where: { deletedAt: null } } },
-        },
-        tasks: {
-          where: { deletedAt: null },
-          select: { status: true },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy, //use dynamic orderBy
+      }),
+    ]);
+    return { total, data };
 
-    return projects;
+    // const projects = await this.prisma.project.findMany({
+    //   where: {
+    //     projectMembers: {
+    //       some: {
+    //         userId,
+    //         deletedAt: null,
+    //       },
+    //     },
+    //     deletedAt: null,
+    //   },
+    //   include: {
+    //     _count: {
+    //       select: { projectMembers: { where: { deletedAt: null } } },
+    //     },
+    //     tasks: {
+    //       where: { deletedAt: null },
+    //       select: { status: true },
+    //     },
+    //   },
+    //   orderBy: {
+    //     createdAt: 'desc',
+    //   },
+    // });
+
+    // return projects;
   }
 
   /**

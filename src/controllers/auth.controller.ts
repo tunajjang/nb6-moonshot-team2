@@ -51,11 +51,21 @@ export class AuthController {
    * 리프레시 토큰 재발급
    */
   refreshTokens = async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
-      throw new AppError('잘못된 요청입니다', StatusCodes.BAD_REQUEST);
+    // const { refreshToken } = req.body;
+    // if (!refreshToken) {
+    //   throw new AppError('잘못된 요청입니다', StatusCodes.BAD_REQUEST);
+    // }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new AppError('토큰이 유효하지 않습니다.', StatusCodes.BAD_REQUEST);
     }
 
+    const refreshToken = authHeader.split(' ')[1]; // 'Bearer ' 이후의 토큰 값만 분리
+
+    if (!refreshToken) {
+      throw new AppError('토큰이 유효하지 않습니다.', StatusCodes.BAD_REQUEST);
+    }
     const tokens = await this.authService.refreshTokens(refreshToken);
     return res.status(StatusCodes.OK).json(tokens);
   };

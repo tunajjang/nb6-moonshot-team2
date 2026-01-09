@@ -1,9 +1,9 @@
 import { is, create } from 'superstruct';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { EmailStruct, GetMyTasksQueryStruct } from '@superstructs';
 import { UserService } from '@services';
-import { GetMyTasksQuery } from '@types';
+import { EmailStruct, GetMyTasksQueryStruct, GetMyProjectsQueryStruct } from '@superstructs';
+import { GetMyTasksQuery, GetMyProjectsQuery } from '@types';
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -74,7 +74,7 @@ export class UserController {
   findUserByEmail = async (req: Request, res: Response) => {
     const email = req.query.email as string;
     if (!is(email, EmailStruct)) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: 'Email is required' });
+      res.status(StatusCodes.BAD_REQUEST).json({ message: '존재하지 않는 이메일 입니다.' });
       return;
     }
     const { password, ...userData } = await this.userService.findUserByEmail(email);
@@ -84,7 +84,8 @@ export class UserController {
   // 내 프로젝트 목록 보기
   getMyProjects = async (req: Request, res: Response) => {
     const userId = req.user?.id as number;
-    const projects = await this.userService.getMyProjects(userId);
+    const query = create(req.query, GetMyProjectsQueryStruct) as GetMyProjectsQuery;
+    const projects = await this.userService.getMyProjects(userId, query);
     return res.status(StatusCodes.OK).json(projects);
   };
 

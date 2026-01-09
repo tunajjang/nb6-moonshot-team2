@@ -97,18 +97,9 @@ export const authRouter = (authController: AuthController) => {
    *   post:
    *     summary: 리프래시 토큰 재발급
    *     tags: [Auth]
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             required:
-   *               - refreshToken
-   *             properties:
-   *               refreshToken:
-   *                 type: string
-   *                 example: eyJhbGciOiJIUzI1NiIsI...
+   *     security:
+   *       - bearerAuth: [] # [추가] Authorization 헤더에 Refresh Token을 넣어주세요
+   *     # [제거] requestBody 섹션 전체 제거
    *     responses:
    *       200:
    *         description: OK - 리프래시 토큰 재발급 성공
@@ -119,10 +110,8 @@ export const authRouter = (authController: AuthController) => {
    *               properties:
    *                 accessToken:
    *                   type: string
-   *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    *                 refreshToken:
    *                   type: string
-   *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    *       401:
    *         description: Unauthorized - 토큰이 유효하지 않습니다.
    */

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { UserRepository } from '@repositories';
 import { NotFoundError, AppError } from '@lib';
 import { StatusCodes } from 'http-status-codes';
-import { UpdateUserRequest, GetMyTasksQuery } from '@types';
+import { UpdateUserRequest, GetMyTasksQuery, GetMyProjectsQuery } from '@types';
 
 export class UserService {
 constructor(private userRepository: UserRepository) {}
@@ -14,12 +14,12 @@ constructor(private userRepository: UserRepository) {}
   async verifyPassword(userId: User['id'], password: User['password']) {
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
-      throw new NotFoundError('User Not Found!');
+      throw new NotFoundError('존재하지 않는 유저입니다');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new AppError('비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
+      throw new AppError('로그인이 필요합니다', StatusCodes.UNAUTHORIZED);
     }
     return true;
   }
@@ -30,7 +30,7 @@ constructor(private userRepository: UserRepository) {}
   async getUserById(userId: User['id']) {
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
-      throw new NotFoundError('User not found!');
+      throw new NotFoundError('존재하지 않는 유저입니다');
     }
     const { deletedAt, ...userData } = user;
     return userData;
@@ -43,7 +43,7 @@ constructor(private userRepository: UserRepository) {}
     const user = await this.getUserById(userId);
     const isPassword = await bcrypt.compare(userData.currentPassword, user.password);
     if (!isPassword) {
-      throw new AppError('현재 비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
+      throw new AppError('로그인이 필요합니다', StatusCodes.UNAUTHORIZED);
     }
 
     const updateData: any = {};
@@ -87,7 +87,7 @@ constructor(private userRepository: UserRepository) {}
   async findUserByEmail(email: User['email']) {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('존재하지 않는 유저입니다');
     }
     const { deletedAt, ...userData } = user;
     return userData;
@@ -96,10 +96,23 @@ constructor(private userRepository: UserRepository) {}
   /**
    * 내 프로젝트 목록 조회
    */
-  async getMyProjects(userId: User['id']) {
-    const projects = await this.userRepository.findProjectsByUserId(userId);
+  async getMyProjects(userId: User['id'], query: GetMyProjectsQuery) {
+    const { page, limit, order, order_by } = query;
 
-    const projectList = projects.map((project) => {
+    let prismaOrderBy: any = { createdAt: order };
+    if (order_by === 'name') {
+      prismaOrderBy = { name: order };
+    }
+
+    const { data, total } = await this.userRepository.findProjectsByUserId(userId, {
+      page,
+      limit,
+      orderBy: prismaOrderBy,
+    });
+
+    // const projects = await this.userRepository.findProjectsByUserId(userId);
+
+    const projectList = data.map((project) => {
       const todoCount = project.tasks.filter((task) => task.status === 'PENDING').length;
       const inProgressCount = project.tasks.filter((task) => task.status === 'IN_PROGRESS').length;
       const doneCount = project.tasks.filter((task) => task.status === 'DONE').length;
@@ -119,7 +132,7 @@ constructor(private userRepository: UserRepository) {}
 
     return {
       data: projectList,
-      total: projectList.length,
+      total, //: projectList.length,
     };
   }
 
