@@ -4,6 +4,18 @@ import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
 import { taskRepository } from '@repositories';
 import { MemberService } from '@services';
 
+//구글 api 호출 코드
+import { google } from 'googleapis';
+import { GoogleCalendarError } from '@/lib/errors/google.error';
+
+const auth = new google.auth.JWT({
+  email: process.env.GOOGLE_CLIENT_EMAIL,
+  key: process.env.GOOGLE_PRIVATE_KEY,
+  scopes: ['https://www.googleapis.com/auth/calendar'],
+});
+//calendar의 events(insert/delete등)을 다루는 인스턴스
+const calendar = google.calendar({ version: 'v3', auth });
+
 type CreateTaskData = Omit<
   Task,
   'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'projectId' | 'assigneeId'
@@ -221,5 +233,49 @@ export const taskService = {
     }
 
     return taskRepository.delete(id);
+  },
+
+  //구글 캘린더 연동
+  //task 담당자의 계정 email이 gmail일 시 구글에서 담당자의 계정에 task가 캘린더에 반영되도록 만듬
+
+  async assignTaskToUser(taskId: number, assigneeId: number) {
+    const task = await taskRepository.findByIdWithAuth(taskId, assigneeId);
+    if (!task) {
+      throw new NotFoundError('');
+    }
+
+    const assigneeEmail = task.assignee.email;
+
+    if (assigneeEmail.endsWith('@gmail.com')) {
+      try {
+        const startDate = `${task.startYear}-${String(task.startMonth).padStart(2, '0')}-${String(
+          task.startDay,
+        ).padStart(2, '0')}`;
+        //구글 날짜 규칙에 따라 끝나는 날에는 +1을 해줘야 원하는 식으로 나타남
+        const endDay = task.endDay + 1;
+        const endDate = `${task.endYear}-${String(task.endMonth).padStart(2, '0')}-${String(
+          endDay,
+        ).padStart(2, '0')}`;
+
+        //구글 캘린더 API 호출
+        await calendar.events.insert({
+          calendarId: 'primary',
+          sendUpdates: 'all',
+          requestBody: {
+            summary: `[할 일] ${task.title}`,
+            start: {
+              date: startDate,
+            },
+            end: {
+              date: endDate,
+            },
+            attendees: [{ email: assigneeEmail }],
+          },
+        });
+      } catch (err: any) {
+        console.error('Google API Detail: ', err.response?.data || err.message);
+        throw new GoogleCalendarError();
+      }
+    }
   },
 };
