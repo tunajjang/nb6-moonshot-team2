@@ -4,6 +4,26 @@ import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
 import { taskRepository } from '@repositories';
 import { MemberService } from '@services';
 
+
+import { JWT } from 'google-auth-library';
+import { calendar as googleCalendar } from '@googleapis/calendar';
+import { GoogleCalendarError } from '@/lib/errors/google.error';
+
+// 1. 인증 객체 생성 (JWT 클래스 직접 사용)
+const authClient = new JWT({
+  email: process.env.GOOGLE_CLIENT_EMAIL,
+  // .env의 \n 문자를 실제 줄바꿈으로 치환해줘야 인증 에러가 나지 않습니다.
+  key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  scopes: ['https://www.googleapis.com/auth/calendar'],
+});
+
+// 2. 캘린더 인스턴스 생성
+// google.calendar() 대신 임포트한 googleCalendar() 함수를 사용합니다.
+const calendar = googleCalendar({ 
+  version: 'v3', 
+  auth: authClient 
+});
+
 type CreateTaskData = Omit<
   Task,
   'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'projectId' | 'assigneeId'
@@ -221,5 +241,49 @@ export const taskService = {
     }
 
     return taskRepository.delete(id);
+  },
+
+  //구글 캘린더 연동
+  //task 담당자의 계정 email이 gmail일 시 구글에서 담당자의 계정에 task가 캘린더에 반영되도록 만듬
+
+  async assignTaskToUser(taskId: number, assigneeId: number) {
+    const task = await taskRepository.findByIdWithAuth(taskId, assigneeId);
+    if (!task) {
+      throw new NotFoundError('');
+    }
+
+    const assigneeEmail = task.assignee.email;
+
+    if (assigneeEmail.endsWith('@gmail.com')) {
+      try {
+        const startDate = `${task.startYear}-${String(task.startMonth).padStart(2, '0')}-${String(
+          task.startDay,
+        ).padStart(2, '0')}`;
+        //구글 날짜 규칙에 따라 끝나는 날에는 +1을 해줘야 원하는 식으로 나타남
+        const endDay = task.endDay + 1;
+        const endDate = `${task.endYear}-${String(task.endMonth).padStart(2, '0')}-${String(
+          endDay,
+        ).padStart(2, '0')}`;
+
+        //구글 캘린더 API 호출
+        await calendar.events.insert({
+          calendarId: 'primary',
+          sendUpdates: 'all',
+          requestBody: {
+            summary: `[할 일] ${task.title}`,
+            start: {
+              date: startDate,
+            },
+            end: {
+              date: endDate,
+            },
+            //attendees: [{ email: assigneeEmail }],
+          },
+        });
+      } catch (err: any) {
+        console.error('Google API Detail: ', err.response?.data || err.message);
+        throw new GoogleCalendarError();
+      }
+    }
   },
 };

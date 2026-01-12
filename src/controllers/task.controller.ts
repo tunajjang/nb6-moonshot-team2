@@ -8,15 +8,21 @@ import {
   GetTaskListParamsStruct,
   UpdateTaskBodyStruct,
 } from '@superstructs';
-import { validate } from '@lib';
+import { UnauthorizedError, validate } from '@lib';
 
 export async function createTask(req: Request, res: Response) {
+  if (!req.user) {
+    throw new UnauthorizedError('로그인이 필요한 서비스입니다');
+  }
+
   const { projectId } = create(req.params, ProjectIdParamStruct);
 
   const data = validate(req.body, CreateTaskBodyStruct);
 
   const createData = await taskService.createTask(data as any, req.user, projectId);
   const result = await taskService.getTask(createData.id, req.user);
+
+  await taskService.assignTaskToUser(createData.id, req.user.id);
   return res.send(result);
 }
 

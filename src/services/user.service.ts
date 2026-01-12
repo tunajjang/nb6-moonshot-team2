@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { UpdateUserRequest, GetMyTasksQuery } from '@types';
 
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+constructor(private userRepository: UserRepository) {}
 
   /**
    * 비밀번호 검증
