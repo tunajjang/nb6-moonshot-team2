@@ -435,6 +435,13 @@ const commentRouter = (commentController: CommentController) => {
     asyncHandler(commentController.updateComment),
   );
 
+  router.patch(
+    '/comments/:commentId',
+    authenticate,
+    ...UpdateCommentSchema,
+    asyncHandler(commentController.updateComment),
+  );
+
   /**
    * @swagger
    * /api/comments/{commentId}:
