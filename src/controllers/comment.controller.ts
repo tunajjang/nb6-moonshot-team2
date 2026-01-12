@@ -6,8 +6,8 @@ import { UnauthorizedError, BadRequestError } from '@lib';
 export class CommentController {
   private commentService: CommentService;
 
-  constructor(commentService: CommentService) {
-    this.commentService = new CommentService();
+  constructor(commentService?: CommentService) {
+    this.commentService = commentService || new CommentService();
   }
 
   // 댓글 생성
