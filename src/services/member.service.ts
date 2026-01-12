@@ -164,7 +164,7 @@ export class MemberService {
     // 프로젝트 소유자만 멤버 제외 가능
     const isOwner = await this.memberRepository.isProjectOwner(projectId, requesterId);
     if (!isOwner) {
-      throw new MemberUnauthorizedError('프로젝트 관리자만 멤버를 제외할 수 있습니다');
+      throw new MemberUnauthorizedError('프로젝트 관리자가 아닙니다');
     }
     // 제외할 멤버 조회
     const member = await this.memberRepository.findByProjectAndUser(projectId, userId);

@@ -68,7 +68,7 @@ router.route('/').get((req, res) => {
   res.send('ok');
 });
 
-router.use('/api', commentRouter(commentController));
+router.use('/', commentRouter(commentController));
 router.use('/auth', authRouter(authController));
 router.use('/users', userRouter(userController));
 router.use('/projects', projectRouter(projectController, memberController, invitationController));

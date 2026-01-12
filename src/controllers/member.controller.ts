@@ -41,7 +41,7 @@ export class MemberController {
     const { memberId } = req.params;
     const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
     if (!userId) {
-      throw new UnauthorizedError('User authentication required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
     // 요청 데이터 검증
     const errors = validationResult(req);
@@ -65,7 +65,7 @@ export class MemberController {
     const { memberId } = req.params;
     const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
     if (!userId) {
-      throw new UnauthorizedError('User authentication required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
     // 요청 데이터 검증
     const errors = validationResult(req);
@@ -89,7 +89,7 @@ export class MemberController {
     const { memberId } = req.params;
     const userId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
     if (!userId) {
-      throw new UnauthorizedError('User authentication required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
     await this.memberService.deleteMember(parseInt(memberId), userId);
     res.status(200).json({
@@ -115,16 +115,14 @@ export class MemberController {
     const { projectId, userId } = req.params;
     const requesterId = req.user?.id; // 인증 미들웨어에서 설정된 사용자 ID
     if (!requesterId) {
-      throw new UnauthorizedError('User authentication required');
+      throw new UnauthorizedError('로그인이 필요합니다');
     }
     await this.memberService.removeUserFromProject(
       parseInt(projectId),
       parseInt(userId),
       requesterId,
     );
-    res.status(200).json({
-      success: true,
-      message: 'User removed from project successfully',
-    });
+    // 요구사항에 맞는 응답 형식: 204 No Content (응답 본문 없음)
+    res.status(204).send();
   };
 }
