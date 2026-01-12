@@ -14,7 +14,7 @@ export class AuthController {
    */
   signUp = async (req: Request, res: Response) => {
     if (!is(req.body, signUpStruct)) {
-      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid input data.' });
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 요청 형식' });
     }
 
     const newUser = await this.authService.signUp(req.body as Prisma.UserCreateInput);
@@ -26,7 +26,7 @@ export class AuthController {
    */
   login = async (req: Request, res: Response) => {
     if (!is(req.body, loginStruct)) {
-      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid input data.' });
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 요청 형식' });
     }
     const { email, password } = req.body as Prisma.UserCreateInput;
     const userAgent = req.headers['user-agent'] || 'Unknown User Agent';

@@ -46,7 +46,7 @@ export class MemberController {
     // 요청 데이터 검증
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      throw new BadRequestError('Invalid input');
+      throw new BadRequestError('잘못된 요청 형식');
     }
     const member = await this.memberService.updateMemberRole(
       parseInt(memberId),
@@ -70,7 +70,7 @@ export class MemberController {
     // 요청 데이터 검증
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      throw new BadRequestError('Invalid input');
+      throw new BadRequestError('잘못된 요청 형식');
     }
     const member = await this.memberService.updateMemberStatus(
       parseInt(memberId),
