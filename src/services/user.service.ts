@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { UpdateUserRequest, GetMyTasksQuery, GetMyProjectsQuery } from '@types';
 
 export class UserService {
-constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: UserRepository) {}
 
   /**
    * 비밀번호 검증
@@ -19,7 +19,7 @@ constructor(private userRepository: UserRepository) {}
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new AppError('로그인이 필요합니다', StatusCodes.UNAUTHORIZED);
+      throw new AppError('비밀번호가 일치하지 않습니다.', StatusCodes.UNAUTHORIZED);
     }
     return true;
   }

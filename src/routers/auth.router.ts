@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { asyncHandler } from '@middlewares';
 import { AuthController } from '@controllers';
+import { uploadMulti } from '@middlewares';
 
 export const authRouter = (authController: AuthController) => {
   const router = Router();
@@ -37,7 +38,7 @@ export const authRouter = (authController: AuthController) => {
    *       400:
    *         description: 잘못된 요청
    */
-  router.route('/register').post(asyncHandler(authController.signUp));
+  router.route('/register').post(uploadMulti, asyncHandler(authController.signUp));
 
   /**
    * @swagger

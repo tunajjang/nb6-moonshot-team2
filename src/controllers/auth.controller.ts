@@ -13,6 +13,9 @@ export class AuthController {
    * 회원가입
    */
   signUp = async (req: Request, res: Response) => {
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      req.body.profileImage = req.files[0].filename;
+    }
     if (!is(req.body, signUpStruct)) {
       return res.status(StatusCodes.BAD_REQUEST).json({ message: '잘못된 데이터 형식' });
     }

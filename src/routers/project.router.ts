@@ -7,7 +7,7 @@ import {
   getTaskList,
 } from '@controllers';
 import { CreateInvitationSchema } from '@superstructs';
-import { authenticate, asyncHandler } from '@middlewares';
+import { authenticate, asyncHandler, uploadMulti } from '@middlewares';
 
 export const projectRouter = (
   projectController: ProjectController,
@@ -234,7 +234,7 @@ export const projectRouter = (
   router.delete('/:projectId', asyncHandler(projectController.deleteProject));
 
   //아래는 Task 생성/목록조회 라우터
-  router.post('/:projectId/tasks', authenticate, asyncHandler(createTask));
+  router.post('/:projectId/tasks', authenticate, uploadMulti, asyncHandler(createTask));
   router.get('/:projectId/tasks', authenticate, asyncHandler(getTaskList));
 
   return router;

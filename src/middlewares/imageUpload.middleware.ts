@@ -4,7 +4,6 @@ import crypto from 'crypto';
 import { Request } from 'express';
 import fs from 'fs';
 
-
 const UPLOAD_DIR = path.resolve(process.cwd(), 'uploads');
 
 //서버 시작시 이미지를 저장할 UPLOAD 폴더가 존재하지 않으면 폴더를 생성하도록 만듬
@@ -46,4 +45,6 @@ export const uploadMulti = multer({
   storage,
   fileFilter,
   limits,
-}).array('images', 10);
+}).any(); //array('images', 10);
+
+export const uploadNone = multer().none();
