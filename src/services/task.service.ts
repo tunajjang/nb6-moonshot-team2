@@ -4,17 +4,25 @@ import { ForbiddenError, NotFoundError, UnauthorizedError } from '@lib';
 import { taskRepository } from '@repositories';
 import { MemberService } from '@services';
 
-//구글 api 호출 코드
-import { google } from 'googleapis';
+
+import { JWT } from 'google-auth-library';
+import { calendar as googleCalendar } from '@googleapis/calendar';
 import { GoogleCalendarError } from '@/lib/errors/google.error';
 
-const auth = new google.auth.JWT({
+// 1. 인증 객체 생성 (JWT 클래스 직접 사용)
+const authClient = new JWT({
   email: process.env.GOOGLE_CLIENT_EMAIL,
-  key: process.env.GOOGLE_PRIVATE_KEY,
+  // .env의 \n 문자를 실제 줄바꿈으로 치환해줘야 인증 에러가 나지 않습니다.
+  key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
   scopes: ['https://www.googleapis.com/auth/calendar'],
 });
-//calendar의 events(insert/delete등)을 다루는 인스턴스
-const calendar = google.calendar({ version: 'v3', auth });
+
+// 2. 캘린더 인스턴스 생성
+// google.calendar() 대신 임포트한 googleCalendar() 함수를 사용합니다.
+const calendar = googleCalendar({ 
+  version: 'v3', 
+  auth: authClient 
+});
 
 type CreateTaskData = Omit<
   Task,
@@ -269,7 +277,7 @@ export const taskService = {
             end: {
               date: endDate,
             },
-            attendees: [{ email: assigneeEmail }],
+            //attendees: [{ email: assigneeEmail }],
           },
         });
       } catch (err: any) {
