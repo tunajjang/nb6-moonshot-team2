@@ -6,7 +6,7 @@ function throwBadRequest(err: unknown): never {
   if (err instanceof StructError) {
     //StructError는 superstruct가 검증 실패시 던지는 전용 에러
     //instance of는 객체가 특정 클래스의 인스턴스인지 확인하는 연산자
-    throw new BadRequestError('잘못된 형식의 데이터입니다.');
+    throw new BadRequestError('잘못된 요청 형식');
   }
   throw err;
 }

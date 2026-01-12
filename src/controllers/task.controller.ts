@@ -74,7 +74,7 @@ export async function updateTask(req: Request, res: Response) {
 
 export async function deleteTask(req: Request, res: Response) {
   const { taskId } = validate(req.params, IdParamStruct);
-  const result = await taskService.deleteTask(taskId, req.user);
+  await taskService.deleteTask(taskId, req.user);
 
-  return res.send(result);
+  return res.status(204).send();
 }

@@ -41,8 +41,18 @@ export const subTaskService = {
     if (!user) {
       throw new UnauthorizedError('로그인이 필요합니다.');
     }
-    const subTaskList = subTaskRepository.findList(taskId);
-    return subTaskList;
+    const { subTaskList, total } = await subTaskRepository.findList(taskId);
+
+    const formetSubTaskList = (await subTaskList).map((subtask) => ({
+      id: subtask.id,
+      title: subtask.title,
+      taskId: subtask.taskId,
+      status: subtask.status === 'PENDING' ? 'todo' : subtask.status.toLocaleLowerCase(),
+    }));
+    return {
+      data: formetSubTaskList,
+      total: total,
+    };
   },
 
   async updateSubTask(

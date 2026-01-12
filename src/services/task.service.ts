@@ -191,6 +191,7 @@ export const taskService = {
     const { tasks, total } = await taskRepository.findList(projectId, params);
 
     const formattedTasks = tasks.map((task) => ({
+      id: task.id,
       projectId: task.projectId,
       title: task.title,
       startYear: task.startYear,

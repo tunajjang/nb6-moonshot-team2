@@ -6,13 +6,17 @@ export const subTaskRepository = {
     return prisma.subTask.create({ data });
   },
 
-  findList(taskId: number) {
-    return prisma.subTask.findMany({
-      where: {
-        taskId: taskId,
-        deletedAt: null,
-      },
-    });
+  async findList(taskId: number) {
+    const [subTaskList, total] = await prisma.$transaction([
+      prisma.subTask.findMany({
+        where: {
+          taskId: taskId,
+          deletedAt: null,
+        },
+      }),
+      prisma.subTask.count({ where: { taskId: taskId, deletedAt: null } }),
+    ]);
+    return { subTaskList, total };
   },
 
   findById(subTaskId: number) {

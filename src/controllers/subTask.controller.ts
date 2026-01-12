@@ -47,7 +47,7 @@ export async function updateSubTask(req: Request, res: Response) {
 
 export async function deleteSubTask(req: Request, res: Response) {
   const { subTaskId } = validate(req.params, SubTaskIdParamStruct);
-  const result = await subTaskService.deleteSubTask(subTaskId, req.user);
+  await subTaskService.deleteSubTask(subTaskId, req.user);
 
-  return res.send(result);
+  return res.status(204).send();
 }
