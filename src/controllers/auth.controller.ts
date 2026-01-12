@@ -86,14 +86,38 @@ export class AuthController {
   // };
   googleAuthCallback = async (req: Request, res: Response) => {
     const { code } = req.query;
-    if (!code) {
-      throw new AppError('인증 코드가 없습니다.', StatusCodes.BAD_REQUEST);
-    }
+    if (!code) throw new AppError('인증 코드가 없습니다', StatusCodes.BAD_REQUEST);
+
     const result = await this.authService.googleLogin(code as string);
 
-    // JSON 응답 대신, URL 뒤에 토큰을 붙여서 리다이렉트
-    const redirectUrl = `http://localhost:3001/projects?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}`;
+    // 1. 지금이 배포 환경인지 확인 production 이 배포환경
+    const isProduction = process.env.NODE_ENV === 'production';
 
-    return res.status(StatusCodes.OK).redirect(redirectUrl);
+    // 2. 프론트엔드 주소 결정 (배포 주소 vs 로컬 주소)
+    // .env 파일에 FRONTEND_URL을 등록해두고 불러오는 게 가장 좋습니다.
+    const frontendUrl = isProduction
+      ? process.env.FRONTEND_URL // <- .env파일에 등록 했으면 사용 (그렇지 않다면 예: https://moonshot.vercel.app)
+      : 'http://localhost:3001';
+
+    // 3. 쿠키 설정 (배포 시 Secure 필수)
+    const cookieOption = {
+      httpOnly: false, // 프론트엔드 axios 로직 때문에 false 유지 = 프론트엔드가 쿠키에서 토큰을 가져오는 방식으로 사용했기 때문
+      secure: isProduction, // 배포(https)면 true, 아니면 false
+      sameSite: isProduction ? 'none' : 'lax', // 배포 시 도메인이 다르면 'none' 필수
+      path: '/',
+      maxAge: 3600000,
+      // domain: '.moonshot.com', // (선택) 프론트/백엔드 상위 도메인이 같으면 설정
+    };
+
+    // 타입 이슈가 있다면 as any 사용 (지워보니까 타입 이슈 있어서 any 사용)
+    res.cookie('access-token', result.accessToken, cookieOption as any);
+
+    res.cookie('refresh-token', result.refreshToken, {
+      ...cookieOption,
+      maxAge: 7 * 24 * 3600000,
+    } as any);
+
+    // 4. 결정된 주소로 리다이렉트
+    return res.redirect(`${frontendUrl}/projects`);
   };
 }
