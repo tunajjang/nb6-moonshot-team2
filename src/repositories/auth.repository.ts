@@ -57,7 +57,11 @@ export class AuthRepository {
   /**
    * 소셜 로그인 유저 생성
    */
-  async createSocialUser(userData: { email: User['email']; name: User['name'] }) {
+  async createSocialUser(userData: {
+    email: User['email'];
+    name: User['name'];
+    profileImage: User['profileImage'];
+  }) {
     return await this.prisma.user.create({
       data: { ...userData, password: '' },
     });

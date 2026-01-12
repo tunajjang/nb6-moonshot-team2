@@ -159,6 +159,7 @@ export class AuthService {
       user = await this.authRepository.createSocialUser({
         email: googleUser.email,
         name: googleUser.name,
+        profileImage: googleUser.picture,
       });
     }
 
